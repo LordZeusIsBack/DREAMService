@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MaxValueValidator
 
 # Create your models here.
 class Seller(User):
@@ -28,3 +29,26 @@ class Estate(models.Model):
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
 
     def __str__(self): return self.name
+
+
+class VerificationDetails(models.Model):
+    aadhaar_card = models.ImageField(upload_to='pictures/seller/verification/aadhaar', null=True, blank=True)
+    aadhaar_number = models.IntegerField(validators=[MaxValueValidator(999999999999)], unique=True, editable=False)
+    pan_card = models.ImageField(upload_to='pictures/seller/verification/pan', null=True, blank=True)
+    pan_number = models.CharField(max_length=10, unique=True, editable=False)
+
+    class Mets:
+        abstract = True
+
+
+class SellerVerification(VerificationDetails):
+    seller = models.OneToOneField(Seller, on_delete=models.CASCADE)
+    gstin = models.IntegerField(validators=[MaxValueValidator(9999999999)], unique=True, editable=False)
+
+    def __str__(self): return self.seller.business_name
+
+
+class BuyerVerification(VerificationDetails):
+    buyer = models.OneToOneField(Buyer, on_delete=models.CASCADE)
+
+    def __str__(self): return self.buyer.username
