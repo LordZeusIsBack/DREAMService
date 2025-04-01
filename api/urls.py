@@ -2,6 +2,5 @@ from django.urls import path
 import api.views as views
 
 urlpatterns = [
-    path('index-checking', views.index, name='index'),
-    path('model-checking', views.seller_models, name='seller_model'),
+    path('view-seller-model', views.seller_model_data, name='seller_model'),
 ]
