@@ -1,9 +1,15 @@
 asgiref==3.8.1
+dataclasses==0.6
 Django==5.1.6
 djangorestframework==3.15.2
+djongo==1.2.31
+dnspython==2.7.0
+dotenv==0.9.9
 pillow==11.1.0
 psycopg2==2.9.10
+pymongo==4.11.3
 python-dateutil==2.9.0.post0
+python-dotenv==1.1.0
 pytz==2025.1
 six==1.17.0
 sqlparse==0.5.3
