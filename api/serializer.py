@@ -12,4 +12,4 @@ class SellerSerializer(serializers.ModelSerializer):
     verification = SellerVerificationSerializer(source='sellerverification', read_only=True)
     class Meta:
         model = models.Seller
-        fields = ('first_name', 'last_name', 'email', 'phone_number', 'username', 'business_name', 'verification')
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'business_name', 'verification')
