@@ -13,11 +13,9 @@ def seller_model_data(r):
 
 @api_view(['PUT', 'PATCH'])
 def seller_model_update(r):
-    try:
-        seller_id = r.data['id']
-    except KeyError:
-        return Response({'status': 'error', 'data': 'Seller ID not provided'},
-                        status=status.HTTP_400_BAD_REQUEST)
+    try: seller_id = r.data['id']
+    except KeyError: return Response({'status': 'error', 'data': 'Seller ID not provided'},
+                                     status=status.HTTP_400_BAD_REQUEST)
     seller_obj = get_object_or_404(models.Seller, id=seller_id)
     partial_update = r.method == 'PATCH'
     serializer = SellerSerializer(seller_obj, data=r.data, partial=partial_update)
@@ -27,3 +25,13 @@ def seller_model_update(r):
                         status=status.HTTP_200_OK)
     return Response({'status': 'error', 'data': serializer.errors},
                         status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+def seller_model_delete(r):
+    try: seller_id = r.data['id']
+    except KeyError: return Response({'status': 'error', 'data': 'Seller ID not provided'},
+                                     status=status.HTTP_400_BAD_REQUEST)
+    seller_obj = get_object_or_404(models.Seller, id=seller_id)
+    seller_obj.delete()
+    return Response({'status': 'success', 'data': f'Seller with ID {seller_id} has been deleted'},
+                    status=status.HTTP_200_OK)
