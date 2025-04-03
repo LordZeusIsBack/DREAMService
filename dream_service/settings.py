@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "api",
     "seller_data",
-    "buyer_data"
+    "buyer_data",
+    "common"
 ]
 
 MIDDLEWARE = [
