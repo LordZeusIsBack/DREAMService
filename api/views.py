@@ -17,6 +17,9 @@ def process_serializer(serializer_class, data, instance=None, success_status=sta
     return serializer_instance.errors, status.HTTP_400_BAD_REQUEST
 
 @api_view(['GET'])
+def model_data(r): return Response(serializer.SellerSerializer(models.Seller.objects.all(), many=True).data)
+
+@api_view(['GET'])
 def seller_model_data(r, seller_id): return Response(serializer.SellerSerializer(get_object_or_404(models.Seller, id=seller_id)).data)
 
 @api_view(['PUT'])
