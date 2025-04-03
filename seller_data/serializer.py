@@ -1,5 +1,5 @@
 from rest_framework import serializers
-import api.models as models
+import seller_data.models as models
 
 
 class SellerVerificationSerializer(serializers.ModelSerializer):
