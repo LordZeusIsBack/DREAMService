@@ -20,3 +20,8 @@ def update_seller_data(request, seller_id):
     seller = get_object_or_404(models.Seller, id=seller_id)
     data, resp_status = process_serializer(serializer.SellerSerializer, instance=seller, data=request.data)
     return Response(data, status=resp_status)
+
+@api_view(['POST'])
+def add_seller(r):
+    data, resp_status = process_serializer(serializer.SellerSerializer, data=r.data)
+    return Response(data, status=resp_status)
