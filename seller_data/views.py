@@ -28,7 +28,7 @@ def add_seller(r):
     return Response(data, status=resp_status)
 
 @api_view(['DELETE'])
-def delete_user(r, seller_id):
+def delete_seller(r, seller_id):
     obj = get_object_or_404(models.Seller, id=seller_id)
     obj.is_deleted = True
     obj.save()
