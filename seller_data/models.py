@@ -15,4 +15,3 @@ class SellerVerification(VerificationMixin):
     gstin = models.BigIntegerField(validators=[MaxValueValidator(9999999999)], unique=True, editable=False)
 
     def __str__(self): return self.seller.business_name
-
