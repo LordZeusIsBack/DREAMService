@@ -17,9 +17,9 @@ def seller_data(r, seller_id):
     return Response(serial_instance.data)
 
 @api_view(['PUT'])
-def update_seller_data(request, seller_id):
+def update_seller_data(r, seller_id):
     seller = get_object_or_404(models.Seller, id=seller_id)
-    data, resp_status = process_serializer(serializer.SellerSerializer, instance=seller, data=request.data)
+    data, resp_status = process_serializer(serializer.SellerSerializer, r.data, instance=seller)
     return Response(data, status=resp_status)
 
 @api_view(['POST'])
