@@ -5,5 +5,5 @@ import buyer_data.serializer as serializer
 from rest_framework.response import Response
 
 # Create your views here.
-@api_view(['GET'])
-def view_buyer_model(r): return Response(serializer.BuyerSerializer(models.Buyer.objects.all()).data)
+@api_view(['GET', 'HEAD'])
+def view_buyer_model(r): return Response(serializer.BuyerSerializer(models.Buyer.objects.all(), many=True).data)
