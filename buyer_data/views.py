@@ -1,3 +1,9 @@
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import api_view
+import buyer_data.models as models
+import buyer_data.serializer as serializer
+from rest_framework.response import Response
 
 # Create your views here.
+@api_view(['GET'])
+def view_buyer_model(r): return Response(serializer.BuyerSerializer(models.Buyer.objects.all()).data)
