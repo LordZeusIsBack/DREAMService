@@ -5,7 +5,7 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 class UserExtensionMixin(models.Model):
     is_deleted = models.BooleanField(default=False)
     profile_picture = models.ImageField(upload_to='pictures/seller', null=True, blank=True)
-    phone_number = models.CharField(max_length=10, unique=True, null=True, blank=True, editable=False)
+    phone_number = models.CharField(max_length=10, unique=True, null=True, blank=True)
     is_verified = models.BooleanField(default=False, editable=False)
 
     class Meta:
