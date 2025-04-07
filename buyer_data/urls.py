@@ -3,4 +3,5 @@ import buyer_data.views as views
 
 urlpatterns = [
     path('view-buyer-data', views.view_buyer_model, name='view_buyer_model'),
+    path('view-buyer/<str:buyer_email>', views.view_buyer_model, name='view_buyer_model'),
 ]
