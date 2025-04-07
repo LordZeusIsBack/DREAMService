@@ -1,5 +1,6 @@
 from rest_framework import serializers
 import seller_data.models as models
+from rest_framework.exceptions import ValidationError
 
 
 class SellerVerificationSerializer(serializers.ModelSerializer):
@@ -15,19 +16,18 @@ class SellerSerializer(serializers.ModelSerializer):
     verification = SellerVerificationSerializer(source='sellerverification', read_only=False)
     class Meta:
         model = models.Seller
-        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'business_name', 'verification')
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'business_name', 'password',
+                  'verification')
 
     def create(self, validated_data):
-        # Extract nested verification data using the source key 'sellerverification'
         verification_data = validated_data.pop('sellerverification', None)
-
-        # Create the Seller instance using the remaining validated data
+        password = validated_data.pop('password', None)
+        if not (password and verification_data):
+            return ValidationError({'error': 'Both password and verification data are required.'})
         seller = models.Seller.objects.create(**validated_data)
-
-        # If verification data is provided, create the SellerVerification record linked to the seller
-        if verification_data:
-            models.SellerVerification.objects.create(seller=seller, **verification_data)
-
+        seller.set_password(password)
+        seller.save()
+        models.SellerVerification.objects.create(seller=seller, **verification_data)
         return seller
 
     def update(self, instance, validated_data):
