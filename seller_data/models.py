@@ -5,7 +5,7 @@ from common.models import UserExtensionMixin, VerificationMixin
 
 # Create your models here.
 class Seller(User, UserExtensionMixin):
-    business_name = models.CharField(max_length=100)
+    business_name = models.CharField(max_length=100, editable=False)
 
     def __str__(self): return self.business_name
 
