@@ -33,6 +33,8 @@ class SellerSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         validated_data.pop('sellerverification', None)
+        new_password = validated_data.pop('password', None)
         for attr, value in validated_data.items(): setattr(instance, attr, value)
+        if new_password: instance.set_password(new_password)
         instance.save()
         return instance
