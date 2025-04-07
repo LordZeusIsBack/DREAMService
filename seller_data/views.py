@@ -10,7 +10,7 @@ from common.views import process_serializer
 @api_view(['GET'])
 def seller_data(r, seller_id): return Response(serializer.SellerSerializer(get_object_or_404(models.Seller, id=seller_id, is_deleted=False)).data)
 
-@api_view(['PUT'])
+@api_view(['PUT', 'PATCH'])
 def update_seller_data(r, seller_id):
     seller = get_object_or_404(models.Seller, id=seller_id)
     data, resp_status = process_serializer(serializer.SellerSerializer, r.data, instance=seller)
