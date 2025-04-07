@@ -14,6 +14,7 @@ class SellerVerificationSerializer(serializers.ModelSerializer):
 
 class SellerSerializer(serializers.ModelSerializer):
     verification = SellerVerificationSerializer(source='sellerverification', read_only=False)
+    password = serializers.CharField(write_only=True)
     class Meta:
         model = models.Seller
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'business_name', 'password',
