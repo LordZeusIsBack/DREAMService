@@ -9,6 +9,6 @@ class Buyer(User, UserExtensionMixin):
 
 
 class BuyerVerification(VerificationMixin):
-    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE)
+    buyer = models.OneToOneField(Buyer, on_delete=models.CASCADE)
 
     def __str__(self): return f"{self.buyer.first_name} {self.buyer.last_name}"
