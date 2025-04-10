@@ -7,7 +7,7 @@ class BuyerVerificationSerializer(serializers.ModelSerializer):
     """
     Serializer for buyer verification.
     """
-    aadhaar_card = serializers.IntegerField()
+    aadhaar_number = serializers.IntegerField()
     pan_number = serializers.CharField()
     class Meta:
         model = models.BuyerVerification
@@ -27,9 +27,19 @@ class BuyerSerializer(BaseUserSerializer):
         """
         Create a new buyer instance.
         """
-        return self.create_user(
+        return BaseUserSerializer.create_user(
             validated_data,
             models.Buyer,
             models.BuyerVerification,
+            'verification'
+        )
+
+    def update(self, instance, validated_data):
+        """
+        Update an existing buyer instance.
+        """
+        return BaseUserSerializer.update_user(
+            instance,
+            validated_data,
             'verification'
         )
