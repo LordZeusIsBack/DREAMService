@@ -1,5 +1,6 @@
 from rest_framework import serializers
 import seller_data.models as models
+from common.serializer import BaseUserSerializer
 from rest_framework.exceptions import ValidationError
 
 
@@ -12,31 +13,32 @@ class SellerVerificationSerializer(serializers.ModelSerializer):
         fields = ('gstin', 'aadhaar_number', 'pan_number')
 
 
-class SellerSerializer(serializers.ModelSerializer):
+class SellerSerializer(BaseUserSerializer):
+    """
+    Serializer for seller model.
+    """
     verification = SellerVerificationSerializer(source='sellerverification', read_only=False)
-    password = serializers.CharField(write_only=True, required=False)
     business_name = serializers.CharField()
-    phone_number = serializers.CharField()
-    class Meta:
+
+    class Meta(BaseUserSerializer.Meta):
         model = models.Seller
-        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'business_name', 'password',
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'business_name', 'username', 'password',
                   'verification')
 
     def create(self, validated_data):
-        verification_data = validated_data.pop('sellerverification', None)
-        password = validated_data.pop('password', None)
-        if not (password and verification_data):
-            return ValidationError({'error': 'Both password and verification data are required.'})
-        seller = models.Seller.objects.create(**validated_data)
-        seller.set_password(password)
-        seller.save()
-        models.SellerVerification.objects.create(seller=seller, **verification_data)
-        return seller
+        return BaseUserSerializer.create_user(
+            validated_data,
+            models.Seller,
+            models.SellerVerification,
+            'sellerverification'
+        )
 
     def update(self, instance, validated_data):
-        validated_data.pop('sellerverification', None)
-        new_password = validated_data.pop('password', None)
-        for attr, value in validated_data.items(): setattr(instance, attr, value)
-        if new_password: instance.set_password(new_password)
-        instance.save()
-        return instance
+        """
+        Update an existing seller instance.
+        """
+        return BaseUserSerializer.update_user(
+            instance,
+            validated_data,
+            'sellerverification'
+        )
