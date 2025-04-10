@@ -25,3 +25,14 @@ class BaseUserSerializer(serializers.ModelSerializer):
 
         verification_model.objects.create(**{user_model.__name__.lower(): user_instance}, **verification_data)
         return user_instance
+
+    def update_user(self, instance, validated_data, verification_field):
+        """
+        Update an existing user instance.
+        """
+        validated_data.pop(verification_field, None)
+        new_password = validated_data.pop('password', None)
+        for attr, value in validated_data.items(): setattr(instance, attr, value)
+        if new_password: instance.set_password(new_password)
+        instance.save()
+        return instance
