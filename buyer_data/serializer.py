@@ -31,7 +31,7 @@ class BuyerSerializer(BaseUserSerializer):
             validated_data,
             models.Buyer,
             models.BuyerVerification,
-            'verification'
+            'buyerverification'
         )
 
     def update(self, instance, validated_data):
@@ -41,5 +41,5 @@ class BuyerSerializer(BaseUserSerializer):
         return BaseUserSerializer.update_user(
             instance,
             validated_data,
-            'verification'
+            'buyerverification'
         )
