@@ -1,7 +1,6 @@
 from rest_framework import serializers
 import seller_data.models as models
 from common.serializer import BaseUserSerializer
-from rest_framework.exceptions import ValidationError
 
 
 class SellerVerificationSerializer(serializers.ModelSerializer):
