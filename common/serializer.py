@@ -11,7 +11,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
     class Meta:
         abstract = True
 
-    def create_user(self, validated_data, user_model, verification_model, verification_field):
+    @staticmethod
+    def create_user(validated_data, user_model, verification_model, verification_field):
         """
         Create a new user instance.
         """
@@ -26,7 +27,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
         verification_model.objects.create(**{user_model.__name__.lower(): user_instance}, **verification_data)
         return user_instance
 
-    def update_user(self, instance, validated_data, verification_field):
+    @staticmethod
+    def update_user(instance, validated_data, verification_field):
         """
         Update an existing user instance.
         """
