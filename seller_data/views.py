@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 import seller_data.serializer as serializer
 import seller_data.models as models
-import rest_framework.status as status
+from rest_framework.status import HTTP_204_NO_CONTENT
 from django.shortcuts import get_object_or_404
 from common.views import process_serializer
 
@@ -26,4 +26,4 @@ def delete_seller(r, seller_username):
     obj = get_object_or_404(models.Seller, username=seller_username, is_deleted=False)
     obj.is_deleted = True
     obj.save()
-    return Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(status=HTTP_204_NO_CONTENT)
