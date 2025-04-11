@@ -15,12 +15,12 @@ def buyer_data(r, buyer_username): return Response(serializer.BuyerSerializer(ge
 
 @api_view(['PUT', 'PATCH'])
 def update_buyer_data(r, buyer_username):
-    seller = get_object_or_404(models.Buyer, username=buyer_username, is_deleted=False)
-    data, resp_status = process_serializer(serializer.BuyerSerializer, r.data, instance=seller)
+    obj = get_object_or_404(models.Buyer, username=buyer_username, is_deleted=False)
+    data, resp_status = process_serializer(serializer.BuyerSerializer, r.data, instance=obj)
     return Response(data, status=resp_status)
 
 @api_view(['DELETE'])
-def delete_seller(r, buyer_username):
+def delete_buyer(r, buyer_username):
     obj = get_object_or_404(models.Buyer, username=buyer_username, is_deleted=False)
     obj.is_deleted = True
     obj.save()
