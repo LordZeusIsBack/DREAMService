@@ -13,13 +13,13 @@ class UserExtensionMixin(models.Model):
 
 
 class VerificationMixin(models.Model):
-    aadhaar_card = models.ImageField(upload_to='pictures/seller/verification/aadhaar', null=True, blank=True)
+    aadhaar_card = models.ImageField(upload_to='pictures/seller/verification/aadhaar')
     aadhaar_number = models.BigIntegerField(
         validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
         unique=True,
         editable=False
     )
-    pan_card = models.ImageField(upload_to='pictures/seller/verification/pan', null=True, blank=True)
+    pan_card = models.ImageField(upload_to='pictures/seller/verification/pan')
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
 
     class Meta:
