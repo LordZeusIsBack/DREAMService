@@ -6,7 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import seller_data.models as models
 import seller_data.serializer as serializer
-from common.views import process_serializer, send_password_reset_email
+from common.views import process_serializer, send_password_reset_email, reset_user_password
 
 # Create your views here.
 @api_view(['GET'])
@@ -41,3 +41,14 @@ def forgot_password(r):
         if 'success' in response: return Response(response, status=status.HTTP_200_OK)
         return Response(response, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except models.Seller.DoesNotExist: return Response({'success': 'If the email is registered, you will receive a password reset email.'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password(r):
+    uid = r.GET.get('uid')
+    token = r.GET.get('token')
+    new_password = r.GET.get('password')
+    if not (uid and token and new_password): return Response({'error': 'All fields are required'}, status=status.HTTP_400_BAD_REQUEST)
+    response = reset_user_password(uid, token, new_password, models.Seller)
+    if 'success' in response: return Response(response, status=status.HTTP_200_OK)
+    return Response(response, status=status.HTTP_400_BAD_REQUEST)
