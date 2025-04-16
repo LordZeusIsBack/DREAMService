@@ -7,9 +7,6 @@ from common.views import process_serializer
 from rest_framework.status import HTTP_204_NO_CONTENT
 
 # Create your views here.
-@api_view(['GET', 'HEAD'])
-def view_buyer_model(r): return Response(serializer.BuyerSerializer(models.Buyer.objects.all(), many=True).data)
-
 @api_view(['GET'])
 def buyer_data(r, buyer_username): return Response(serializer.BuyerSerializer(get_object_or_404(models.Buyer, username=buyer_username, is_deleted=False)).data)
 
