@@ -77,3 +77,28 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             )
             return Response({'success': 'Password reset mail has been sent!'}, status=status.HTTP_200_OK)
         except Exception as e: return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    """Serializer for confirming a password reset."""
+    uid, token, new_password = serializers.CharField(), serializers.CharField(), serializers.CharField(write_only=True)
+
+    @staticmethod
+    def validate_password(value):
+        """
+        Validates the new password.
+        """
+        if len(value) < 8: raise serializers.ValidationError('Password must be at least 8 characters long.')
+        return value
+
+    def reset_password(self, user_model):
+        uid, token, password = self.validated_data['uid'], self.validated_data['token'], self.validated_data['password']
+        try:
+            pk = force_str(urlsafe_base64_decode(uid))
+            user = user_model.objects.get(pk=pk)
+            if not default_token_generator.check_token(user, token): return Response({'error': 'Invalid token or expired link.'}, status=status.HTTP_400_BAD_REQUEST)
+            user.set_password(password)
+            user.save()
+            return Response({'success': 'Your Password has been successfully changed!'}, status=status.HTTP_200_OK)
+        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist): return Response({'error': 'Invalid token or expired link.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e: return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
