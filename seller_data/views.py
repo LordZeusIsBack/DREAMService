@@ -6,6 +6,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 import seller_data.models as models
 import seller_data.serializer as seller_serializer
+import common.serializer as common_serializer
 from common.views import process_serializer
 
 # Create your views here.
@@ -29,3 +30,14 @@ def delete_seller(r, seller_username):
     obj.is_deleted = True
     obj.save()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def forgot_password(r):
+    serializer_instance = common_serializer.PasswordResetRequestSerializer(data=r.data)
+    if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
+    email = serializer_instance.validated_data['email']
+    try:
+        seller = models.Seller.objects.get(email=email, is_deleted=False)
+        return serializer_instance.send_password_reset_email(seller, settings.FRONTEND_URL)
+    except models.Seller.DoesNotExist: return Response({'success': 'If the email is registered, you will receive a password reset email.'}, status=status.HTTP_200_OK)
