@@ -41,3 +41,10 @@ def forgot_password(r):
         seller = models.Seller.objects.get(email=email, is_deleted=False)
         return serializer_instance.send_password_reset_email(seller, settings.FRONTEND_URL)
     except models.Seller.DoesNotExist: return Response({'success': 'If the email is registered, you will receive a password reset email.'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def reset_password(r):
+    serializer_instance = common_serializer.PasswordResetConfirmSerializer(data=r.data)
+    if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
+    return serializer_instance.reset_password(models.Seller)
