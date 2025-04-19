@@ -1,12 +1,10 @@
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
-import rest_framework.status as status
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.conf import settings
-from rest_framework.response import Response
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """
@@ -61,7 +59,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
         :param frontend_url: The frontend URL where the reset link will redirect.
         """
         try:
-            token = default_token_generator(user)
+            token = default_token_generator.make_token(user)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
             reset_link = f"{frontend_url}/reset-password/{uid}/{token}/"
             send_mail(
@@ -70,18 +68,20 @@ class PasswordResetRequestSerializer(serializers.Serializer):
                 f'You requested a password reset for your account. '
                 f'Please click the following link to set a new password:\n\n'
                 f'{reset_link}\n\n'
-                f'This link will expire in 24 hours.',
+                f'This link will expire in 1 hour.',
                 settings.DEFAULT_FROM_EMAIL,
                 [user.email],
                 fail_silently=False
             )
-            return Response({'success': 'Password reset mail has been sent!'}, status=status.HTTP_200_OK)
-        except Exception as e: return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return True, 'Password reset mail has been sent!'
+        except Exception as e: return False, str(e)
 
 
 class PasswordResetConfirmSerializer(serializers.Serializer):
     """Serializer for confirming a password reset."""
-    uid, token, new_password = serializers.CharField(), serializers.CharField(), serializers.CharField(write_only=True)
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True, required=True)
 
     @staticmethod
     def validate_password(value):
@@ -92,13 +92,15 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return value
 
     def reset_password(self, user_model):
-        uid, token, password = self.validated_data['uid'], self.validated_data['token'], self.validated_data['password']
+        uid = self.validated_data['uid']
+        token = self.validated_data['token']
+        new_password = self.validated_data['new_password']
         try:
             pk = force_str(urlsafe_base64_decode(uid))
             user = user_model.objects.get(pk=pk)
-            if not default_token_generator.check_token(user, token): return Response({'error': 'Invalid token or expired link.'}, status=status.HTTP_400_BAD_REQUEST)
-            user.set_password(password)
+            if not default_token_generator.check_token(user, token): return False , 'Invalid token or expired link.'
+            user.set_password(new_password)
             user.save()
-            return Response({'success': 'Your Password has been successfully changed!'}, status=status.HTTP_200_OK)
-        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist): return Response({'error': 'Invalid token or expired link.'}, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e: return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return True, 'Your Password has been successfully changed!'
+        except (TypeError, ValueError, OverflowError, user_model.DoesNotExist): return False, 'Invalid token or expired link.'
+        except Exception as e: return False, str(e)
