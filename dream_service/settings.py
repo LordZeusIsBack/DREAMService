@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     "api",
     "seller_data",
     "buyer_data",
-    "common"
+    "common",
+    "estate_data"
 ]
 
 MIDDLEWARE = [
