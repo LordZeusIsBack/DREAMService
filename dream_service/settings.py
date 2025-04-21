@@ -16,6 +16,8 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+GDAL_LIBRARY_PATH = r"C:\Users\ASUS\anaconda3\envs\Django-Practice\Library\bin\gdal.dll"
+GDAL_DATA = r"C:\Users\ASUS\anaconda3\envs\Django-Practice\Library\share\gdal"
 load_dotenv()
 
 # Quick-start development settings - unsuitable for production
