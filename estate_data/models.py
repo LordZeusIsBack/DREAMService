@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.gis.db import models as gis_models
 from seller_data.models import Seller
 
 # Create your models here.
@@ -24,6 +25,7 @@ class Estate(models.Model):
         ('rented', 'Rented'),
         ('pending', 'Pending')
     ])
+    location = gis_models.PointField(geography=True)
 
     def __str__(self): return f"{self.estate_name} - {self.estate_type}"
 
