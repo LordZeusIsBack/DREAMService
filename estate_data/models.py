@@ -39,7 +39,8 @@ class Estate(models.Model):
     def __str__(self): return f"{self.estate_name} - {self.estate_type}"
 
     def save(self, *args, **kwargs):
-        if not self.slug: self.slug = slugify(self.estate_name)
+        uuid_lst = str(uuid4()).split('-')
+        if not self.slug: self.slug = uuid_lst[0] + slugify(self.estate_name) + uuid_lst[-1]
         if not self.location: self.location = Point(75.33986000, 19.88467000, srid=4326)
         return super().save(*args, **kwargs)
 
