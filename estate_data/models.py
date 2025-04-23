@@ -6,8 +6,6 @@ from django.utils.text import slugify
 
 def estate_image_path(instance, filename): return f'picture/estate_images/{instance.estate.slug}/{filename}'
 
-def default_point(): return Point(75.33986000, 19.88467000, srid=4326)
-
 # Create your models here.
 class Estate(models.Model):
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
