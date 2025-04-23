@@ -1,3 +1,4 @@
+from uuid import uuid4
 from django.db import models
 from django.contrib.gis.db import models as gis_models
 from django.contrib.gis.geos import Point
@@ -38,7 +39,13 @@ class Estate(models.Model):
 
     def save(self, *args, **kwargs):
         uuid_lst = str(uuid4()).split('-')
-        if not self.slug: self.slug = uuid_lst[0] + slugify(self.estate_name) + uuid_lst[-1]
+        if not self.slug:
+            base_slug = uuid_lst[0] + slugify(self.estate_name) + uuid_lst[-1]
+            num = 1
+            while self.__class__.objects.filter(slug=base_slug).exists():
+                base_slug = f"{uuid_lst[0]}-{slugify(self.estate_name)}-{num}-{uuid_lst[-1]}"
+                num += 1
+            self.slug = base_slug
         if not self.location: self.location = Point(75.33986000, 19.88467000, srid=4326)
         return super().save(*args, **kwargs)
 
