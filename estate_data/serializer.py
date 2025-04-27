@@ -13,7 +13,7 @@ class EstateSerializer(serializers.ModelSerializer):
     images = EstateImageSerializer(many=True, read_only=True)
     class Meta:
         model = models.Estate
-        fields = ['seller', 'estate_name', 'estate_type', 'estate_price', 'status', 'location', 'images']
+        fields = ['seller', 'estate_name', 'estate_type', 'estate_price', 'status', 'slug', 'location', 'images']
 
     def create(self, validated_data):
         estate = models.Estate.objects.create(**validated_data)
