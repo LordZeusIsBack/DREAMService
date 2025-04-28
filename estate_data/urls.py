@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path
 from estate_data import views
 urlpatterns = [
     path('estate-details/<str:estate_slug>', views.get_estate_data, name='estate_details'),
