@@ -1,5 +1,5 @@
-import models
-from serializer import EstateSerializer
+import estate_data.models as models
+from estate_data.serializer import EstateSerializer
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework.parsers import MultiPartParser, FormParser
