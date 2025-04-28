@@ -22,3 +22,12 @@ class EstateSerializer(serializers.ModelSerializer):
             image_files = request.FILES.getlist('images')
             for image_file in image_files: models.EstateImage.objects.create(estate=estate, image=image_file)
         return estate
+
+    def update(self, instance, validated_data):
+        for attr, value in validated_data.items(): setattr(instance, attr, value)
+        instance.save()
+        request = self.context.get('request')
+        if request and request.FILES:
+            image_files = request.FILES.getlist('images')
+            for image_file in image_files: models.EstateImage.objects.create(estate=instance, image=image_file)
+        return instance
