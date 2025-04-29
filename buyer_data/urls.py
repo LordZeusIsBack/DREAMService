@@ -7,5 +7,6 @@ urlpatterns = [
     path('add-buyer', views.add_buyer, name='add_buyer'),
     path('delete-buyer/<str:buyer_username>', views.delete_buyer, name='delete_buyer'),
     path('forgot-password/', views.buyer_forgot_password, name='buyer_forgot_password'),
-    path('forgot-password/', views.buyer_reset_password, name='buyer_reset_password'),
+    path('reset-password/', views.buyer_reset_password, name='buyer_reset_password'),
+    path('buyer-login/', views.buyer_login, name='buyer_login'),
 ]
