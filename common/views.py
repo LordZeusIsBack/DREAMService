@@ -1,4 +1,6 @@
 import rest_framework.status as status
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
@@ -37,3 +39,24 @@ def handle_password_reset_conformation(request_data, model_class, serializer_cla
     success, message = serializer_instance.reset_password(model_class)
     if success: return Response({'success': message}, status=status.HTTP_200_OK)
     return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+
+def handle_user_login(request_data, model_class, serializer_class, user_type_name='user'):
+    username = request_data.get('username', '')
+    email = request_data.get('email', '')
+    password = request_data.get('password', '')
+    user = None
+    if username: user = authenticate(username=username, password=password)
+    elif email:
+        try: user = authenticate(username=model_class.objects.get(email=email).username, password=password)
+        except model_class.DoesNotExist: pass
+    else: return Response({'error': 'Username or password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    if user:
+        try:
+            user_profile = model_class.objects.get(id=user.id)
+            if hasattr(user_profile, 'is_verified') and user_profile.is_verified:return Response({'error': 'You are already verified.'}, status=status.HTTP_400_BAD_REQUEST)
+            if user_profile.is_deleted: return Response({'error': 'Your account has been deleted.'}, status=status.HTTP_400_BAD_REQUEST)
+            token, created = Token.objects.get_or_create(user=user)
+            serializer = serializer_class(user)
+            return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
+        except model_class.DoesNotExist: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
+    else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
