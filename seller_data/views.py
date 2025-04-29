@@ -35,12 +35,7 @@ def seller_forgot_password(r): return common_views.handle_password_reset(r.data,
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def reset_password(r):
-    serializer_instance = common_serializer.PasswordResetConfirmSerializer(data=r.data)
-    if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
-    success, message = serializer_instance.reset_password(models.Seller)
-    if success: return Response({'success': message}, status=status.HTTP_200_OK)
-    return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
+def seller_reset_password(r): return common_views.handle_password_reset_conformation(r.data, models.Seller, common_serializer.PasswordResetConfirmSerializer)
 
 @api_view(['PUT', 'PATCH'])
 @permission_classes([AllowAny])
