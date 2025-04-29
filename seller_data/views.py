@@ -31,16 +31,7 @@ def delete_seller(r, seller_username): return common_views.soft_delete_user(mode
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
-def forgot_password(r):
-    serializer_instance = common_serializer.PasswordResetRequestSerializer(data=r.data)
-    if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
-    email = serializer_instance.validated_data['email']
-    try:
-        seller = models.Seller.objects.get(email=email, is_deleted=False)
-        success, message = serializer_instance.send_password_reset_email(seller, settings.FRONTEND_URL)
-        if success: return Response({'success': message}, status=status.HTTP_200_OK)
-        return Response({'error': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-    except models.Seller.DoesNotExist: return Response({'success': 'If the email is registered, you will receive a password reset email.'}, status=status.HTTP_200_OK)
+def seller_forgot_password(r): return common_views.handle_password_reset(r.data, models.Seller, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
