@@ -1,11 +1,9 @@
-from django.conf import settings
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import seller_data.models as models
 import seller_data.serializer as seller_serializer
-import common.serializer as common_serializer
+from common.views import create_user_views
 import common.views as common_views
 
 # Create your views here.
