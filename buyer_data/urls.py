@@ -6,4 +6,6 @@ urlpatterns = [
     path('update-buyer/<str:buyer_username>', views.update_buyer_data, name='update_buyer'),
     path('add-buyer', views.add_buyer, name='add_buyer'),
     path('delete-buyer/<str:buyer_username>', views.delete_buyer, name='delete_buyer'),
+    path('forgot-password/', views.buyer_forgot_password, name='buyer_forgot_password'),
+    path('forgot-password/', views.buyer_reset_password, name='buyer_reset_password'),
 ]
