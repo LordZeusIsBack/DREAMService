@@ -22,18 +22,3 @@ def update_seller_data(r, seller_username):
 def add_seller(r):
     data, resp_status = common_views.process_serializer(seller_serializer.SellerSerializer, data=r.data)
     return Response(data, status=resp_status)
-
-@api_view(['DELETE'])
-def delete_seller(r, seller_username): return common_views.soft_delete_user(models.Seller, seller_username)
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def seller_forgot_password(r): return common_views.handle_password_reset(r.data, models.Seller, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def seller_reset_password(r): return common_views.handle_password_reset_conformation(r.data, models.Seller, common_serializer.PasswordResetConfirmSerializer)
-
-@api_view(['PUT', 'PATCH'])
-@permission_classes([AllowAny])
-def seller_login(r): return common_views.handle_user_login(r.data, models.Seller, seller_serializer.SellerSerializer, 'seller')
