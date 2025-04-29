@@ -25,8 +25,4 @@ def add_buyer(r):
     return Response(data, status=resp_status)
 
 @api_view(['DELETE'])
-def delete_buyer(r, buyer_username):
-    obj = get_object_or_404(models.Buyer, username=buyer_username, is_deleted=False)
-    obj.is_deleted = True
-    obj.save()
-    return Response(status=HTTP_204_NO_CONTENT)
+def delete_buyer(r, buyer_username): return common_views.soft_delete_user(models.Buyer, buyer_username)
