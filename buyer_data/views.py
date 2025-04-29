@@ -26,3 +26,7 @@ def add_buyer(r):
 
 @api_view(['DELETE'])
 def delete_buyer(r, buyer_username): return common_views.soft_delete_user(models.Buyer, buyer_username)
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def buyer_forgot_password(r): return common_views.handle_password_reset(r.data, models.Buyer, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
