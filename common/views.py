@@ -30,3 +30,10 @@ def handle_password_reset(request_data, model_class, frontend_url, serializer_cl
         if success: return Response({'success': message}, status=status.HTTP_200_OK)
         return Response({'error': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except model_class.DoesNotExist: return Response({'success': 'If email exists, you will receive a password reset email.'}, status=status.HTTP_200_OK)
+
+def handle_password_reset_conformation(request_data, model_class, serializer_class):
+    serializer_instance = serializer_class(data=request_data)
+    if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
+    success, message = serializer_instance.reset_password(model_class)
+    if success: return Response({'success': message}, status=status.HTTP_200_OK)
+    return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
