@@ -39,26 +39,4 @@ def seller_reset_password(r): return common_views.handle_password_reset_conforma
 
 @api_view(['PUT', 'PATCH'])
 @permission_classes([AllowAny])
-def seller_login(r):
-    username = r.data.get('username', '')
-    email = r.data.get('email', '')
-    password = r.data.get('password', '')
-    user = None
-    if username: user = authenticate(username=username, password=password)
-    elif email:
-        try: user = authenticate(username=models.Seller.objects.get(email=email).username, password=password)
-        except models.Seller.DoesNotExist: pass
-    else: return Response({'error': 'Username or email is required.'}, status=status.HTTP_400_BAD_REQUEST)
-    if user:
-        try:
-            seller = models.Seller.objects.get(id=user.id)
-            if not seller.is_verified: return Response({'error': 'You are not verified.'}, status=status.HTTP_400_BAD_REQUEST)
-            if seller.is_deleted: return Response({'error': 'Your account has been deleted.'}, status=status.HTTP_400_BAD_REQUEST)
-            token, created = Token.objects.get_or_create(user=user)
-            serializer = seller_serializer.SellerSerializer(seller)
-            return Response({
-                'token': token.key,
-                'user': serializer.data
-            }, status=status.HTTP_200_OK)
-        except models.Seller.DoesNotExist: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_401_UNAUTHORIZED)
-    else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+def seller_login(r): return common_views.handle_user_login(r.data, models.Seller, seller_serializer.SellerSerializer, 'seller')
