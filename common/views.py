@@ -19,3 +19,14 @@ def soft_delete_user(model, username):
     obj.is_deleted = True
     obj.save()
     return Response(status=status.HTTP_204_NO_CONTENT)
+
+def handle_password_reset(request_data, model_class, frontend_url, serializer_class):
+    serializer_instance = serializer_class(data=request_data)
+    if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
+    email = serializer_instance.validated_data['email']
+    try:
+        user = model_class.objects.get(email=email)
+        success, message = serializer_instance.send_password_reset_email(user, frontend_url)
+        if success: return Response({'success': message}, status=status.HTTP_200_OK)
+        return Response({'error': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    except model_class.DoesNotExist: return Response({'success': 'If email exists, you will receive a password reset email.'}, status=status.HTTP_200_OK)
