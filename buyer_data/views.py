@@ -7,6 +7,13 @@ from rest_framework.response import Response
 import common.views as common_views
 
 # Create your views here.
+buyer_views = common_views.create_user_views(Buyer, BuyerSerializer, 'buyer')
+
+delete_buyer = buyer_views['delete_user']
+buyer_forgot_password = buyer_views['forgot_password']
+buyer_reset_password = buyer_views['reset_password']
+buyer_login = buyer_views['login']
+
 @api_view(['GET'])
 def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, username=buyer_username, is_deleted=False)).data)
 
