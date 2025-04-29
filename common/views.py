@@ -1,8 +1,12 @@
+from django.conf import settings
+import common.serializer as common_serializer
 import rest_framework.status as status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
 
 
 # Create your views here.
@@ -60,3 +64,26 @@ def handle_user_login(request_data, model_class, serializer_class, user_type_nam
             return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
         except model_class.DoesNotExist: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+
+def create_user_views(model_class, serializer_class, user_type_name):
+    @api_view(['DELETE'])
+    def delete_user(r, username): return soft_delete_user(model_class, username)
+
+    @api_view(['POST'])
+    @permission_classes([AllowAny])
+    def forgot_password(r): return handle_password_reset(r.data, model_class, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
+
+    @api_view(['POST'])
+    @permission_classes([AllowAny])
+    def reset_password(r): return handle_password_reset_conformation(r.data, model_class, common_serializer.PasswordResetConfirmSerializer)
+
+    @api_view(['PUT', 'PATCH'])
+    @permission_classes([AllowAny])
+    def login(r): return handle_user_login(r.data, model_class, serializer_class, user_type_name)
+
+    return {
+        'delete_user': delete_user,
+        'forgot_password': forgot_password,
+        'reset_password': reset_password,
+        'login': login
+    }
