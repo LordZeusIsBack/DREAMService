@@ -7,6 +7,13 @@ from common.views import create_user_views
 import common.views as common_views
 
 # Create your views here.
+seller_views = create_user_views(models.Seller, seller_serializer.SellerSerializer, 'seller')
+
+delete_seller = seller_views['delete_user']
+seller_forgot_password = seller_views['forgot_password']
+seller_reset_password = seller_views['reset_password']
+seller_login = seller_views['login']
+
 @api_view(['GET'])
 def seller_data(r, seller_username): return Response(seller_serializer.SellerSerializer(get_object_or_404(models.Seller, username=seller_username, is_deleted=False)).data)
 
