@@ -23,18 +23,3 @@ def update_buyer_data(r, buyer_username):
 def add_buyer(r):
     data, resp_status = common_views.process_serializer(buyer_serializer.BuyerSerializer, data=r.data)
     return Response(data, status=resp_status)
-
-@api_view(['DELETE'])
-def delete_buyer(r, buyer_username): return common_views.soft_delete_user(models.Buyer, buyer_username)
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def buyer_forgot_password(r): return common_views.handle_password_reset(r.data, models.Buyer, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
-
-@api_view(['POST'])
-@permission_classes([AllowAny])
-def buyer_reset_password(r): return common_views.handle_password_reset_conformation(r.data, models.Buyer, common_serializer.PasswordResetConfirmSerializer)
-
-@api_view(['PUT', 'PATCH'])
-@permission_classes([AllowAny])
-def buyer_login(r): return common_views.handle_user_login(r.data, models.Buyer, buyer_serializer.BuyerSerializer, 'buyer')
