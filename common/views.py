@@ -57,7 +57,7 @@ def handle_user_login(request_data, model_class, serializer_class, user_type_nam
     if user:
         try:
             user_profile = model_class.objects.get(id=user.id)
-            if hasattr(user_profile, 'is_verified') and user_profile.is_verified:return Response({'error': 'You are already verified.'}, status=status.HTTP_400_BAD_REQUEST)
+            if hasattr(user_profile, 'is_verified') and not user_profile.is_verified:return Response({'error': 'You are not verified.'}, status=status.HTTP_403_FORBIDDEN)
             if user_profile.is_deleted: return Response({'error': 'Your account has been deleted.'}, status=status.HTTP_400_BAD_REQUEST)
             token, created = Token.objects.get_or_create(user=user)
             serializer = serializer_class(user)
