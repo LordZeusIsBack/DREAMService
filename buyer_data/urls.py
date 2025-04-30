@@ -1,4 +1,3 @@
-from django.urls import path
 import buyer_data.views as views
 
 urlpatterns = [
