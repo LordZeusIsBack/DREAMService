@@ -1,4 +1,4 @@
 import seller_data.views as views
 from common.urls import create_user_url_patterns
 
-urlpatterns = [create_user_url_patterns(views, 'seller')]
+urlpatterns = create_user_url_patterns(views, 'seller')
