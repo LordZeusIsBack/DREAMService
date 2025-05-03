@@ -8,7 +8,6 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 
-
 # Create your views here.
 def process_serializer(serializer_class, data, instance=None, success_status=status.HTTP_200_OK, create_status=status.HTTP_201_CREATED):
     serializer_instance = serializer_class(instance, data=data) if instance else serializer_class(data=data)
@@ -48,21 +47,26 @@ def handle_user_login(request_data, model_class, serializer_class, user_type_nam
     username = request_data.get('username', '')
     email = request_data.get('email', '')
     password = request_data.get('password', '')
-    user = None
-    if username: user = authenticate(username=username, password=password)
-    elif email:
-        try: user = authenticate(username=model_class.objects.get(email=email).username, password=password)
-        except model_class.DoesNotExist: pass
+    if username:
+        try: user = authenticate(email=model_class.objects.get(username=username).email, password=password)
+        except model_class.DoesNotExist: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+    elif email: user = authenticate(email=email, password=password)
     else: return Response({'error': 'Username or password is required.'}, status=status.HTTP_400_BAD_REQUEST)
     if user:
         try:
-            user_profile = model_class.objects.get(id=user.id)
-            if hasattr(user_profile, 'is_verified') and not user_profile.is_verified:return Response({'error': 'You are not verified.'}, status=status.HTTP_403_FORBIDDEN)
-            if user_profile.is_deleted: return Response({'error': 'Your account has been deleted.'}, status=status.HTTP_400_BAD_REQUEST)
+            if user_type_name == 'buyer':
+                if hasattr(user, 'buyer_profile'): profile = user.buyer_profile
+                else: return Response({'error': 'You are not registered as a buyer.'}, status=status.HTTP_400_BAD_REQUEST)
+            elif user_type_name == 'seller':
+                if hasattr(user, 'seller_profile'): profile = user.seller_profile
+                else: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_400_BAD_REQUEST)
+            else: return Response({'error': 'Invalid User Type'}, status=status.HTTP_400_BAD_REQUEST)
+            if not profile.is_verified: return Response({'error': 'Your profile is not verified.'}, status=status.HTTP_403_FORBIDDEN)
+            if profile.is_deleted: return Response({'error': 'Your account has been deleted.'}, status=status.HTTP_400_BAD_REQUEST)
             token, created = Token.objects.get_or_create(user=user)
-            serializer = serializer_class(user)
-            return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
-        except model_class.DoesNotExist: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
+            serializer = serializer_class(profile)
+            return Response({'token': token.key, 'created': created, 'user': serializer.data}, status=status.HTTP_200_OK)
+        except AttributeError: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 def create_user_views(model_class, serializer_class, user_type_name):
