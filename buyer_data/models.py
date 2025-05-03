@@ -1,6 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
-from common.models import UserExtensionMixin, VerificationMixin
+from common.models import CustomUser, UserExtensionMixin, VerificationMixin
 
 # Create your models here.
 class Buyer(User, UserExtensionMixin):
