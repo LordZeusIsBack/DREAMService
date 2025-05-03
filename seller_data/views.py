@@ -1,9 +1,9 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import seller_data.models as models
+from seller_data.models import Seller
+from common.models import CustomUser
 import seller_data.serializer as seller_serializer
-from common.views import create_user_views
 import common.views as common_views
 
 # Create your views here.
