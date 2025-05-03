@@ -12,7 +12,6 @@ from rest_framework import generics
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
-from django.views.decorators.cache import cache_page
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
 
 # Create your views here.
@@ -58,15 +57,16 @@ class EstateAreaView(generics.ListAPIView):
     """
     serializer_class = EstateSerializer
 
-    def get(self, request, *args, **kwargs):
-        if 'estate_type' not in request.query_params or 'area' not in request.query_params: return Response({'error': 'Missing required query parameters: estate_type and area'}, status=status.HTTP_400_BAD_REQUEST)
-
-    @cache_page(60 * 60)
     def get_queryset(self):
         estate_type = self.request.query_params.get('estate_type')
         area = self.request.query_params.get('area')
-        core_radius = float(self.request.query_params.get('core_radius', 5))
-        outer_radius = float(self.request.query_params.get('outer_radius', core_radius + 5))
+
+        if not estate_type or not area: return models.Estate.objects.none()
+
+        try:
+            core_radius = float(self.request.query_params.get('core_radius', 5))
+            outer_radius = float(self.request.query_params.get('outer_radius', core_radius + 5))
+        except ValueError: return models.Estate.objects.none()
 
         geolocator = Nominatim(user_agent='estate_data')
         try: location = geolocator.geocode(area)
@@ -75,13 +75,14 @@ class EstateAreaView(generics.ListAPIView):
         if not location: return models.Estate.objects.none()
 
         center = Point(location.longitude, location.latitude, srid=4326)
-        base_qs = (models.Estate.objects.filter(estate_type=estate_type, status='available').annotate(distance=Distance('location', center)))
+        base_qs = models.Estate.objects.filter(estate_type=estate_type, status='available').annotate(distance=Distance('location', center))
         combined_qs = base_qs.filter(Q(distance__lte=D(km=core_radius)) | Q(distance__gt=D(km=core_radius), distance__lte=D(km=outer_radius))).order_by('distance')
 
         return combined_qs
 
     def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        page = self.paginate_queryset(queryset)
-        serializer = self.get_serializer(page or queryset, many=True)
-        return self.get_paginated_response(serializer.data)
+        """
+        Override the list method to add a custom message.
+        """
+        if 'estate_type' not in request.query_params or 'area' not in request.query_params: return Response({"error": "Missing required query parameters: estate_type and area."}, status=status.HTTP_400_BAD_REQUEST)
+        return super().list(request, *args, **kwargs)
