@@ -21,8 +21,15 @@ def process_serializer(serializer_class, data, instance=None, success_status=sta
 
 def soft_delete_user(model, username):
     obj = get_object_or_404(model, username=username)
-    obj.is_deleted = True
-    obj.save()
+    if hasattr(obj, 'buyer_profile'):
+        profile = obj.buyer_profile
+        profile.is_deleted = True
+        profile.save()
+    elif hasattr(obj, 'seller_profile'):
+        profile = obj.seller_profile
+        profile.is_deleted = True
+        profile.save()
+    else: return Response({'error': 'User has no profile.'}, status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def handle_password_reset(request_data, model_class, frontend_url, serializer_class):
