@@ -18,6 +18,11 @@ class BuyerSerializer(BaseUserSerializer):
     """
     Serializer for buyer model.
     """
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.CharField(source='user.email')
+    username = serializers.CharField(source='user.username')
+    password = serializers.CharField(source='user.password', write_only=True)
     verification = BuyerVerificationSerializer(source='buyerverification', read_only=False)
     class Meta(BaseUserSerializer.Meta):
         model = models.Buyer
