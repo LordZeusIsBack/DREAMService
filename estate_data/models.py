@@ -1,7 +1,5 @@
 from uuid import uuid4
 from django.db import models
-from django.contrib.gis.db import models as gis_models
-from django.contrib.gis.geos import Point
 from seller_data.models import Seller
 from django.utils.text import slugify
 
@@ -30,23 +28,20 @@ class Estate(models.Model):
         ('rented', 'Rented'),
         ('pending', 'Pending')
     ])
-    location = gis_models.PointField(geography=True, null=True, blank=True)
-    slug = models.SlugField(max_length=255, unique=True)
+    latitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self): return f"{self.estate_name} - {self.estate_type}"
 
     def save(self, *args, **kwargs):
-        uuid_lst = str(uuid4()).split('-')
         if not self.slug:
-            base_slug = uuid_lst[0] + slugify(self.estate_name) + uuid_lst[-1]
-            num = 1
-            while self.__class__.objects.filter(slug=base_slug).exists():
-                base_slug = f"{uuid_lst[0]}-{slugify(self.estate_name)}-{num}-{uuid_lst[-1]}"
-                num += 1
+            base_slug = slugify(self.estate_name)
+            candidate = f"{base_slug}-{uuid4().hex[:8]}"
+            while Estate.objects.filter(slug=candidate).exists(): candidate = f"{base_slug}-{uuid4().hex[:8]}"
             self.slug = base_slug
-        if not self.location: self.location = Point(75.33986000, 19.88467000, srid=4326)
         return super().save(*args, **kwargs)
 
 class EstateImage(models.Model):
