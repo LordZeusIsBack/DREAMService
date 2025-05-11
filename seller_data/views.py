@@ -2,12 +2,11 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from seller_data.models import Seller
-from common.models import CustomUser
 import seller_data.serializer as seller_serializer
 import common.views as common_views
 
 # Create your views here.
-seller_views = common_views.create_user_views(CustomUser, seller_serializer.SellerSerializer, 'seller')
+seller_views = common_views.create_user_views(Seller, seller_serializer.SellerSerializer, 'seller')
 
 delete_seller = seller_views['delete_user']
 seller_forgot_password = seller_views['forgot_password']
