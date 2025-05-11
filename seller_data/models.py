@@ -1,10 +1,10 @@
 from django.db import models
+from django.contrib.auth.models import User
 from django.core.validators import MaxValueValidator
-from common.models import CustomUser, UserExtensionMixin, VerificationMixin
+from common.models import UserExtensionMixin, VerificationMixin
 
 # Create your models here.
-class Seller(UserExtensionMixin):
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='seller_profile')
+class Seller(User, UserExtensionMixin):
     business_name = models.CharField(max_length=100, editable=False)
 
     def __str__(self): return self.business_name
