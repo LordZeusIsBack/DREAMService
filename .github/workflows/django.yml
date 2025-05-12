@@ -15,6 +15,9 @@ jobs:
       matrix:
         python-version: [3.11]
 
+    env:
+      DB_NAME: dreamservice_db
+
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
