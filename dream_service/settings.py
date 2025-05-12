@@ -85,11 +85,14 @@ WSGI_APPLICATION = "dream_service.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "DREAMService",
-        "USER": "postgres",
-        "PASSWORD": "root",
-        "HOST": "localhost",
+        "NAME": os.getenv('DB_NAME'),
+        "USER": os.getenv('DB_USER'),
+        "PASSWORD": os.getenv('DB_PASSWORD'),
+        "HOST": os.getenv('DB_ENDPOINT'),
         "PORT": "5432",
+        "OPTIONS": {
+            "sslmode": "require",
+        },
     }
 }
 
