@@ -19,8 +19,8 @@ class EstateSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = models.Estate
-        fields = ['seller', 'estate_name', 'estate_type', 'estate_price', 'status', 'slug', 'location', 'images',
-                  'images_to_delete']
+        fields = ['seller', 'estate_name', 'estate_type', 'estate_price', 'status', 'slug', 'latitude', 'longitude',
+                  'images', 'images_to_delete']
 
     def create(self, validated_data):
         if 'images_to_delete' in validated_data: validated_data.pop('images_to_delete')
