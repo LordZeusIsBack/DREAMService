@@ -1,4 +1,4 @@
-from math import radians, sin, cos, asin, sqrt
+from math import radians, degrees, sin, cos, asin, sqrt
 import estate_data.models as models
 from estate_data.serializer import EstateSerializer
 from django.shortcuts import get_object_or_404
