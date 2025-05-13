@@ -8,7 +8,17 @@ from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 import rest_framework.status as status
 
-def haversine(lon1, lat1, lon2, lat2):
+def bounding_box(lat, long, radius):
+    lat, long, earth_radius = float(lat), float(long), 6371
+    delta_lat, delta_long = degrees(radius / earth_radius), degrees(radius / (earth_radius * cos(radians(lat))))
+    return (
+        lat - delta_lat,
+        lat + delta_lat,
+        long - delta_long,
+        long + delta_long
+    )
+
+def haversine(lat1, lon1, lat2, lon2):
     """
     Calculate the great circle distance in kilometers between two points on the earth (specified in decimal degrees)
     """
