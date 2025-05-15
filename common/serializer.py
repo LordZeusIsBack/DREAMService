@@ -21,16 +21,24 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """
         Create a new user instance.
         """
+        # Extract user data
+        user_data = {}
+        for field in ['first_name', 'last_name', 'email', 'username']:
+            key = f'user.{field}'
+            if key in validated_data: user_data[field] = validated_data.pop(key)
         verification_data = validated_data.pop(verification_field, None)
         password = validated_data.pop('password', None)
-
         if not (password and verification_data): raise ValidationError({'error': 'Both password and verification data are required.'})
-        user_instance = user_model.objects.create(**validated_data)
-        user_instance.set_password(password)
-        user_instance.save()
-
-        verification_model.objects.create(**{user_model.__name__.lower(): user_instance}, **verification_data)
-        return user_instance
+        custom_user_instance = CustomUser.objects.create_user(
+            email=user_data['email'],
+            username=user_data['username'],
+            password=password,
+            first_name=user_data['first_name'],
+            last_name=user_data['last_name']
+        )
+        user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
+        verification_model.objects.create( **{user_model.__name__.lower(): user_model_instance}, **verification_data)
+        return user_model_instance
 
     @staticmethod
     def update_user(instance, validated_data, verification_field):
