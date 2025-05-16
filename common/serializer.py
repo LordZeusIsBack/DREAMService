@@ -1,3 +1,4 @@
+from common.models import CustomUser
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.tokens import default_token_generator
@@ -21,11 +22,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """
         Create a new user instance.
         """
-        # Extract user data
-        user_data = {}
-        for field in ['first_name', 'last_name', 'email', 'username']:
-            key = f'user.{field}'
-            if key in validated_data: user_data[field] = validated_data.pop(key)
+        user_data = validated_data.pop('user')
         verification_data = validated_data.pop(verification_field, None)
         password = validated_data.pop('password', None)
         if not (password and verification_data): raise ValidationError({'error': 'Both password and verification data are required.'})
@@ -37,7 +34,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
             last_name=user_data['last_name']
         )
         user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
-        verification_model.objects.create( **{user_model.__name__.lower(): user_model_instance}, **verification_data)
+        verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
         return user_model_instance
 
     @staticmethod
