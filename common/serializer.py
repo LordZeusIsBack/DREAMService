@@ -42,10 +42,14 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """
         Update an existing user instance.
         """
+        user_data = validated_data.pop('user')
         validated_data.pop(verification_field, None)
         new_password = validated_data.pop('password', None)
+        user_instance = instance.user
+        for attr, value in user_data.items(): setattr(user_instance, attr, value)
+        if new_password: user_instance.set_password(new_password)
+        user_instance.save()
         for attr, value in validated_data.items(): setattr(instance, attr, value)
-        if new_password: instance.set_password(new_password)
         instance.save()
         return instance
 
