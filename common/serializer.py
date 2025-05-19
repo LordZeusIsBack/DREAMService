@@ -73,7 +73,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             reset_link = f"{frontend_url}/reset-password/{uid}/{token}/"
             send_mail(
                 'Password Reset Request',
-                f'Hello {user.get_full_name()},\n\n'
+                f'Hello {user.first_name} {user.last_name},\n\n'
                 f'You requested a password reset for your account. '
                 f'Please click the following link to set a new password:\n\n'
                 f'{reset_link}\n\n'
