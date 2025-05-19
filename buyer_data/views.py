@@ -15,7 +15,7 @@ buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
 
 @api_view(['GET'])
-def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, username=buyer_username, is_deleted=False)).data)
+def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)).data)
 
 @api_view(['PUT', 'PATCH'])
 def update_buyer_data(r, buyer_username):
