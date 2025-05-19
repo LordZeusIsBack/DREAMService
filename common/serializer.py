@@ -103,7 +103,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def reset_password(self, user_model):
         uid = self.validated_data['uid']
         token = self.validated_data['token']
-        new_password = self.validated_data['new_password']
+        new_password = self.validated_data['password']
         try:
             pk = force_str(urlsafe_base64_decode(uid))
             user = user_model.objects.get(pk=pk)
