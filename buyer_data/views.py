@@ -19,7 +19,7 @@ def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or
 
 @api_view(['PUT', 'PATCH'])
 def update_buyer_data(r, buyer_username):
-    obj = get_object_or_404(Buyer, username=buyer_username, is_deleted=False)
+    obj = get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)
     data, resp_status = common_views.process_serializer(BuyerSerializer, r.data, instance=obj)
     return Response(data, status=resp_status)
 
