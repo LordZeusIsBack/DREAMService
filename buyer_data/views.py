@@ -5,9 +5,10 @@ from buyer_data.models import Buyer
 from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
 import common.views as common_views
+from common.models import CustomUser
 
 # Create your views here.
-buyer_views = common_views.create_user_views(Buyer, BuyerSerializer, 'buyer')
+buyer_views = common_views.create_user_views(CustomUser, BuyerSerializer, 'buyer')
 
 delete_buyer = buyer_views['delete_user']
 buyer_forgot_password = buyer_views['forgot_password']
