@@ -62,14 +62,14 @@ def handle_user_login(request_data, model_class, serializer_class, user_type_nam
     if user:
         try:
             if user_type_name == 'buyer':
-                if hasattr(user, 'buyer_profile'): profile = user.buyer_profile
+                if hasattr(user, 'buyer'): profile = user.buyer
                 else: return Response({'error': 'You are not registered as a buyer.'}, status=status.HTTP_400_BAD_REQUEST)
             elif user_type_name == 'seller':
-                if hasattr(user, 'seller_profile'): profile = user.seller_profile
+                if hasattr(user, 'seller'): profile = user.seller
                 else: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_400_BAD_REQUEST)
             else: return Response({'error': 'Invalid User Type'}, status=status.HTTP_400_BAD_REQUEST)
             if not profile.is_verified: return Response({'error': 'Your profile is not verified.'}, status=status.HTTP_403_FORBIDDEN)
-            if profile.is_deleted: return Response({'error': 'Your account has been deleted.'}, status=status.HTTP_400_BAD_REQUEST)
+            if profile.is_deleted: return Response({'error': 'Your account does not exist.'}, status=status.HTTP_410_GONE)
             token, created = Token.objects.get_or_create(user=user)
             serializer = serializer_class(profile)
             return Response({'token': token.key, 'created': created, 'user': serializer.data}, status=status.HTTP_200_OK)
