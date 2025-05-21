@@ -44,6 +44,10 @@ def update_user_details(request_data, username, model_class, serializer_class, l
     data, resp_status = process_serializer(serializer_class, data=request_data, instance=profile)
     return Response(data, status=resp_status)
 
+def add_user(request_data, serializer_class):
+    data, resp_status = process_serializer(serializer_class, request_data)
+    return Response(data, status=resp_status)
+
 def password_reset(request_data, model_class, frontend_url, serializer_class):
     serializer_instance = serializer_class(data=request_data)
     if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
