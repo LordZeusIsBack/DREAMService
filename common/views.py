@@ -32,6 +32,18 @@ def soft_delete_user(model, username):
     else: return Response({'error': 'User has no profile.'}, status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
+def update_user_details(request_data, username, model_class, serializer_class, lookup_kwargs=None):
+    user = get_object_or_404(model_class, username=username)
+    if hasattr(user, 'buyer'):
+        profile = user.buyer
+        if profile.is_deleted: return Response({'error': 'User not found or deleted'}, status=status.HTTP_410_GONE)
+    elif hasattr(user, 'seller'):
+        profile = user.seller
+        if profile.is_deleted: return Response({'error': 'User not found or deleted'}, status=status.HTTP_410_GONE)
+    else: return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+    data, resp_status = process_serializer(serializer_class, data=request_data, instance=profile)
+    return Response(data, status=resp_status)
+
 def password_reset(request_data, model_class, frontend_url, serializer_class):
     serializer_instance = serializer_class(data=request_data)
     if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
