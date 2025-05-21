@@ -86,11 +86,17 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def reset_password(r): return handle_password_reset_conformation(r.data, model_class, common_serializer.PasswordResetConfirmSerializer)
+    def forgot_password(r): return password_reset(r.data, model_class, settings.FRONTEND_URL,
+                                                  common_serializer.PasswordResetRequestSerializer)
+
+    @api_view(['POST'])
+    @permission_classes([AllowAny])
+    def reset_password(r): return password_reset_conformation(r.data, model_class,
+                                                              common_serializer.PasswordResetConfirmSerializer)
 
     @api_view(['PUT', 'PATCH'])
     @permission_classes([AllowAny])
-    def login(r): return handle_user_login(r.data, model_class, serializer_class, user_type_name)
+    def login(r): return user_login(r.data, model_class, serializer_class, user_type_name)
 
     return {
         'delete_user': delete_user,
