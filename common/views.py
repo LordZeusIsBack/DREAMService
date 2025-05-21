@@ -32,7 +32,7 @@ def soft_delete_user(model, username):
     else: return Response({'error': 'User has no profile.'}, status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-def handle_password_reset(request_data, model_class, frontend_url, serializer_class):
+def password_reset(request_data, model_class, frontend_url, serializer_class):
     serializer_instance = serializer_class(data=request_data)
     if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
     email = serializer_instance.validated_data['email']
@@ -43,14 +43,14 @@ def handle_password_reset(request_data, model_class, frontend_url, serializer_cl
         return Response({'error': message}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     except model_class.DoesNotExist: return Response({'success': 'If email exists, you will receive a password reset email.'}, status=status.HTTP_200_OK)
 
-def handle_password_reset_conformation(request_data, model_class, serializer_class):
+def password_reset_conformation(request_data, model_class, serializer_class):
     serializer_instance = serializer_class(data=request_data)
     if not serializer_instance.is_valid(): return Response(serializer_instance.errors, status=status.HTTP_400_BAD_REQUEST)
     success, message = serializer_instance.reset_password(model_class)
     if success: return Response({'success': message}, status=status.HTTP_200_OK)
     return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
-def handle_user_login(request_data, model_class, serializer_class, user_type_name='user'):
+def user_login(request_data, model_class, serializer_class, user_type_name='user'):
     username = request_data.get('username', '')
     email = request_data.get('email', '')
     password = request_data.get('password', '')
