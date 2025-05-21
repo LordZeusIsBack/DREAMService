@@ -18,6 +18,10 @@ class SellerSerializer(BaseUserSerializer):
     """
     verification = SellerVerificationSerializer(source='sellerverification', read_only=False)
     business_name = serializers.CharField()
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    email = serializers.EmailField(source='user.email')
+    username = serializers.CharField(source='user.username')
 
     class Meta(BaseUserSerializer.Meta):
         model = models.Seller

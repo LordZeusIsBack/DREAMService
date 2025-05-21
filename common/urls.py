@@ -8,7 +8,7 @@ def create_user_url_patterns(view_module, user_type):
 
     return [
         path(f'view-{user_type}/<str:{user_type}_username>', getattr(view_module, f'{user_type}_data'), name=view_name),
-        path(f'update-{user_type}/<str:{user_type}_username>', getattr(view_module, f'update_{user_type}_data'), name=update_name),
+        path(f'update-{user_type}/<str:username>', getattr(view_module, f'update_{user_type}_data'), name=update_name),
         path(f'add-{user_type}', getattr(view_module, f'add_{user_type}'), name=f'add_{user_type}'),
         path(f'delete-{user_type}/<str:{user_type}_username>', getattr(view_module, f'delete_{user_type}'), name=f'delete_{user_type}'),
         path('forgot-password/', getattr(view_module, f'{user_type}_forgot_password'), name=forgot_name),

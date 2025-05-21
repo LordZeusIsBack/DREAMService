@@ -1,3 +1,4 @@
+from common.models import CustomUser
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.tokens import default_token_generator
@@ -21,26 +22,34 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """
         Create a new user instance.
         """
+        user_data = validated_data.pop('user')
         verification_data = validated_data.pop(verification_field, None)
         password = validated_data.pop('password', None)
-
         if not (password and verification_data): raise ValidationError({'error': 'Both password and verification data are required.'})
-        user_instance = user_model.objects.create(**validated_data)
-        user_instance.set_password(password)
-        user_instance.save()
-
-        verification_model.objects.create(**{user_model.__name__.lower(): user_instance}, **verification_data)
-        return user_instance
+        custom_user_instance = CustomUser.objects.create_user(
+            email=user_data['email'],
+            username=user_data['username'],
+            password=password,
+            first_name=user_data['first_name'],
+            last_name=user_data['last_name']
+        )
+        user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
+        verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
+        return user_model_instance
 
     @staticmethod
     def update_user(instance, validated_data, verification_field):
         """
         Update an existing user instance.
         """
+        user_data = validated_data.pop('user')
         validated_data.pop(verification_field, None)
         new_password = validated_data.pop('password', None)
+        user_instance = instance.user
+        for attr, value in user_data.items(): setattr(user_instance, attr, value)
+        if new_password: user_instance.set_password(new_password)
+        user_instance.save()
         for attr, value in validated_data.items(): setattr(instance, attr, value)
-        if new_password: instance.set_password(new_password)
         instance.save()
         return instance
 
@@ -64,7 +73,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
             reset_link = f"{frontend_url}/reset-password/{uid}/{token}/"
             send_mail(
                 'Password Reset Request',
-                f'Hello {user.get_full_name()},\n\n'
+                f'Hello {user.first_name} {user.last_name},\n\n'
                 f'You requested a password reset for your account. '
                 f'Please click the following link to set a new password:\n\n'
                 f'{reset_link}\n\n'
@@ -94,7 +103,7 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
     def reset_password(self, user_model):
         uid = self.validated_data['uid']
         token = self.validated_data['token']
-        new_password = self.validated_data['new_password']
+        new_password = self.validated_data['password']
         try:
             pk = force_str(urlsafe_base64_decode(uid))
             user = user_model.objects.get(pk=pk)
