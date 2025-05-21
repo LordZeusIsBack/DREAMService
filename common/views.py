@@ -32,7 +32,7 @@ def soft_delete_user(model, username):
     else: return Response({'error': 'User has no profile.'}, status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_204_NO_CONTENT)
 
-def update_user_details(request_data, username, model_class, serializer_class, lookup_kwargs=None):
+def update_user_details(request_data, username, model_class, serializer_class):
     user = get_object_or_404(model_class, username=username)
     if hasattr(user, 'buyer'):
         profile = user.buyer
