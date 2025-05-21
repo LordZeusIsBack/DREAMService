@@ -101,7 +101,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def forgot_password(r): return handle_password_reset(r.data, model_class, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
+    def add_new_user(r): return add_user(r.data, serializer_class)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
