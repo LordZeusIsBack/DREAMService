@@ -92,6 +92,9 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['DELETE'])
     def delete_user(r, username): return soft_delete_user(model_class, username)
 
+    @api_view(['PUT', 'PATCH'])
+    def update_user(r, username): return update_user_details(r.data, username, model_class, serializer_class)
+
     @api_view(['POST'])
     @permission_classes([AllowAny])
     def forgot_password(r): return handle_password_reset(r.data, model_class, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
