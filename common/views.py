@@ -119,6 +119,8 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     return {
         'delete_user': delete_user,
+        'update_user': update_user,
+        'add_user': add_new_user,
         'forgot_password': forgot_password,
         'reset_password': reset_password,
         'login': login
