@@ -1,6 +1,16 @@
 from django.urls import path
 
 def create_user_url_patterns(view_module, user_type):
+    """
+    Generates Django URL patterns for user-related endpoints based on the specified user type.
+    
+    Args:
+        view_module: A module containing the view functions for user operations.
+        user_type: The type of user ('buyer' or 'seller') for which to generate URL patterns.
+    
+    Returns:
+        A list of Django URL patterns for viewing, updating, adding, deleting, password management, and login endpoints, with route names and view functions determined by the user type.
+    """
     view_name = 'view_buyer' if user_type == 'buyer' else 'view_seller'
     update_name = 'update_buyer' if user_type == 'buyer' else 'update_seller'
     forgot_name = f'{user_type}_forgot_password' if user_type == 'buyer' else f'{user_type}_forgot_password'

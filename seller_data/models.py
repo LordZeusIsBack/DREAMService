@@ -7,7 +7,10 @@ class Seller(UserExtensionMixin):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='seller')
     business_name = models.CharField(max_length=100, editable=False)
 
-    def __str__(self): return self.business_name
+    def __str__(self): """
+Returns the business name of the seller as its string representation.
+"""
+return self.business_name
 
 
 class SellerVerification(VerificationMixin):

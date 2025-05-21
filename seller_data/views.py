@@ -17,4 +17,13 @@ seller_reset_password = seller_views['reset_password']
 seller_login = seller_views['login']
 
 @api_view(['GET'])
-def seller_data(r, seller_username): return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
+def seller_data(r, seller_username): """
+Retrieves and returns serialized data for a seller by username.
+
+Args:
+    seller_username: The username of the seller's associated user account.
+
+Returns:
+    A Response containing the serialized seller data if found; otherwise, returns a 404 error.
+"""
+return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)

@@ -20,7 +20,19 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def create_user(validated_data, user_model, verification_model, verification_field):
         """
-        Create a new user instance.
+        Creates a new user along with associated verification data.
+        
+        Args:
+            validated_data: Dictionary containing user details, password, and verification data.
+            user_model: The model class for the user profile to be created.
+            verification_model: The model class for storing verification information.
+            verification_field: The key in validated_data for verification data.
+        
+        Returns:
+            The created user_model instance.
+        
+        Raises:
+            ValidationError: If password or verification data is missing.
         """
         user_data = validated_data.pop('user')
         verification_data = validated_data.pop(verification_field, None)
@@ -40,7 +52,17 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def update_user(instance, validated_data, verification_field):
         """
-        Update an existing user instance.
+        Updates a user model instance and its related user account with new data.
+        
+        The function updates the attributes of the related user account, including setting a new password if provided, and then updates the main instance's attributes. The verification field is ignored during the update.
+        
+        Args:
+            instance: The user model instance to update.
+            validated_data: Dictionary containing updated data, including nested user data.
+            verification_field: The key for verification data to exclude from updates.
+        
+        Returns:
+            The updated user model instance.
         """
         user_data = validated_data.pop('user')
         validated_data.pop(verification_field, None)
@@ -63,9 +85,14 @@ class PasswordResetRequestSerializer(serializers.Serializer):
     @staticmethod
     def send_password_reset_email(user, frontend_url):
         """
-        Sends a password reset email to the user with a secure token.
-        :param user: The user instance (Seller or Buyer).
-        :param frontend_url: The frontend URL where the reset link will redirect.
+        Sends a password reset email with a secure token and reset link to the user.
+        
+        Args:
+            user: The user instance to receive the reset email.
+            frontend_url: The base URL of the frontend application for constructing the reset link.
+        
+        Returns:
+            A tuple (success, message) where success is True if the email was sent, or False with an error message otherwise.
         """
         try:
             token = default_token_generator.make_token(user)
@@ -101,6 +128,17 @@ class PasswordResetConfirmSerializer(serializers.Serializer):
         return value
 
     def reset_password(self, user_model):
+        """
+        Resets a user's password using a UID and token.
+        
+        Attempts to set a new password for the user identified by the provided UID if the token is valid. Returns a tuple indicating success or failure and a corresponding message.
+        
+        Args:
+            user_model: The user model class to query for the user instance.
+        
+        Returns:
+            A tuple (success: bool, message: str) indicating the result of the password reset attempt.
+        """
         uid = self.validated_data['uid']
         token = self.validated_data['token']
         new_password = self.validated_data['password']

@@ -17,4 +17,13 @@ buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
 
 @api_view(['GET'])
-def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)).data)
+def buyer_data(r, buyer_username): """
+Retrieves and returns buyer data for a given username.
+
+Args:
+	buyer_username: The username of the buyer whose data is requested.
+
+Returns:
+	A Response containing serialized buyer data if found; otherwise, returns a 404 error.
+"""
+return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)).data)
