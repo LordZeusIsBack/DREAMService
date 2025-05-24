@@ -19,9 +19,6 @@ def bounding_box(lat, long, radius):
     )
 
 def haversine(lat1, lon1, lat2, lon2):
-    """
-    Calculate the great circle distance in kilometers between two points on the earth (specified in decimal degrees)
-    """
     lat1, lon1, lat2, lon2 = map(radians, [float(lat1), float(lon1), float(lat2), float(lon2)])
     d_lon = lon2 - lon1
     d_lat = lat2 - lat1
@@ -35,9 +32,6 @@ def get_estate_data(r, estate_slug): return Response(EstateSerializer(get_object
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
 def add_new_estate(r):
-    """
-    Add new estate data.
-    """
     serializer = EstateSerializer(data=r.data, context={'request': r})
     if serializer.is_valid():
         serializer.save()
@@ -47,9 +41,6 @@ def add_new_estate(r):
 @api_view(['PUT', 'PATCH'])
 @parser_classes([MultiPartParser, FormParser])
 def update_estate_data(r, slug):
-    """
-    Update estate data.
-    """
     with transaction.atomic():
         estate = get_object_or_404(models.Estate, slug=slug)
         serializer = EstateSerializer(estate, data=r.data, context={'request': r}, partial=True)
@@ -60,9 +51,6 @@ def update_estate_data(r, slug):
 
 @api_view(['GET'])
 def area_estate(r):
-    """
-    Get all estates in a given area.
-    """
     lat = r.query_params.get('lat')
     long = r.query_params.get('long')
     estate_type = r.query_params.get('estate_type')
