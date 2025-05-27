@@ -59,7 +59,6 @@ def area_estate(request):
     estate_type = request.query_params.get('estate_type')
     radius = float(request.query_params.get('radius', 10))
 
-    # Resolve lat/long from place if place is provided and lat/long are missing
     if place and (not lat or not long):
         geo_url = f"https://api.geoapify.com/v1/geocode/search"
         params = {
@@ -71,28 +70,21 @@ def area_estate(request):
             geo_response = requests.get(geo_url, params=params)
             geo_data = geo_response.json()
 
-            if not geo_data['results']:
-                return Response({"error": f"Could not find location for place: {place}"}, status=status.HTTP_400_BAD_REQUEST)
+            if not geo_data['results']: return Response({"error": f"Could not find location for place: {place}"}, status=status.HTTP_400_BAD_REQUEST)
 
             lat = geo_data['results'][0]['lat']
             long = geo_data['results'][0]['lon']
-        except Exception as e:
-            return Response({"error": "Failed to fetch coordinates from Geoapify.", "details": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
+        except Exception as e: return Response({"error": "Failed to fetch coordinates from Geoapify.", "details": str(e)}, status=status.HTTP_502_BAD_GATEWAY)
 
-    # Validate essential query params
-    if not lat or not long or not estate_type:
-        return Response({"error": "Missing required parameters: 'lat', 'long', or 'estate_type'."}, status=status.HTTP_400_BAD_REQUEST)
+    if not lat or not long or not estate_type: return Response({"error": "Missing required parameters: 'lat', 'long', or 'estate_type'."}, status=status.HTTP_400_BAD_REQUEST)
 
     try:
         lat = float(lat)
         long = float(long)
-    except ValueError:
-        return Response({"error": "Latitude and longitude must be valid float numbers."}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError: return Response({"error": "Latitude and longitude must be valid float numbers."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Calculate bounding box
     min_lat, max_lat, min_long, max_long = bounding_box(lat, long, radius)
 
-    # Filter estates within the bounding box and available
     estates = models.Estate.objects.filter(
         estate_type=estate_type,
         latitude__gte=min_lat,
@@ -102,9 +94,7 @@ def area_estate(request):
         status='available'
     )
 
-    # Apply precise Haversine filter
     result = [estate for estate in estates if haversine(lat, long, estate.latitude, estate.longitude) <= radius]
 
-    # Serialize and return
     data = EstateSerializer(result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
