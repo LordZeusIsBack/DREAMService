@@ -67,7 +67,7 @@ def area_estate(request):
             "apiKey": settings.GEOAPIFY_API_KEY
         }
         try:
-            geo_response = requests.get(geo_url, params=params, timeout=REQUEST_TIMEOUT)
+            geo_response = requests.get(geo_url, params=params, timeout=5)
             geo_response.raise_for_status()
             geo_data = geo_response.json()
 
