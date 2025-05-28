@@ -11,6 +11,18 @@ import rest_framework.status as status
 from django.conf import settings
 
 def bounding_box(lat, long, radius):
+    """
+    Calculates a latitude-longitude bounding box around a geographic point.
+    
+    Args:
+        lat: Latitude of the center point in decimal degrees.
+        long: Longitude of the center point in decimal degrees.
+        radius: Radius in kilometers for the bounding box.
+    
+    Returns:
+        A tuple (min_lat, max_lat, min_long, max_long) representing the bounding box
+        that encloses all points within the specified radius of the center.
+    """
     lat, long, earth_radius = float(lat), float(long), 6371
     delta_lat, delta_long = degrees(radius / earth_radius), degrees(radius / (earth_radius * cos(radians(lat))))
     return (
@@ -21,6 +33,18 @@ def bounding_box(lat, long, radius):
     )
 
 def haversine(lat1, lon1, lat2, lon2):
+    """
+    Calculates the great-circle distance in kilometers between two geographic coordinates.
+    
+    Args:
+        lat1: Latitude of the first point in decimal degrees.
+        lon1: Longitude of the first point in decimal degrees.
+        lat2: Latitude of the second point in decimal degrees.
+        lon2: Longitude of the second point in decimal degrees.
+    
+    Returns:
+        The distance between the two points in kilometers, computed using the haversine formula.
+    """
     lat1, lon1, lat2, lon2 = map(radians, [float(lat1), float(lon1), float(lat2), float(lon2)])
     d_lon = lon2 - lon1
     d_lat = lat2 - lat1
@@ -34,6 +58,11 @@ def get_estate_data(r, estate_slug): return Response(EstateSerializer(get_object
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
 def add_new_estate(r):
+    """
+    Creates a new estate entry from the provided request data.
+    
+    Validates the input using the EstateSerializer and saves the estate if valid. Returns the serialized estate data with HTTP 201 status on success, or validation errors with HTTP 400 status on failure.
+    """
     serializer = EstateSerializer(data=r.data, context={'request': r})
     if serializer.is_valid():
         serializer.save()
@@ -43,6 +72,11 @@ def add_new_estate(r):
 @api_view(['PUT', 'PATCH'])
 @parser_classes([MultiPartParser, FormParser])
 def update_estate_data(r, slug):
+    """
+    Updates an existing estate with new data provided in the request.
+    
+    Performs a partial update on the estate identified by the given slug. Validates the input data and returns the updated estate data on success, or validation errors with HTTP 400 status on failure.
+    """
     with transaction.atomic():
         estate = get_object_or_404(models.Estate, slug=slug)
         serializer = EstateSerializer(estate, data=r.data, context={'request': r}, partial=True)
@@ -53,6 +87,14 @@ def update_estate_data(r, slug):
 
 @api_view(['GET'])
 def area_estate(request):
+    """
+    Retrieves available estates of a specified type within a geographic radius.
+    
+    Accepts query parameters for latitude, longitude, estate type, and optional radius (default 10 km). If a place name is provided instead of coordinates, resolves it to latitude and longitude using the Geoapify geocoding API. Returns a list of estates matching the type and located within the specified radius of the given point.
+    
+    Returns:
+        Response: A JSON array of serialized estate data with HTTP 200 status, or an error message with appropriate HTTP status if parameters are missing or invalid, or if geocoding fails.
+    """
     place = request.query_params.get('place')
     lat = request.query_params.get('lat')
     long = request.query_params.get('long')
