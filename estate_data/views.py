@@ -60,14 +60,15 @@ def area_estate(request):
     radius = float(request.query_params.get('radius', 10))
 
     if place and (not lat or not long):
-        geo_url = f"https://api.geoapify.com/v1/geocode/search"
+        geo_url = "https://api.geoapify.com/v1/geocode/search"
         params = {
             "text": place,
             "format": "json",
             "apiKey": settings.GEOAPIFY_API_KEY
         }
         try:
-            geo_response = requests.get(geo_url, params=params)
+            geo_response = requests.get(geo_url, params=params, timeout=REQUEST_TIMEOUT)
+            geo_response.raise_for_status()
             geo_data = geo_response.json()
 
             if not geo_data['results']: return Response({"error": f"Could not find location for place: {place}"}, status=status.HTTP_400_BAD_REQUEST)
