@@ -5,6 +5,7 @@ def create_user_url_patterns(view_module, user_type):
     update_name = 'update_buyer' if user_type == 'buyer' else 'update_seller'
     forgot_name = f'{user_type}_forgot_password' if user_type == 'buyer' else f'{user_type}_forgot_password'
     reset_name = f'{user_type}_reset_password' if user_type == 'buyer' else f'{user_type}_reset_password'
+    estate_listing = 'get_bought_estate' if user_type == 'buyer' else 'get_listed_estates'
 
     return [
         path(f'view-{user_type}/<str:{user_type}_username>', getattr(view_module, f'{user_type}_data'), name=view_name),
@@ -14,4 +15,5 @@ def create_user_url_patterns(view_module, user_type):
         path('forgot-password/', getattr(view_module, f'{user_type}_forgot_password'), name=forgot_name),
         path('reset-password/', getattr(view_module, f'{user_type}_reset_password'), name=reset_name),
         path(f'{user_type}-login/', getattr(view_module, f'{user_type}_login'), name=f'{user_type}_login'),
+        path(f'{estate_listing}/<str:{user_type}_username>', getattr(view_module, f'{user_type}_estate'), name=f'{user_type}_estate_data'),
     ]
