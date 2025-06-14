@@ -22,6 +22,5 @@ def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or
 def get_bought_estate(r, buyer_username):
     from estate_data.models import Estate
     from estate_data.serializer import EstateSerializer
-    buyer = get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)
-    estates = Estate.objects.filter(buyer=buyer)
-    return Response(EstateSerializer(estates, many=True).data)
+    from rest_framework.status import HTTP_200_OK
+    return Response(EstateSerializer(Estate.objects.filter(buyer=get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)), many=True).data, status=HTTP_200_OK)
