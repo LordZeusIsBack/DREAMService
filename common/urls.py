@@ -15,5 +15,5 @@ def create_user_url_patterns(view_module, user_type):
         path('forgot-password/', getattr(view_module, f'{user_type}_forgot_password'), name=forgot_name),
         path('reset-password/', getattr(view_module, f'{user_type}_reset_password'), name=reset_name),
         path(f'{user_type}-login/', getattr(view_module, f'{user_type}_login'), name=f'{user_type}_login'),
-        path(f'{estate_listing}/<str:{user_type}_username>', getattr(view_module, f'{user_type}_estate'), name=f'{user_type}_estate_data'),
+        path(f'{estate_listing}/<str:{user_type}_username>', getattr(view_module, estate_listing), name=f'{user_type}_estate_data'),
     ]
