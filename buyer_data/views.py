@@ -18,3 +18,10 @@ buyer_login = buyer_views['login']
 
 @api_view(['GET'])
 def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)).data)
+
+def get_bought_estate(r, buyer_username):
+    from estate_data.models import Estate
+    from estate_data.serializer import EstateSerializer
+    buyer = get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)
+    estates = Estate.objects.filter(buyer=buyer)
+    return Response(EstateSerializer(estates, many=True).data)
