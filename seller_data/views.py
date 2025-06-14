@@ -18,3 +18,10 @@ seller_login = seller_views['login']
 
 @api_view(['GET'])
 def seller_data(r, seller_username): return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
+
+@api_view(['GET'])
+def get_listed_estates(r, seller_username):
+    from rest_framework import status
+    from estate_data.models import Estate
+    from estate_data.serializer import EstateSerializer
+    return Response(EstateSerializer(Estate.objects.filter(seller=get_object_or_404(Seller, user__username=seller_username, is_deleted=False)), many=True).data, status=status.HTTP_200_OK)
