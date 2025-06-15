@@ -3,10 +3,18 @@
     {
       "src": "dream_service/wsgi.py",
       "use": "@vercel/python",
-      "config": { "maxLambdasize": "15mb", "runtime": "python3.11" }
+      "config": { "maxLambdaSize": "15mb", "runtime": "python3.11" }
     }
   ],
   "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/static/$1"
+    },
+    {
+      "src": "/media/(.*)",
+      "dest": "/media/$1"
+    },
     {
       "src": "/(.*)",
       "dest": "dream_service/wsgi.py"
