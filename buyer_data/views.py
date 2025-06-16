@@ -1,5 +1,8 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from django.db import transaction
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 import buyer_data.models as buyer_models
 from buyer_data.serializer import BuyerSerializer, PurchasedEstateSerializer
 from rest_framework.response import Response
