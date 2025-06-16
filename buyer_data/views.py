@@ -17,7 +17,7 @@ buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
 
 @api_view(['GET'])
-def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)).data)
+def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)
 
 def get_bought_estate(r, buyer_username):
     from estate_data.models import Estate
