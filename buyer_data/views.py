@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-from buyer_data.models import Buyer
-from buyer_data.serializer import BuyerSerializer
+import buyer_data.models as buyer_models
+from buyer_data.serializer import BuyerSerializer, PurchasedEstateSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
