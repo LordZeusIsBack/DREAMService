@@ -41,7 +41,7 @@ class Estate(models.Model):
             base_slug = slugify(self.estate_name)
             candidate = f"{base_slug}-{uuid4().hex[:8]}"
             while Estate.objects.filter(slug=candidate).exists(): candidate = f"{base_slug}-{uuid4().hex[:8]}"
-            self.slug = base_slug
+            self.slug = candidate
         return super().save(*args, **kwargs)
 
 class EstateImage(models.Model):

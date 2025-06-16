@@ -1,7 +1,10 @@
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
-from buyer_data.models import Buyer
-from buyer_data.serializer import BuyerSerializer
+from django.db import transaction
+from rest_framework import status
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+import buyer_data.models as buyer_models
+from buyer_data.serializer import BuyerSerializer, PurchasedEstateSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
@@ -17,4 +20,17 @@ buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
 
 @api_view(['GET'])
-def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)).data)
+def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)
+
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def get_bought_estate(r):
+    buyer = get_object_or_404(buyer_models.Buyer, user__username=r.user.username, is_deleted=False)
+    if r.method == 'GET': return Response(PurchasedEstateSerializer(buyer_models.PurchasedEstate.objects.filter(buyer=buyer).select_related('estate'), many=True).data, status=status.HTTP_200_OK)
+    elif r.method == 'POST':
+        try:
+            with transaction.atomic():
+                serializer = PurchasedEstateSerializer(data=r.data, context={'request': r})
+                if serializer.is_valid(): return Response(PurchasedEstateSerializer(serializer.save()).data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e: return Response({'detail': 'Purchase failed due to server error. Please try again.', 'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
