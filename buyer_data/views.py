@@ -19,8 +19,15 @@ buyer_login = buyer_views['login']
 @api_view(['GET'])
 def buyer_data(r, buyer_username): return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)
 
-def get_bought_estate(r, buyer_username):
-    from estate_data.models import Estate
-    from estate_data.serializer import EstateSerializer
-    from rest_framework.status import HTTP_200_OK
-    return Response(EstateSerializer(Estate.objects.filter(buyer=get_object_or_404(Buyer, user__username=buyer_username, is_deleted=False)), many=True).data, status=HTTP_200_OK)
+@api_view(['GET', 'POST'])
+@permission_classes([IsAuthenticated])
+def get_bought_estate(r):
+    buyer = get_object_or_404(buyer_models.Buyer, user__username=r.user.username, is_deleted=False)
+    if r.method == 'GET': return Response(PurchasedEstateSerializer(buyer_models.PurchasedEstate.objects.filter(buyer=buyer).select_related('estate'), many=True).data, status=status.HTTP_200_OK)
+    elif r.method == 'POST':
+        try:
+            with transaction.atomic():
+                serializer = PurchasedEstateSerializer(data=r.data, context={'request': r})
+                if serializer.is_valid(): return Response(PurchasedEstateSerializer(serializer.save()).data, status=status.HTTP_201_CREATED)
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e: return Response({'detail': 'Purchase failed due to server error. Please try again.', 'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
