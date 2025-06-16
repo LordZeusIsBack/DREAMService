@@ -17,12 +17,13 @@ seller_reset_password = seller_views['reset_password']
 seller_login = seller_views['login']
 
 @api_view(['GET'])
-def seller_data(r, seller_username): """
-Retrieves seller data for a given username.
+def seller_data(r, seller_username):
+    """
+    Retrieves seller data for a given username.
 
-Returns serialized seller information if the seller exists and is not marked as deleted; otherwise, returns a 404 error.
-"""
-return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
+    Returns serialized seller information if the seller exists and is not marked as deleted; otherwise, returns a 404 error.
+    """
+    return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
 
 @api_view(['GET'])
 def get_listed_estates(r, seller_username):
