@@ -17,10 +17,20 @@ seller_reset_password = seller_views['reset_password']
 seller_login = seller_views['login']
 
 @api_view(['GET'])
-def seller_data(r, seller_username): return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
+def seller_data(r, seller_username): """
+Retrieves seller data for a given username.
+
+Returns serialized seller information if the seller exists and is not marked as deleted; otherwise, returns a 404 error.
+"""
+return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
 
 @api_view(['GET'])
 def get_listed_estates(r, seller_username):
+    """
+    Retrieves a list of estates associated with a given seller username.
+    
+    Returns a 204 No Content response with a message if the seller has no estates. Otherwise, returns serialized estate data for the seller with a 200 OK status.
+    """
     from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
     from estate_data.models import Estate
     from estate_data.serializer import EstateSerializer

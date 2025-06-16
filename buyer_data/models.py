@@ -13,7 +13,8 @@ class Buyer(UserExtensionMixin):
 class BuyerVerification(VerificationMixin):
     buyer = models.OneToOneField(Buyer, on_delete=models.CASCADE, related_name='buyerverification')
 
-    def __str__(self): return f"{self.buyer.user.first_name} {self.buyer.user.last_name}"
+    def __str__(self): Returns the full name of the buyer associated with this object.
+return f"{self.buyer.user.first_name} {self.buyer.user.last_name}"
 
 class PurchasedEstate(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, related_name='purchased_estates')
@@ -32,12 +33,21 @@ class PurchasedEstate(models.Model):
         ]
 
     def save(self, *args, **kwargs):
+        """
+        Saves the PurchasedEstate instance, preventing changes to transaction_id after creation.
+        
+        Raises:
+            ValidationError: If an attempt is made to modify transaction_id on an existing record.
+        """
         if self.pk:
             original = type(self).objects.get(pk=self.pk)
             if original.transaction_id != self.transaction_id: raise ValidationError('transaction_id cannot be changed once set!')
         super().save(*args, **kwargs)
 
-    def __str__(self): return f"{self.buyer.user.email} purchased {self.estate.estate_name} for INR{self.purchase_price}"
+    def __str__(self): """
+Returns a string summarizing the buyer's email, estate name, and purchase price.
+"""
+return f"{self.buyer.user.email} purchased {self.estate.estate_name} for INR{self.purchase_price}"
 
 class WishlistItem(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, related_name='wishlistitems')
@@ -52,4 +62,7 @@ class WishlistItem(models.Model):
             models.Index(fields=['estate', 'added_on'])
         ]
 
-    def __str__(self): return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"
+    def __str__(self): """
+Returns a string summarizing the buyer's email and the name of the bookmarked estate.
+"""
+return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"

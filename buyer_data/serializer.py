@@ -40,7 +40,9 @@ class BuyerSerializer(BaseUserSerializer):
 
     def update(self, instance, validated_data):
         """
-        Update an existing buyer instance.
+        Updates a buyer and associated verification details.
+        
+        Delegates the update operation to the base user serializer, ensuring both buyer and verification data are updated together.
         """
         return BaseUserSerializer.update_user(
             instance,
@@ -66,6 +68,11 @@ class PurchasedEstateSerializer(serializers.ModelSerializer):
         }
 
     def validate(self, data):
+        """
+        Validates that the buyer has not already purchased the estate and that the estate is available for purchase.
+        
+        Raises a validation error if the buyer has previously purchased the estate or if the estate is not currently available.
+        """
         buyer = self.context['request'].user.buyer
         estate = data.get('estate')
         if models.PurchasedEstate.objects.filter(buyer=buyer, estate=estate).exists(): raise serializers.ValidationError("You have already purchased this estate.")
@@ -73,6 +80,11 @@ class PurchasedEstateSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """
+        Creates a PurchasedEstate record for the current buyer and marks the estate as sold.
+        
+        Retrieves the buyer from the request context, updates the estate's status to 'sold', and creates a PurchasedEstate instance with the associated buyer, estate, purchase price, and transaction ID.
+        """
         buyer = self.context['request'].user.buyer
         estate = validated_data.get('estate')
         transaction_id = validated_data.get('transaction_id')
@@ -89,5 +101,10 @@ class PurchasedEstateSerializer(serializers.ModelSerializer):
         )
 
     def update(self, instance, validated_data):
+        """
+        Updates a PurchasedEstate instance, preventing changes to the transaction ID.
+        
+        Raises a validation error if an attempt is made to modify the transaction ID after it has been set; otherwise, updates the instance with the provided data.
+        """
         if 'transaction_id' in validated_data and instance.transaction_id != validated_data['transaction_id']: raise serializers.ValidationError({'transaction_id': 'Cannot modify transaction_id once set.'})
         return super().update(instance, validated_data)

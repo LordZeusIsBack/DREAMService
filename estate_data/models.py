@@ -37,6 +37,11 @@ class Estate(models.Model):
     def __str__(self): return f"{self.estate_name} - {self.estate_type}"
 
     def save(self, *args, **kwargs):
+        """
+        Saves the Estate instance, generating a unique slug if one is not set.
+        
+        If the slug field is empty, a unique slug is created from the estate name and a random UUID segment, ensuring no conflicts with existing slugs before saving.
+        """
         if not self.slug:
             base_slug = slugify(self.estate_name)
             candidate = f"{base_slug}-{uuid4().hex[:8]}"
