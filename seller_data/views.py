@@ -21,7 +21,9 @@ def seller_data(r, seller_username): return Response(SellerSerializer(get_object
 
 @api_view(['GET'])
 def get_listed_estates(r, seller_username):
-    from rest_framework.status import HTTP_200_OK
+    from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
     from estate_data.models import Estate
     from estate_data.serializer import EstateSerializer
-    return Response(EstateSerializer(Estate.objects.filter(seller=get_object_or_404(Seller, user__username=seller_username, is_deleted=False)), many=True).data, status=HTTP_200_OK)
+    estates = Estate.objects.filter(seller__user__username=seller_username, seller__is_deleted=False).select_related('seller__user').prefetch_related('images')
+    if not estates.exists(): return Response({'message': 'No estate available for selected seller'}, status=HTTP_204_NO_CONTENT)
+    return Response(EstateSerializer(estates, many=True).data, status=HTTP_200_OK)
