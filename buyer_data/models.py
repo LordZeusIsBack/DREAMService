@@ -1,4 +1,5 @@
 from django.db import models
+from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
 from estate_data.models import Estate
 
@@ -19,7 +20,7 @@ class PurchasedEstate(models.Model):
     estate = models.ForeignKey(Estate, on_delete=models.CASCADE, related_name='purchased_by')
     purchase_date = models.DateTimeField(auto_now_add=True)
     purchase_price = models.DecimalField(max_digits=12, decimal_places=2)
-    transaction_id = models.CharField(max_length=100, unique=True, editable=False)
+    transaction_id = models.CharField(max_length=100, unique=True)
 
     class Meta:
         unique_together = ('buyer', 'estate')
@@ -29,6 +30,12 @@ class PurchasedEstate(models.Model):
             models.Index(fields=['estate', 'purchase_date']),
             models.Index(fields=['transaction_id'])
         ]
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            original = type(self).objects.get(pk=self.pk)
+            if original.transaction_id != self.transaction_id: raise ValidationError('transaction_id cannot be changed once set!')
+        super().save(*args, **kwargs)
 
     def __str__(self): return f"{self.buyer.user.email} purchased {self.estate.estate_name} for INR{self.purchase_price}"
 
