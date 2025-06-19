@@ -18,3 +18,10 @@ def send_otp(email):
         recipient_list=[email],
         fail_silently=False,
     )
+
+def verify_otp(email, input_otp):
+    stored_otp = otp_handler_cache.get(f"otp_{email}")
+    if stored_otp and stored_otp == input_otp:
+        otp_handler_cache.delete(f"otp_{email}")
+        return True
+    return False
