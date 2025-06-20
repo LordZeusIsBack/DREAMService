@@ -2,8 +2,13 @@ import secrets
 from django.core.cache import caches
 from django.core.mail import send_mail
 from django.conf import settings
+from hashlib import sha256
 
 otp_handler_cache = caches['otp_handler_cache']
+
+def _normalize_email(email): return email.strip().lower()
+
+def _cache_key(prefix, email): return f'{prefix}_{sha256(email.encode()).hexdigest()}'
 
 def generate_otp(length=6): return str(secrets.randbelow(10 * length)).zfill(length)
 
