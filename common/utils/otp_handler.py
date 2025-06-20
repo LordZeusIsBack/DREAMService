@@ -10,6 +10,8 @@ def _normalize_email(email): return email.strip().lower()
 
 def _cache_key(prefix, email): return f'{prefix}_{sha256(email.encode()).hexdigest()}'
 
+def _ip_key(ip): return f'ip_throttle{ip}'
+
 def generate_otp(length=6): return str(secrets.randbelow(10 * length)).zfill(length)
 
 def send_otp(email):
