@@ -45,6 +45,15 @@ def increase_backoff(email):
     otp_handler_cache.set(key, new_timeout, timeout=3600)
     return new_timeout
 
+def send_security_alert(email):
+    send_mail(
+        subject="Suspicious OTP Activity Detected",
+        message=f"We noticed unusual activity with OTP submissions on your account ({email}). If this wasn't you, please contact support immediately.",
+        from_email=settings.EMAIL_HOST_USER,
+        recipient_list=[email],
+        fail_silently=True,
+    )
+
 def send_otp(email):
     otp = generate_otp()
     otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
