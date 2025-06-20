@@ -20,6 +20,12 @@ def mark_otp_throttle(email, cooldown=30): otp_handler_cache.set(_cache_key('otp
 
 def is_otp_brute_forced(email, max_attempts=5): return otp_handler_cache.get(_cache_key("otp_attempts", email), 0) >= max_attempts
 
+def increment_otp_attempt(email, ttl=300):
+    key = _cache_key("otp_attempts", email)
+    attempts = otp_handler_cache.get(key, 0)
+    otp_handler_cache.set(key, attempts + 1, timeout=ttl)
+    return attempts + 1
+
 def send_otp(email):
     otp = generate_otp()
     otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
