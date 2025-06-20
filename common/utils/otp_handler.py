@@ -26,6 +26,10 @@ def increment_otp_attempt(email, ttl=300):
     otp_handler_cache.set(key, attempts + 1, timeout=ttl)
     return attempts + 1
 
+def clear_otp_attempts(email): otp_handler_cache.delete(_cache_key("otp_attempts", email))
+
+def is_ip_throttled(ip, max_requests=20): return otp_handler_cache.get(_ip_key(ip), 0) >= max_requests
+
 def send_otp(email):
     otp = generate_otp()
     otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
