@@ -56,19 +56,21 @@ def send_security_alert(email):
 
 def send_otp(email):
     otp = generate_otp()
-    otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
+    otp_handler_cache.set(_cache_key('otp', email), otp, timeout=settings.OTP_TIMEOUT)
 
     send_mail(
         subject="Your Verification OTP",
-        message=f"Your OTP is {otp}. It is valid for 5 minutes.",
+        message=f"Your OTP is {otp}. It is valid for {settings.OTP_TIMEOUT // 60} minutes.",
         from_email=settings.EMAIL_HOST_USER,
         recipient_list=[email],
         fail_silently=False,
     )
 
 def verify_otp(email, input_otp):
-    stored_otp = otp_handler_cache.get(f"otp_{email}")
+    stored_otp = otp_handler_cache.get(_cache_key('otp', email))
     if stored_otp and stored_otp == input_otp:
         otp_handler_cache.delete(f"otp_{email}")
         return True
+    attempts = increment_otp_attempt(email)
+    if attempts == 3: send_security_alert(email)
     return False
