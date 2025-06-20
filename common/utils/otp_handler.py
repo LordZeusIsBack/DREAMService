@@ -30,6 +30,14 @@ def clear_otp_attempts(email): otp_handler_cache.delete(_cache_key("otp_attempts
 
 def is_ip_throttled(ip, max_requests=20): return otp_handler_cache.get(_ip_key(ip), 0) >= max_requests
 
+def track_ip_request(ip, ttl=300):
+    key = _ip_key(ip)
+    count = otp_handler_cache.get(key, 0)
+    otp_handler_cache.set(key, count + 1, timeout=ttl)
+    return count + 1
+
+def get_current_backoff(email): return otp_handler_cache.get(_cache_key("otp_backoff", email), 30)
+
 def send_otp(email):
     otp = generate_otp()
     otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
