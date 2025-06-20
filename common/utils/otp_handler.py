@@ -38,6 +38,13 @@ def track_ip_request(ip, ttl=300):
 
 def get_current_backoff(email): return otp_handler_cache.get(_cache_key("otp_backoff", email), 30)
 
+def increase_backoff(email):
+    key = _cache_key("otp_backoff", email)
+    current = get_current_backoff(email)
+    new_timeout = min(current * 2, 600)
+    otp_handler_cache.set(key, new_timeout, timeout=3600)
+    return new_timeout
+
 def send_otp(email):
     otp = generate_otp()
     otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
