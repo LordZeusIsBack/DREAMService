@@ -14,6 +14,8 @@ def _ip_key(ip): return f'ip_throttle{ip}'
 
 def generate_otp(length=6): return str(secrets.randbelow(10 * length)).zfill(length)
 
+def can_resend_otp(email): return not otp_handler_cache.get(_cache_key('otp_resend', email))
+
 def send_otp(email):
     otp = generate_otp()
     otp_handler_cache.set(f"otp_{email}", otp, timeout=settings.OTP_TIMEOUT)
