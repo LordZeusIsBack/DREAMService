@@ -8,7 +8,7 @@ otp_handler_cache = caches['otp_handler_cache']
 
 def _normalize_email(email): return email.strip().lower()
 
-def _cache_key(prefix, email): return f'{prefix}_{sha256(email.encode()).hexdigest()}'
+def _cache_key(prefix, email): return f'{prefix}_{sha256(_normalize_email(email).encode()).hexdigest()}'
 
 def _ip_key(ip): return f'ip_throttle{ip}'
 
