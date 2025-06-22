@@ -97,6 +97,16 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv('REDIS_URL'),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+    }
+}
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -163,3 +173,5 @@ PASSWORD_RESET_TIMEOUT = 3600
 FRONTEND_URL = os.getenv('FRONT_URL')
 
 GEOAPIFY_API_KEY = os.getenv('GEOAPIFY_KEY')
+
+OTP_TIMEOUT = 300

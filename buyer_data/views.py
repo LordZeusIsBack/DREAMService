@@ -18,6 +18,8 @@ add_buyer = buyer_views['add_user']
 buyer_forgot_password = buyer_views['forgot_password']
 buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
+buyer_verify_email = buyer_views['verify']
+buyer_resend_otp = buyer_views['resend_otp']
 
 @api_view(['GET'])
 def buyer_data(r, buyer_username): 
@@ -25,6 +27,7 @@ def buyer_data(r, buyer_username):
     Retrieves and returns serialized data for a non-deleted buyer by username.
 
     Args:
+        r: This contains the request session via a dictionary containing JSON structure.
         buyer_username: The username of the buyer to retrieve.
 
     Returns:
@@ -34,13 +37,13 @@ def buyer_data(r, buyer_username):
 
 @api_view(['GET', 'POST'])
 @permission_classes([IsAuthenticated])
-def get_bought_estate(r):
+def get_bought_estate(r, buyer_username):
     """
     Handles retrieval and creation of purchased estate records for the authenticated buyer.
     
     On GET, returns a list of estates purchased by the authenticated buyer. On POST, attempts to create a new purchased estate record for the buyer using the provided data. Returns validation errors if the input is invalid, or a server error message if an exception occurs during creation.
     """
-    buyer = get_object_or_404(buyer_models.Buyer, user__username=r.user.username, is_deleted=False)
+    buyer = get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)
     if r.method == 'GET': return Response(PurchasedEstateSerializer(buyer_models.PurchasedEstate.objects.filter(buyer=buyer).select_related('estate'), many=True).data, status=status.HTTP_200_OK)
     elif r.method == 'POST':
         try:
