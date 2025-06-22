@@ -1,7 +1,6 @@
 from django.conf import settings
 import common.serializer as common_serializer
-from .utils.otp_handler import verify_otp, is_ip_throttled, track_ip_request, is_otp_brute_forced, increase_backoff, \
-    clear_otp_attempts, can_resend_otp, send_otp, mark_otp_throttle
+from .utils.otp_handler import verify_otp, is_ip_throttled, track_ip_request, is_otp_brute_forced, increase_backoff, clear_otp_attempts, can_resend_otp, send_otp, mark_otp_throttle
 import rest_framework.status as status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
@@ -117,6 +116,24 @@ def verify_user(request, email, model_class, user_type='user'):
         clear_otp_attempts(email)
         return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
 
+def resend_user_otp(request, email, model_class, user_type='user'):
+    if request.META.get('HTTP_X_FORWARDED_FOR'): ip = request.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
+    else: ip = request.META.get('REMOTE_ADDR')
+    if is_ip_throttled(ip): return Response({'error': 'Too many requests from this IP. Try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    track_ip_request(ip)
+    if not can_resend_otp(email): return Response({'error': 'You can only resend OTP after cooldown period.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    try:
+        user = model_class.objects.get(email=email)
+        user_profile = getattr(user, user_type)
+        if not user_profile: return Response({'error': 'Unable to send OTP. Please contact support.'}, status=status.HTTP_400_BAD_REQUEST)
+        send_otp(email, is_resend=True)
+        return Response({'success': 'If this email is registered, an OTP has been sent.'}, status=status.HTTP_200_OK)
+    except model_class.DoesNotExist:
+        mark_otp_throttle(email, cooldown=30)
+        return Response({'error': 'User profile not found'}, status=status.HTTP_400_BAD_REQUEST)
+    except ValueError as e: return Response({'error': 'Please wait before requesting another OTP.', 'message': str(e)}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    except Exception as e: return Response({'error':'Unable to send OTP. Please try again later.', 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['DELETE'])
     def delete_user(r, username): return soft_delete_user(model_class, username)
@@ -146,6 +163,10 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @permission_classes([AllowAny])
     def verify(r, email): return verify_user(r, email, model_class, user_type_name)
 
+    @api_view(['GET'])
+    @permission_classes([AllowAny])
+    def resend_otp(r, email): return resend_user_otp(r, email, model_class, user_type_name)
+
     return {
         'delete_user': delete_user,
         'update_user': update_user,
@@ -154,4 +175,5 @@ def create_user_views(model_class, serializer_class, user_type_name):
         'reset_password': reset_password,
         'login': login,
         'verify': verify,
+        'resend_otp': resend_otp
     }
