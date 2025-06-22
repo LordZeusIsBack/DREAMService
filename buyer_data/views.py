@@ -24,14 +24,13 @@ buyer_resend_otp = buyer_views['resend_otp']
 @api_view(['GET'])
 def buyer_data(r, buyer_username): 
     """
-    Retrieves and returns serialized data for a non-deleted buyer by username.
-
-    Args:
-        r: This contains the request session via a dictionary containing JSON structure.
-        buyer_username: The username of the buyer to retrieve.
-
+    Retrieve serialized data for a non-deleted buyer by username.
+    
+    Parameters:
+        buyer_username (str): The username of the buyer to retrieve.
+    
     Returns:
-        A Response containing the serialized buyer data, or a 404 error if not found.
+        Response: Serialized buyer data if found; otherwise, a 404 error response.
     """
     return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)
 
@@ -39,9 +38,15 @@ def buyer_data(r, buyer_username):
 @permission_classes([IsAuthenticated])
 def get_bought_estate(r, buyer_username):
     """
-    Handles retrieval and creation of purchased estate records for the authenticated buyer.
+    Retrieve or create purchased estate records for a specified buyer.
     
-    On GET, returns a list of estates purchased by the authenticated buyer. On POST, attempts to create a new purchased estate record for the buyer using the provided data. Returns validation errors if the input is invalid, or a server error message if an exception occurs during creation.
+    Handles GET and POST requests. On GET, returns a list of estates purchased by the buyer identified by `buyer_username`. On POST, attempts to create a new purchased estate record for the buyer using the provided data; returns validation errors or a server error message if creation fails.
+    
+    Parameters:
+        buyer_username (str): The username of the buyer whose purchased estates are being accessed.
+    
+    Returns:
+        Response: A serialized list of purchased estates on GET, the created record on successful POST, or error details on failure.
     """
     buyer = get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)
     if r.method == 'GET': return Response(PurchasedEstateSerializer(buyer_models.PurchasedEstate.objects.filter(buyer=buyer).select_related('estate'), many=True).data, status=status.HTTP_200_OK)
