@@ -188,35 +188,38 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['PUT', 'PATCH'])
     @permission_classes([AllowAny])
-    def login(r): """
-Authenticates a user and returns an authentication token and user data.
+    def login(r):
+        """
+        Authenticates a user and returns an authentication token and user data.
 
-Returns:
-    Response containing authentication token and serialized user profile data on success, or an error response on failure.
-"""
-return user_login(r.data, model_class, serializer_class, user_type_name)
+        Returns:
+            Response containing authentication token and serialized user profile data on success, or an error response on failure.
+        """
+        return user_login(r.data, model_class, serializer_class, user_type_name)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def verify(r, email): """
-Verifies a user's OTP using the provided email address.
+    def verify(r, email):
+        """
+        Verifies a user's OTP using the provided email address.
 
-Delegates to the `verify_user` function with the specified model and user type.
-"""
-return verify_user(r, email, model_class, user_type_name)
+        Delegates to the `verify_user` function with the specified model and user type.
+        """
+        return verify_user(r, email, model_class, user_type_name)
 
     @api_view(['GET'])
     @permission_classes([AllowAny])
-    def resend_otp(r, email): """
-Resend a one-time password (OTP) to the user's email address with rate limiting and cooldown enforcement.
+    def resend_otp(r, email):
+        """
+        Resend a one-time password (OTP) to the user's email address with rate limiting and cooldown enforcement.
 
-Parameters:
-    email (str): The email address of the user to receive the OTP.
+        Parameters:
+            email (str): The email address of the user to receive the OTP.
 
-Returns:
-    Response: A Django REST framework response indicating success or the reason for failure (e.g., throttling, cooldown, or user not found).
-"""
-return resend_user_otp(r, email, model_class, user_type_name)
+        Returns:
+            Response: A Django REST framework response indicating success or the reason for failure (e.g., throttling, cooldown, or user not found).
+        """
+        return resend_user_otp(r, email, model_class, user_type_name)
 
     return {
         'delete_user': delete_user,
