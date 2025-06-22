@@ -98,7 +98,7 @@ DATABASES = {
 }
 
 CACHES = {
-    "otp_handler_cache": {
+    "default": {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": os.getenv('REDIS_URL'),
         "OPTIONS": {
