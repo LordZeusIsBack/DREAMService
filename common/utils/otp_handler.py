@@ -12,7 +12,7 @@ def _cache_key(prefix, email): return f'{prefix}_{sha256(_normalize_email(email)
 
 def _ip_key(ip): return f'ip_throttle{ip}'
 
-def generate_otp(length=6): return str(secrets.randbelow(10 * length)).zfill(length)
+def generate_otp(length=8): return str(secrets.randbelow(10 * length)).zfill(length)
 
 def can_resend_otp(email): return not otp_handler_cache.get(_cache_key('otp_resend', email))
 
