@@ -7,73 +7,81 @@ from hmac import compare_digest
 
 otp_handler_cache = caches['default']
 
-def _normalize_email(email): """
-Normalize an email address by removing leading and trailing whitespace and converting it to lowercase.
-"""
-return email.strip().lower()
+def _normalize_email(email):
+    """
+    Normalize an email address by removing leading and trailing whitespace and converting it to lowercase.
+    """
+    return email.strip().lower()
 
-def hash_otp(otp): """
-Return the SHA-256 hexadecimal hash of the provided OTP string.
+def hash_otp(otp):
+    """
+    Return the SHA-256 hexadecimal hash of the provided OTP string.
 
-Parameters:
-	otp (str): The OTP value to be hashed.
+    Parameters:
+	    otp (str): The OTP value to be hashed.
 
-Returns:
-	str: The SHA-256 hash of the OTP as a hexadecimal string.
-"""
-return sha256(otp.encode()).hexdigest()
+    Returns:
+	    str: The SHA-256 hash of the OTP as a hexadecimal string.
+    """
+    return sha256(otp.encode()).hexdigest()
 
-def _cache_key(prefix, email): """
-Generate a cache key by combining a prefix with the SHA-256 hash of the normalized email address.
+def _cache_key(prefix, email):
+    """
+    Generate a cache key by combining a prefix with the SHA-256 hash of the normalized email address.
 
-Parameters:
-	prefix (str): The cache key prefix to use.
-	email (str): The email address to be normalized and hashed.
+    Parameters:
+	    prefix (str): The cache key prefix to use.
+	    email (str): The email address to be normalized and hashed.
 
-Returns:
-	str: The generated cache key.
-"""
-return f'{prefix}_{sha256(_normalize_email(email).encode()).hexdigest()}'
+    Returns:
+	    str: The generated cache key.
+    """
+    return f'{prefix}_{sha256(_normalize_email(email).encode()).hexdigest()}'
 
-def _ip_key(ip): """
-Generate a cache key for IP-based throttling using the provided IP address.
-"""
-return f'ip_throttle{ip}'
+def _ip_key(ip):
+    """
+    Generate a cache key for IP-based throttling using the provided IP address.
+    """
+    return f'ip_throttle{ip}'
 
-def generate_otp(length=8): """
-Generate a zero-padded numeric OTP of the specified length.
+def generate_otp(length=8):
+    """
+    Generate a zero-padded numeric OTP of the specified length.
 
-Parameters:
-    length (int): The desired length of the OTP. Defaults to 8.
+    Parameters:
+        length (int): The desired length of the OTP. Defaults to 8.
 
-Returns:
-    str: A string representing the generated OTP, padded with leading zeros if necessary.
-"""
-return str(secrets.randbelow(10 * length)).zfill(length)
+    Returns:
+        str: A string representing the generated OTP, padded with leading zeros if necessary.
+    """
+    return str(secrets.randbelow(10 * length)).zfill(length)
 
-def can_resend_otp(email): """
-Check if the OTP can be resent to the specified email based on the resend cooldown period.
+def can_resend_otp(email):
+    """
+    Check if the OTP can be resent to the specified email based on the resend cooldown period.
 
-Returns:
-    bool: True if the cooldown has expired and OTP can be resent, False otherwise.
-"""
-return not otp_handler_cache.get(_cache_key('otp_resend', email))
+    Returns:
+        bool: True if the cooldown has expired and OTP can be resent, False otherwise.
+    """
+    return not otp_handler_cache.get(_cache_key('otp_resend', email))
 
-def mark_otp_throttle(email, cooldown=30): """
-Set a throttle flag in cache for the given email to enforce a cooldown period before another OTP can be resent.
+def mark_otp_throttle(email, cooldown=30):
+    """
+    Set a throttle flag in cache for the given email to enforce a cooldown period before another OTP can be resent.
 
-Parameters:
-	cooldown (int): Cooldown period in seconds during which OTP resend is blocked. Defaults to 30 seconds.
-"""
-otp_handler_cache.set(_cache_key('otp_attempts', email), True, timeout=cooldown)
+    Parameters:
+	    cooldown (int): Cooldown period in seconds during which OTP resend is blocked. Defaults to 30 seconds.
+    """
+    otp_handler_cache.set(_cache_key('otp_attempts', email), True, timeout=cooldown)
 
-def is_otp_brute_forced(email, max_attempts=5): """
-Check if the number of OTP verification attempts for an email has reached or exceeded the allowed maximum.
+def is_otp_brute_forced(email, max_attempts=5):
+    """
+    Check if the number of OTP verification attempts for an email has reached or exceeded the allowed maximum.
 
-Returns:
-    bool: True if the attempt count is greater than or equal to max_attempts, otherwise False.
-"""
-return otp_handler_cache.get(_cache_key("otp_attempts", email), 0) >= max_attempts
+    Returns:
+        bool: True if the attempt count is greater than or equal to max_attempts, otherwise False.
+    """
+    return otp_handler_cache.get(_cache_key("otp_attempts", email), 0) >= max_attempts
 
 def increment_otp_attempt(email, ttl=300):
     """
@@ -91,18 +99,20 @@ def increment_otp_attempt(email, ttl=300):
     otp_handler_cache.set(key, attempts + 1, timeout=ttl)
     return attempts + 1
 
-def clear_otp_attempts(email): """
-Remove the OTP attempt count for the specified email from the cache.
-"""
-otp_handler_cache.delete(_cache_key("otp_attempts", email))
+def clear_otp_attempts(email):
+    """
+    Remove the OTP attempt count for the specified email from the cache.
+    """
+    otp_handler_cache.delete(_cache_key("otp_attempts", email))
 
-def is_ip_throttled(ip, max_requests=20): """
-Check if the number of OTP-related requests from an IP address has reached the allowed maximum.
+def is_ip_throttled(ip, max_requests=20):
+    """
+    Check if the number of OTP-related requests from an IP address has reached the allowed maximum.
 
-Returns:
-    bool: True if the IP address has made at least `max_requests` requests; otherwise, False.
-"""
-return otp_handler_cache.get(_ip_key(ip), 0) >= max_requests
+    Returns:
+        bool: True if the IP address has made at least `max_requests` requests; otherwise, False.
+    """
+    return otp_handler_cache.get(_ip_key(ip), 0) >= max_requests
 
 def track_ip_request(ip, ttl=300):
     """
@@ -120,13 +130,14 @@ def track_ip_request(ip, ttl=300):
     otp_handler_cache.set(key, count + 1, timeout=ttl)
     return count + 1
 
-def get_current_backoff(email): """
-Retrieve the current backoff timeout in seconds for OTP requests associated with the given email.
+def get_current_backoff(email):
+    """
+    Retrieve the current backoff timeout in seconds for OTP requests associated with the given email.
 
-Returns:
-    int: The backoff timeout in seconds, defaulting to 30 if not set.
-"""
-return otp_handler_cache.get(_cache_key("otp_backoff", email), 30)
+    Returns:
+        int: The backoff timeout in seconds, defaulting to 30 if not set.
+    """
+    return otp_handler_cache.get(_cache_key("otp_backoff", email), 30)
 
 def increase_backoff(email):
     """
