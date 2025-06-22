@@ -57,9 +57,12 @@ def send_security_alert(email):
         fail_silently=True,
     )
 
-def send_otp(email):
+def send_otp(email, is_resend=False):
+    if is_resend and not can_resend_otp(email): raise ValueError('You can only resend OTP after cooldown period.')
     otp = generate_otp()
-    otp_handler_cache.set(_cache_key('otp', email), otp, timeout=settings.OTP_TIMEOUT)
+    otp_handler_cache.set(_cache_key('otp', email), hash_otp(otp), timeout=settings.OTP_TIMEOUT)
+
+    mark_otp_throttle(email, cooldown=30)
 
     send_mail(
         subject="Your Verification OTP",
