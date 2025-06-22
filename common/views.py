@@ -1,5 +1,7 @@
 from django.conf import settings
 import common.serializer as common_serializer
+from .utils.otp_handler import verify_otp, is_ip_throttled, track_ip_request, is_otp_brute_forced, increase_backoff, \
+    clear_otp_attempts, can_resend_otp, send_otp, mark_otp_throttle
 import rest_framework.status as status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
