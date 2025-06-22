@@ -21,9 +21,10 @@ seller_resend_otp = seller_views['resend_otp']
 @api_view(['GET'])
 def seller_data(r, seller_username):
     """
-    Retrieves seller data for a given username.
-
-    Returns serialized seller information if the seller exists and is not marked as deleted; otherwise, returns a 404 error.
+    Retrieve serialized seller information for a seller identified by username if the seller is active.
+    
+    Returns:
+        Response: Serialized seller data if found; otherwise, a 404 error is returned.
     """
     return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
 

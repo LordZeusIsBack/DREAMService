@@ -68,6 +68,14 @@ def password_reset_conformation(request_data, model_class, serializer_class):
     return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
 def user_login(request_data, model_class, serializer_class, user_type_name='user'):
+    """
+    Authenticate a user by username or email and password, returning an authentication token and user profile data if successful.
+    
+    Checks that the user exists, matches the specified user type (buyer or seller), and that their profile is verified and not deleted. Returns appropriate error responses for invalid credentials, unverified or deleted profiles, or incorrect user type.
+    
+    Returns:
+        Response: On success, a response containing the authentication token, a flag indicating if the token was newly created, and serialized user profile data. On failure, a response with an error message and the relevant HTTP status code.
+    """
     username = request_data.get('username', '')
     email = request_data.get('email', '')
     password = request_data.get('password', '')
@@ -94,6 +102,16 @@ def user_login(request_data, model_class, serializer_class, user_type_name='user
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 def verify_user(request, email, model_class, user_type='user'):
+    """
+    Verifies a user's OTP for account activation with IP-based throttling and brute force protection.
+    
+    Parameters:
+        email (str): The user's email address to verify.
+        user_type (str, optional): The type of user profile to verify (default is 'user').
+    
+    Returns:
+        Response: A DRF Response indicating success if the OTP is valid and the user is verified, or an error message with appropriate HTTP status if verification fails or throttling limits are exceeded.
+    """
     otp = request.data.get('otp')
     if request.META.get('HTTP_X_FORWARDED_FOR'): ip = request.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
     else: ip = request.META.get('REMOTE_ADDR')
@@ -117,6 +135,11 @@ def verify_user(request, email, model_class, user_type='user'):
         return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
 
 def resend_user_otp(request, email, model_class, user_type='user'):
+    """
+    Handles OTP resend requests for user verification with IP-based throttling and cooldown enforcement.
+    
+    If allowed, sends a new OTP to the user's email address. Returns appropriate error responses if the request exceeds rate limits, the cooldown period has not elapsed, the user profile is missing, or if an unexpected error occurs.
+    """
     if request.META.get('HTTP_X_FORWARDED_FOR'): ip = request.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
     else: ip = request.META.get('REMOTE_ADDR')
     if is_ip_throttled(ip): return Response({'error': 'Too many requests from this IP. Try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
@@ -135,6 +158,14 @@ def resend_user_otp(request, email, model_class, user_type='user'):
     except Exception as e: return Response({'error':'Unable to send OTP. Please try again later.', 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 def create_user_views(model_class, serializer_class, user_type_name):
+    """
+    Create a dictionary of Django REST framework view functions for user management operations.
+    
+    The returned dictionary includes views for deleting, updating, adding users, handling password reset and confirmation, logging in, verifying users via OTP, and resending OTPs. Each view is configured with appropriate HTTP methods and permissions, and is tailored to the specified user type and serializer.
+    
+    Returns:
+        dict: A mapping of operation names to their corresponding DRF view functions.
+    """
     @api_view(['DELETE'])
     def delete_user(r, username): return soft_delete_user(model_class, username)
 
@@ -157,15 +188,35 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['PUT', 'PATCH'])
     @permission_classes([AllowAny])
-    def login(r): return user_login(r.data, model_class, serializer_class, user_type_name)
+    def login(r): """
+Authenticates a user and returns an authentication token and user data.
+
+Returns:
+    Response containing authentication token and serialized user profile data on success, or an error response on failure.
+"""
+return user_login(r.data, model_class, serializer_class, user_type_name)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def verify(r, email): return verify_user(r, email, model_class, user_type_name)
+    def verify(r, email): """
+Verifies a user's OTP using the provided email address.
+
+Delegates to the `verify_user` function with the specified model and user type.
+"""
+return verify_user(r, email, model_class, user_type_name)
 
     @api_view(['GET'])
     @permission_classes([AllowAny])
-    def resend_otp(r, email): return resend_user_otp(r, email, model_class, user_type_name)
+    def resend_otp(r, email): """
+Resend a one-time password (OTP) to the user's email address with rate limiting and cooldown enforcement.
+
+Parameters:
+    email (str): The email address of the user to receive the OTP.
+
+Returns:
+    Response: A Django REST framework response indicating success or the reason for failure (e.g., throttling, cooldown, or user not found).
+"""
+return resend_user_otp(r, email, model_class, user_type_name)
 
     return {
         'delete_user': delete_user,
