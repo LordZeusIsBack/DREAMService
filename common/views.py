@@ -142,11 +142,16 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @permission_classes([AllowAny])
     def login(r): return user_login(r.data, model_class, serializer_class, user_type_name)
 
+    @api_view(['POST'])
+    @permission_classes([AllowAny])
+    def verify(r, email): return verify_user(r, email, model_class, user_type_name)
+
     return {
         'delete_user': delete_user,
         'update_user': update_user,
         'add_user': add_new_user,
         'forgot_password': forgot_password,
         'reset_password': reset_password,
-        'login': login
+        'login': login,
+        'verify': verify,
     }
