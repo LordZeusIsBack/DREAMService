@@ -18,6 +18,8 @@ add_buyer = buyer_views['add_user']
 buyer_forgot_password = buyer_views['forgot_password']
 buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
+buyer_verify_email = buyer_views['verify']
+buyer_resend_otp = buyer_views['resend_otp']
 
 @api_view(['GET'])
 def buyer_data(r, buyer_username): 
