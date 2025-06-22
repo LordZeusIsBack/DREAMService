@@ -1,4 +1,5 @@
 from common.models import CustomUser
+from .utils.otp_handler import send_otp
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.contrib.auth.tokens import default_token_generator
@@ -33,6 +34,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
             first_name=user_data['first_name'],
             last_name=user_data['last_name']
         )
+        send_otp(custom_user_instance.email, is_resend=False)
         user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
         verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
         return user_model_instance
