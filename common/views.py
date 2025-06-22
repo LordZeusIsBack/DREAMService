@@ -92,6 +92,29 @@ def user_login(request_data, model_class, serializer_class, user_type_name='user
         except AttributeError: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
 
+def verify_user(request, email, model_class, user_type='user'):
+    otp = request.data.get('otp')
+    if request.META.get('HTTP_X_FORWARDED_FOR'): ip = request.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
+    else: ip = request.META.get('REMOTE_ADDR')
+    if not (email and otp): return Response({'error': 'Email and OTP are required'}, status=status.HTTP_400_BAD_REQUEST)
+    if is_ip_throttled(ip): return Response({'error': 'Too many requests from this IP. Try again.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    track_ip_request(ip)
+    if is_otp_brute_forced(email):
+        backoff = increase_backoff(email)
+        return Response({'error': f'Too many OTP attempts. Try again after {backoff} seconds.'}, status=status.HTTP_429_TOO_MANY_REQUESTS)
+    if not verify_otp(email, otp): return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        user = model_class.objects.get(email=email)
+        user_profile = getattr(user, user_type, None)
+        if not user_profile: return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
+        user_profile.is_verified = True
+        clear_otp_attempts(email)
+        user_profile.save()
+        return Response({'success': 'User successfully verified'}, status=status.HTTP_200_OK)
+    except model_class.DoesNotExist:
+        clear_otp_attempts(email)
+        return Response({'error': 'Invalid or expired OTP'}, status=status.HTTP_400_BAD_REQUEST)
+
 def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['DELETE'])
     def delete_user(r, username): return soft_delete_user(model_class, username)
