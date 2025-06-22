@@ -28,4 +28,6 @@ def create_user_url_patterns(view_module, user_type):
         path('reset-password/', getattr(view_module, f'{user_type}_reset_password'), name=reset_name),
         path(f'{user_type}-login/', getattr(view_module, f'{user_type}_login'), name=f'{user_type}_login'),
         path(f'{estate_listing}/<str:{user_type}_username>', getattr(view_module, estate_listing), name=f'{user_type}_estate_data'),
+        path(f'{user_type}-verify-email/<str:email>', getattr(view_module, f'{user_type}_verify_email'), name=f'{user_type}_email_verification'),
+        path('resend-otp/<str:email>', getattr(view_module, f'{user_type}_resend_otp'), name=f'resend_{user_type}_otp'),
     ]
