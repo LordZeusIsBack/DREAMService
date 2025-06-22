@@ -4,7 +4,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from hashlib import sha256
 
-otp_handler_cache = caches['otp_handler_cache']
+otp_handler_cache = caches['default']
 
 def _normalize_email(email): return email.strip().lower()
 
