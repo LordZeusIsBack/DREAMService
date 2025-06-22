@@ -3,6 +3,7 @@ from django.core.cache import caches
 from django.core.mail import send_mail
 from django.conf import settings
 from hashlib import sha256
+from hmac import compare_digest
 
 otp_handler_cache = caches['default']
 
@@ -70,8 +71,10 @@ def send_otp(email):
 
 def verify_otp(email, input_otp):
     stored_otp = otp_handler_cache.get(_cache_key('otp', email))
-    if stored_otp and stored_otp == input_otp:
-        otp_handler_cache.delete(f"otp_{email}")
+    input_otp = hash_otp(input_otp)
+    if stored_otp and compare_digest(stored_otp, input_otp):
+        otp_handler_cache.delete(_cache_key('otp', email))
+        clear_otp_attempts(email)
         return True
     attempts = increment_otp_attempt(email)
     if attempts == 3: send_security_alert(email)
