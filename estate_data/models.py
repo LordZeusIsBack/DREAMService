@@ -4,7 +4,17 @@ from seller_data.models import Seller
 from django.utils.text import slugify
 from storages.backends.s3boto3 import S3Boto3Storage
 
-def estate_image_path(instance, filename): return f'picture/estate_images/{instance.estate.slug}/{filename}'
+def estate_image_path(instance, filename): """
+Generate the file path for storing an estate image based on the estate's slug and the original filename.
+
+Parameters:
+    instance: The EstateImage instance containing the related estate.
+    filename: The original name of the uploaded image file.
+
+Returns:
+    str: The relative file path for storing the image.
+"""
+return f'picture/estate_images/{instance.estate.slug}/{filename}'
 
 # Create your models here.
 class Estate(models.Model):
@@ -54,4 +64,7 @@ class EstateImage(models.Model):
     estate = models.ForeignKey(Estate, related_name='images', on_delete=models.CASCADE, related_query_name='image')
     image = models.ImageField(upload_to=estate_image_path, storage=S3Boto3Storage)
 
-    def __str__(self): return f"Image for {self.estate.estate_name}"
+    def __str__(self): """
+Return a string indicating the image is associated with a specific estate by name.
+"""
+return f"Image for {self.estate.estate_name}"
