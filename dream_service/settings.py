@@ -103,9 +103,9 @@ DATABASES = {
         "PASSWORD": os.getenv('DB_PASSWORD'),
         "HOST": os.getenv('DB_HOST'),
         "PORT": os.getenv('DB_PORT'),
-        # "OPTIONS": {
-        #     "sslmode": "require",
-        # },
+        "OPTIONS": {
+            "sslmode": "require",
+        },
     }
 }
 
@@ -154,7 +154,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "public", "static"),
 ]
 
-MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
