@@ -1,6 +1,20 @@
+from functools import partial
 from django.db import models
+from django.utils.text import slugify
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from common.storage_backends import MediaStorage
+from uuid import uuid4
+
+def get_user_document_upload_path(instance, filename, subfolder):
+    user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
+    base, extension = filename.rsplit('.', 1)
+    safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
+    return f'{user_type}/{subfolder}/{safe_filename}'
+
+profile_picture_path = partial(get_user_document_upload_path, subfolder='profile_pictures')
+aadhaar_card_image_path = partial(get_user_document_upload_path, subfolder='verification/aadhaar_card')
+pan_card_image_path = partial(get_user_document_upload_path, subfolder='verification/pan_card')
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
