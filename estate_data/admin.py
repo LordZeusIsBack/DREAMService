@@ -4,7 +4,7 @@ from django.utils.html import format_html
 
 # Register your models here.
 @admin.register(EstateImage)
-class EstateAdmin(admin.ModelAdmin):
+class EstateImageAdmin(admin.ModelAdmin):
     list_display = ['estate', 'image_preview']
 
     def image_preview(self, obj):
