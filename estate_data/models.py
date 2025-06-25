@@ -69,7 +69,8 @@ class EstateImage(models.Model):
     estate = models.ForeignKey(Estate, related_name='images', on_delete=models.CASCADE, related_query_name='image')
     image = models.ImageField(upload_to=estate_image_path, storage=MediaStorage)
 
-    def __str__(self): """
-Return a string representation indicating the image is associated with a specific estate.
-"""
-return f"Image for {self.estate.estate_name}"
+    def __str__(self):
+        """
+        Return a string representation indicating the image is associated with a specific estate.
+        """
+        return f"Image for {self.estate.estate_name}"
