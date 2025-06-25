@@ -7,6 +7,19 @@ from common.utils.storage_backends import MediaStorage
 from uuid import uuid4
 
 def get_user_document_upload_path(instance, filename, subfolder):
+    """
+    Generate a unique and organized file upload path for a user's document or image.
+    
+    The path includes the user type ('buyer' or 'seller'), a specified subfolder, and a sanitized filename with a short UUID to prevent collisions.
+    
+    Parameters:
+        instance: The model instance associated with the file upload.
+        filename (str): The original name of the uploaded file.
+        subfolder (str): The subdirectory under the user type where the file will be stored.
+    
+    Returns:
+        str: The constructed file path for storing the uploaded file.
+    """
     user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
     safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
