@@ -5,6 +5,18 @@ from django.utils.text import slugify
 from common.utils.storage_backends import MediaStorage
 
 def estate_image_path(instance, filename):
+    """
+    Generate a unique and safe file path for uploading an estate image.
+    
+    The path includes a slugified version of the estate's name, a short UUID segment for uniqueness, and preserves the original file extension. The resulting path format is: 'estate_images/{estate_slug}/images/{safe_filename}'.
+    
+    Parameters:
+        instance: The EstateImage instance containing the related estate.
+        filename: The original name of the uploaded file.
+    
+    Returns:
+        str: The generated file path for storing the image.
+    """
     base, extension = filename.rsplit('.', 1)
     safe_filename = f'{slugify(instance.estate.estate_name)}-{uuid4().hex[:8]}.{extension}'
     return f'estate_images/{instance.estate.slug}/images/{safe_filename}'
@@ -57,4 +69,7 @@ class EstateImage(models.Model):
     estate = models.ForeignKey(Estate, related_name='images', on_delete=models.CASCADE, related_query_name='image')
     image = models.ImageField(upload_to=estate_image_path, storage=MediaStorage)
 
-    def __str__(self): return f"Image for {self.estate.estate_name}"
+    def __str__(self): """
+Return a string representation indicating the image is associated with a specific estate.
+"""
+return f"Image for {self.estate.estate_name}"
