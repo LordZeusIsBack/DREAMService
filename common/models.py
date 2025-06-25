@@ -41,7 +41,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class UserExtensionMixin(models.Model):
     is_deleted = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to='pictures/seller', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to=profile_picture_path, null=True, blank=True, storage=MediaStorage)
     phone_number = models.CharField(max_length=10, unique=True, null=True, blank=True, editable=False)
     is_verified = models.BooleanField(default=False, editable=False)
 
@@ -50,13 +50,13 @@ class UserExtensionMixin(models.Model):
 
 
 class VerificationMixin(models.Model):
-    aadhaar_card = models.ImageField(upload_to='pictures/seller/verification/aadhaar', null=True, blank=True)
+    aadhaar_card = models.ImageField(upload_to=aadhaar_card_image_path, null=True, blank=True, storage=MediaStorage)
     aadhaar_number = models.BigIntegerField(
         validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
         unique=True,
         editable=False
     )
-    pan_card = models.ImageField(upload_to='pictures/seller/verification/pan', null=True, blank=True)
+    pan_card = models.ImageField(upload_to=pan_card_image_path, null=True, blank=True, storage=MediaStorage)
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
 
     class Meta:
