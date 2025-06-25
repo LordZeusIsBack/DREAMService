@@ -2,7 +2,7 @@ from uuid import uuid4
 from django.db import models
 from seller_data.models import Seller
 from django.utils.text import slugify
-from common.storage_backends import MediaStorage
+from common.utils.storage_backends import MediaStorage
 
 def estate_image_path(instance, filename):
     base, extension = filename.rsplit('.', 1)
