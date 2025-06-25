@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     "seller_data",
     "buyer_data",
     "common",
-    "estate_data"
+    "estate_data",
+    "storages"
 ]
 
 MIDDLEWARE = [
@@ -60,6 +61,18 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "dream_service.urls"
+
+AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
+AWS_S3_REGION_NAME = os.getenv('AWS_REGION_NAME')
+AWS_S3_ADDRESSING_STYLE = "virtual"
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL = None
+AWS_QUERYSTRING_AUTH = True
+AWS_QUERYSTRING_EXPIRE = 900
+
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 TEMPLATES = [
     {
@@ -152,8 +165,7 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "public", "static"),
 ]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, '')
-MEDIA_URL = "/media/"
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

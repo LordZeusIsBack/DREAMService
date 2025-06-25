@@ -2,8 +2,12 @@ from uuid import uuid4
 from django.db import models
 from seller_data.models import Seller
 from django.utils.text import slugify
+from common.utils.storage_backends import MediaStorage
 
-def estate_image_path(instance, filename): return f'picture/estate_images/{instance.estate.slug}/{filename}'
+def estate_image_path(instance, filename):
+    base, extension = filename.rsplit('.', 1)
+    safe_filename = f'{slugify(instance.estate.estate_name)}-{uuid4().hex[:8]}.{extension}'
+    return f'estate_images/{instance.estate.slug}/images/{safe_filename}'
 
 # Create your models here.
 class Estate(models.Model):
@@ -51,6 +55,6 @@ class Estate(models.Model):
 
 class EstateImage(models.Model):
     estate = models.ForeignKey(Estate, related_name='images', on_delete=models.CASCADE, related_query_name='image')
-    image = models.ImageField(upload_to=estate_image_path)
+    image = models.ImageField(upload_to=estate_image_path, storage=MediaStorage)
 
     def __str__(self): return f"Image for {self.estate.estate_name}"

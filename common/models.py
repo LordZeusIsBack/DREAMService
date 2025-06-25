@@ -1,6 +1,20 @@
+from functools import partial
 from django.db import models
+from django.utils.text import slugify
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from common.utils.storage_backends import MediaStorage
+from uuid import uuid4
+
+def get_user_document_upload_path(instance, filename, subfolder):
+    user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
+    base, extension = filename.rsplit('.', 1)
+    safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
+    return f'{user_type}/{subfolder}/{safe_filename}'
+
+profile_picture_path = partial(get_user_document_upload_path, subfolder='profile_pictures')
+aadhaar_card_image_path = partial(get_user_document_upload_path, subfolder='verification/aadhaar_card')
+pan_card_image_path = partial(get_user_document_upload_path, subfolder='verification/pan_card')
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
@@ -41,7 +55,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 class UserExtensionMixin(models.Model):
     is_deleted = models.BooleanField(default=False)
-    profile_picture = models.ImageField(upload_to='pictures/seller', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to=profile_picture_path, null=True, blank=True, storage=MediaStorage)
     phone_number = models.CharField(max_length=10, unique=True, null=True, blank=True, editable=False)
     is_verified = models.BooleanField(default=False, editable=False)
 
@@ -50,13 +64,13 @@ class UserExtensionMixin(models.Model):
 
 
 class VerificationMixin(models.Model):
-    aadhaar_card = models.ImageField(upload_to='pictures/seller/verification/aadhaar', null=True, blank=True)
+    aadhaar_card = models.ImageField(upload_to=aadhaar_card_image_path, null=True, blank=True, storage=MediaStorage)
     aadhaar_number = models.BigIntegerField(
         validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
         unique=True,
         editable=False
     )
-    pan_card = models.ImageField(upload_to='pictures/seller/verification/pan', null=True, blank=True)
+    pan_card = models.ImageField(upload_to=pan_card_image_path, null=True, blank=True, storage=MediaStorage)
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
 
     class Meta:
