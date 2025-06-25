@@ -52,6 +52,6 @@ class Estate(models.Model):
 
 class EstateImage(models.Model):
     estate = models.ForeignKey(Estate, related_name='images', on_delete=models.CASCADE, related_query_name='image')
-    image = models.ImageField(upload_to=estate_image_path, storage=S3Boto3Storage)
+    image = models.ImageField(upload_to=estate_image_path, storage=MediaStorage)
 
     def __str__(self): return f"Image for {self.estate.estate_name}"
