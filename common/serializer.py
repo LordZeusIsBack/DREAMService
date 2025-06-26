@@ -36,7 +36,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
             ValidationError: If either the password or verification data is missing.
         """
         user_data = validated_data.pop('user')
-        verification_data = validated_data.pop(verification_field, None)
+        verification_data = validated_data.pop(verification_field)
         password = validated_data.pop('password', None)
         if not (password and verification_data): raise ValidationError({'error': 'Both password and verification data are required.'})
         custom_user_instance = CustomUser.objects.create_user(
