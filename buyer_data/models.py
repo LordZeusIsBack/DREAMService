@@ -15,7 +15,7 @@ class BuyerVerification(VerificationMixin):
 
     def __str__(self):
         """Returns the full name of the buyer associated with this object."""
-        return f"{self.buyer.user.first_name} {self.buyer.user.last_name}"
+        return f"{self.buyer.user.username}"
 
 class PurchasedEstate(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, related_name='purchased_estates')
