@@ -24,6 +24,16 @@ class BuyerAdmin(admin.ModelAdmin):
     def username(self, obj):
         return obj.user.username
 
+@admin.register(BuyerVerification)
+class BuyerVerificationAdmin(admin.ModelAdmin):
+    readonly_fields = ('aadhaar_number', 'pan_number')
+    list_display = ('buyer_username', 'aadhaar_number', 'pan_number')
+    search_fields = ('aadhaar_number', 'pan_number')
+
+    @admin.display(description='Buyer Username')
+    def buyer_username(self, obj):
+        return obj.buyer.user.username
+
 @admin.register(PurchasedEstate)
 class BuyerPurchaseAdmin(admin.ModelAdmin):
     readonly_fields = ('purchase_date', 'transaction_id')
