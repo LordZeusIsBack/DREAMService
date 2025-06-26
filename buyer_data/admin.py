@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import *
 
 # Register your models here.
@@ -27,12 +28,30 @@ class BuyerAdmin(admin.ModelAdmin):
 @admin.register(BuyerVerification)
 class BuyerVerificationAdmin(admin.ModelAdmin):
     readonly_fields = ('aadhaar_number', 'pan_number')
-    list_display = ('buyer_username', 'aadhaar_number', 'pan_number')
+    list_display = ('buyer_username', 'aadhaar_number', 'aadhaar_preview', 'pan_number', 'pan_preview')
     search_fields = ('aadhaar_number', 'pan_number')
 
     @admin.display(description='Buyer Username')
     def buyer_username(self, obj):
         return obj.buyer.user.username
+
+    @admin.display(description='Aadhaar Card Preview')
+    def aadhaar_preview(self, obj):
+        if obj.aadhaar_card:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />',
+                obj.aadhaar_card.url
+            )
+        return "No Image"
+
+    @admin.display(description='PAN Card Preview')
+    def pan_preview(self, obj):
+        if obj.pan_card:
+            return format_html(
+                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />',
+                obj.pan_card.url
+            )
+        return "No Image"
 
 @admin.register(PurchasedEstate)
 class BuyerPurchaseAdmin(admin.ModelAdmin):
