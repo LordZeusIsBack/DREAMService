@@ -13,6 +13,19 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 
 # Create your views here.
 def process_serializer(serializer_class, data, instance=None, success_status=status.HTTP_200_OK, create_status=status.HTTP_201_CREATED):
+    """
+    Validate and save data using the provided serializer, returning serialized data and appropriate HTTP status.
+    
+    Parameters:
+        serializer_class: The serializer class to use for validation and saving.
+        data: The input data to be validated and saved.
+        instance: Optional existing instance to update; if None, a new instance is created.
+        success_status: HTTP status code to return on successful update.
+        create_status: HTTP status code to return on successful creation.
+    
+    Returns:
+        A tuple containing either the serialized data or error details, and the corresponding HTTP status code.
+    """
     serializer_instance = serializer_class(instance, data=data) if instance else serializer_class(data=data)
     if serializer_instance.is_valid():
         try:
@@ -161,12 +174,12 @@ def resend_user_otp(request, email, model_class, user_type='user'):
 
 def create_user_views(model_class, serializer_class, user_type_name):
     """
-    Create a dictionary of Django REST framework view functions for user management operations.
+    Factory function that generates a set of Django REST framework view functions for user management operations.
     
-    The returned dictionary includes views for deleting, updating, adding users, handling password reset and confirmation, logging in, verifying users via OTP, and resending OTPs. Each view is configured with appropriate HTTP methods and permissions, and is tailored to the specified user type and serializer.
-    
+    Returns a dictionary mapping operation names to DRF views for deleting, updating, creating users, password reset and confirmation, authentication, OTP verification, and OTP resending. Each view is configured for the specified user model, serializer, and user type, with appropriate HTTP methods, permissions, and request parsers.
+     
     Returns:
-        dict: A mapping of operation names to their corresponding DRF view functions.
+        dict: Mapping of operation names to their corresponding DRF view functions.
     """
     @api_view(['DELETE'])
     def delete_user(r, username): return soft_delete_user(model_class, username)
@@ -177,7 +190,13 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['POST'])
     @permission_classes([AllowAny])
     @parser_classes([MultiPartParser, FormParser])
-    def add_new_user(r): return add_user(r.data, serializer_class)
+    def add_new_user(r): """
+Creates a new user profile using the provided request data and serializer.
+
+Returns:
+	Response: Serialized user data and HTTP status code indicating the result of the creation.
+"""
+return add_user(r.data, serializer_class)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
