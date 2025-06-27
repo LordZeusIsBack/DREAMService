@@ -10,9 +10,9 @@ class EstateImageAdmin(admin.ModelAdmin):
     @admin.display(description='Image Preview')
     def image_preview(self, obj):
         """
-        Returns an HTML image preview for the given estate image object in the Django admin list view.
+        Return an HTML image preview for an EstateImage object in the Django admin list view.
         
-        If the object has an associated image, displays a scaled preview; otherwise, returns "No Image".
+        If the object has an associated image, displays a scaled image preview; otherwise, returns "No Image".
         """
         if obj.image: return format_html('<img src="{}" width="100" style="object-fit:contain;" />', obj.image.url)
         return "No Image"
@@ -24,4 +24,13 @@ class EstateAdmin(admin.ModelAdmin):
 
     @admin.display(description='Seller Username')
     def seller_username(self, obj):
+        """
+        Returns the username of the seller associated with the given estate object.
+        
+        Parameters:
+            obj: The estate instance for which to retrieve the seller's username.
+        
+        Returns:
+            str: The username of the seller linked to the estate.
+        """
         return obj.seller.user.username

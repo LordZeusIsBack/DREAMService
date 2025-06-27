@@ -21,19 +21,19 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def create_user(validated_data, user_model, verification_model, verification_field):
         """
-        Creates a new user and associated verification record, sending an OTP to the user's email as part of the process.
+        Create a new user profile and associated verification record, sending an OTP to the user's email.
         
         Parameters:
-            validated_data (dict): Data containing user information, password, and verification details.
-            user_model: The model class for the user profile to be created.
-            verification_model: The model class for storing verification data.
-            verification_field (str): The key in validated_data containing verification information.
+            validated_data (dict): Dictionary containing nested user data, password, and verification information.
+            user_model: Model class for the user profile to be created.
+            verification_model: Model class for storing verification records.
+            verification_field (str): Key in validated_data for verification information.
         
         Returns:
-            An instance of the created user model.
+            The created user profile instance.
         
         Raises:
-            ValidationError: If either the password or verification data is missing.
+            ValidationError: If the password or verification data is missing.
         """
         user_data = validated_data.pop('user')
         verification_data = validated_data.pop(verification_field)
