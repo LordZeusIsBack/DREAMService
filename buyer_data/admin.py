@@ -37,20 +37,12 @@ class BuyerVerificationAdmin(admin.ModelAdmin):
 
     @admin.display(description='Aadhaar Card Preview')
     def aadhaar_preview(self, obj):
-        if obj.aadhaar_card:
-            return format_html(
-                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />',
-                obj.aadhaar_card.url
-            )
+        if obj.aadhaar_card: return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />', obj.aadhaar_card.url)
         return "No Image"
 
     @admin.display(description='PAN Card Preview')
     def pan_preview(self, obj):
-        if obj.pan_card:
-            return format_html(
-                '<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />',
-                obj.pan_card.url
-            )
+        if obj.pan_card: return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />', obj.pan_card.url)
         return "No Image"
 
 @admin.register(PurchasedEstate)
