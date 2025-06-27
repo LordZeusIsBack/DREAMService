@@ -32,7 +32,10 @@ class BuyerSerializer(BaseUserSerializer):
 
     def create(self, validated_data):
         """
-        Create a new buyer instance.
+        Creates a new buyer along with associated verification data.
+        
+        Returns:
+            Buyer: The newly created buyer instance.
         """
         return BaseUserSerializer.create_user(
             validated_data,

@@ -14,7 +14,9 @@ class BuyerVerification(VerificationMixin):
     buyer = models.OneToOneField(Buyer, on_delete=models.CASCADE, related_name='buyerverification')
 
     def __str__(self):
-        """Returns the full name of the buyer associated with this object."""
+        """
+        Return the username of the user associated with this buyer verification.
+        """
         return f"{self.buyer.user.username}"
 
 class PurchasedEstate(models.Model):
