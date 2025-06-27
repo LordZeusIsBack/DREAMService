@@ -7,18 +7,21 @@ from django.utils.html import format_html
 class EstateImageAdmin(admin.ModelAdmin):
     list_display = ['estate', 'image_preview']
 
+    @admin.display(description='Image Preview')
     def image_preview(self, obj):
         """
         Returns an HTML image preview for the given estate image object in the Django admin list view.
         
         If the object has an associated image, displays a scaled preview; otherwise, returns "No Image".
         """
-        if obj.image:
-            return format_html('<img src="{}" width="100" style="object-fit:contain;" />', obj.image.url)
+        if obj.image: return format_html('<img src="{}" width="100" style="object-fit:contain;" />', obj.image.url)
         return "No Image"
-
-    image_preview.short_description = 'Image Preview'
 
 @admin.register(Estate)
 class EstateAdmin(admin.ModelAdmin):
-    list_display = ['estate_name', 'estate_type', 'estate_price', 'status', 'latitude', 'longitude', 'slug', 'created_at', 'updated_at']
+    list_display = ['seller_username', 'estate_name', 'estate_type', 'estate_price', 'status', 'latitude', 'longitude', 'created_at', 'updated_at']
+    search_fields = ['seller__user__username', 'estate_type', 'estate_price']
+
+    @admin.display(description='Seller Username')
+    def seller_username(self, obj):
+        return obj.seller.user.username
