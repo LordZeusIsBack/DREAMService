@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import *
+from .models import Buyer, BuyerVerification, PurchasedEstate
 
 # Register your models here.
 @admin.register(Buyer)
