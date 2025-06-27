@@ -1,4 +1,5 @@
 from django.conf import settings
+from rest_framework.parsers import MultiPartParser, FormParser
 import common.serializer as common_serializer
 from .utils.otp_handler import verify_otp, is_ip_throttled, track_ip_request, is_otp_brute_forced, increase_backoff, clear_otp_attempts, can_resend_otp, send_otp, mark_otp_throttle
 import rest_framework.status as status
@@ -7,7 +8,8 @@ from rest_framework.authtoken.models import Token
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+
 
 # Create your views here.
 def process_serializer(serializer_class, data, instance=None, success_status=status.HTTP_200_OK, create_status=status.HTTP_201_CREATED):
@@ -174,6 +176,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
+    @parser_classes([MultiPartParser, FormParser])
     def add_new_user(r): return add_user(r.data, serializer_class)
 
     @api_view(['POST'])
