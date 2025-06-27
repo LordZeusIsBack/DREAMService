@@ -190,13 +190,14 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['POST'])
     @permission_classes([AllowAny])
     @parser_classes([MultiPartParser, FormParser])
-    def add_new_user(r): """
-Creates a new user profile using the provided request data and serializer.
+    def add_new_user(r):
+        """
+        Creates a new user profile using the provided request data and serializer.
 
-Returns:
-	Response: Serialized user data and HTTP status code indicating the result of the creation.
-"""
-return add_user(r.data, serializer_class)
+        Returns:
+	        Response: Serialized user data and HTTP status code indicating the result of the creation.
+        """
+        return add_user(r.data, serializer_class)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
