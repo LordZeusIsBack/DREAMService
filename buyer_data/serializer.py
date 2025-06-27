@@ -9,9 +9,11 @@ class BuyerVerificationSerializer(serializers.ModelSerializer):
     """
     aadhaar_number = serializers.IntegerField()
     pan_number = serializers.CharField()
+    aadhaar_card = serializers.ImageField(required=False)
+    pan_card = serializers.ImageField(required=False)
     class Meta:
         model = models.BuyerVerification
-        fields = ('aadhaar_number', 'pan_number')
+        fields = ('aadhaar_number', 'pan_number', 'aadhaar_card', 'pan_card')
 
 
 class BuyerSerializer(BaseUserSerializer):
@@ -23,9 +25,10 @@ class BuyerSerializer(BaseUserSerializer):
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.EmailField(source='user.email')
     username = serializers.CharField(source='user.username')
+    profile_picture = serializers.ImageField(required=False)
     class Meta(BaseUserSerializer.Meta):
         model = models.Buyer
-        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'password', 'verification')
+        fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'password', 'verification', 'profile_picture')
 
     def create(self, validated_data):
         """
