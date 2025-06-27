@@ -13,4 +13,4 @@ class SellerAdmin(admin.ModelAdmin):
 
     @admin.display(description='Seller Username')
     def seller_username(self, obj):
-        return obj.user.username
+        return obj.seller.user.username
