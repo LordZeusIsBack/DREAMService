@@ -16,7 +16,13 @@ class SellerSerializer(BaseUserSerializer):
     """
     Serializer for seller model.
     """
-    verification = SellerVerificationSerializer(source='sellerverification', read_only=False)
+    aadhaar_number = serializers.IntegerField(write_only=True)
+    pan_number = serializers.CharField(write_only=True)
+    aadhaar_card = serializers.ImageField(required=False, write_only=True)
+    pan_card = serializers.ImageField(required=False, write_only=True)
+    gstin = serializers.IntegerField(write_only=True)
+    agent_rera_id = serializers.CharField(write_only=True)
+    profile_picture = serializers.ImageField(required=False)
     business_name = serializers.CharField()
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
