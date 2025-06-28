@@ -20,7 +20,6 @@ def get_user_document_upload_path(instance, filename, subfolder):
     Returns:
         str: The constructed file path for storing the uploaded file.
     """
-    print(instance)
     user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
     safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
