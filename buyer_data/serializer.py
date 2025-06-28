@@ -32,7 +32,7 @@ class BuyerSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = models.Buyer
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'password', 'aadhaar_number',
-                  'pan_number', 'aadhaar_card', 'pan_card', 'profile_picture', 'profile_picture')
+                  'pan_number', 'aadhaar_card', 'pan_card', 'profile_picture')
 
     def create(self, validated_data):
         """
