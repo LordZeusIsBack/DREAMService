@@ -16,7 +16,13 @@ class SellerSerializer(BaseUserSerializer):
     """
     Serializer for seller model.
     """
-    verification = SellerVerificationSerializer(source='sellerverification', read_only=False)
+    aadhaar_number = serializers.IntegerField(write_only=True)
+    pan_number = serializers.CharField(write_only=True)
+    aadhaar_card = serializers.ImageField(required=False, write_only=True)
+    pan_card = serializers.ImageField(required=False, write_only=True)
+    gstin = serializers.IntegerField(write_only=True)
+    agent_rera_id = serializers.CharField(write_only=True)
+    profile_picture = serializers.ImageField(required=False)
     business_name = serializers.CharField()
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
@@ -26,9 +32,18 @@ class SellerSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = models.Seller
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'business_name', 'username', 'password',
-                  'verification')
+                  'aadhaar_number', 'pan_number', 'aadhaar_card', 'pan_card', 'gstin', 'agent_rera_id', 'profile_picture')
 
     def create(self, validated_data):
+        verification_data = {
+            'aadhaar_number': validated_data.pop('aadhaar_number'),
+            'pan_number': validated_data.pop('pan_number'),
+            'aadhaar_card': validated_data.pop('aadhaar_card', None),
+            'pan_card': validated_data.pop('pan_card', None),
+            'gstin': validated_data.pop('gstin'),
+            'agent_rera_id': validated_data.pop('agent_rera_id')
+        }
+        validated_data['sellerverification'] = verification_data
         return BaseUserSerializer.create_user(
             validated_data,
             models.Seller,
