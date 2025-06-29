@@ -19,7 +19,8 @@ class EstateImageAdmin(admin.ModelAdmin):
 
 @admin.register(Estate)
 class EstateAdmin(admin.ModelAdmin):
-    list_display = ['seller_username', 'estate_name', 'estate_type', 'estate_price', 'status', 'latitude', 'longitude', 'created_at', 'updated_at']
+    readonly_fields = ('estate_government_id',)
+    list_display = ['estate_government_id', 'seller_username', 'estate_name', 'estate_type', 'estate_price', 'status', 'latitude', 'longitude', 'created_at', 'updated_at']
     search_fields = ['seller__user__username', 'estate_type', 'estate_price']
 
     @admin.display(description='Seller Username')
