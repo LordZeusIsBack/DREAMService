@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
+from rest_framework.exceptions import ValidationError
 from common.utils.storage_backends import MediaStorage
 from uuid import uuid4
 
@@ -85,6 +86,12 @@ class VerificationMixin(models.Model):
     )
     pan_card = models.ImageField(upload_to=pan_card_image_path, null=True, blank=True, storage=MediaStorage)
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
+
+    def save(self, *args, **kwargs):
+        original = type(self).objects.get(pk=self.pk)
+        if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
+        if original.pan_number != self.pan_number: raise ValidationError('Pan Number once swt cannot be changed!')
+        return super().save(*args, **kwargs)
 
     class Meta:
         abstract = True
