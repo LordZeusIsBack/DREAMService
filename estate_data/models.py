@@ -47,7 +47,7 @@ class Estate(models.Model):
     ])
     latitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True, db_index=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True, db_index=True)
-    slug = models.SlugField(max_length=255, unique=True, blank=True, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, db_index=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
