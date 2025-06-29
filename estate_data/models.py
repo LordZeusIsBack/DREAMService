@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.db import models
+from rest_framework.exceptions import ValidationError
 from seller_data.models import Seller
 from django.utils.text import slugify
 from common.utils.storage_backends import MediaStorage
@@ -64,6 +65,9 @@ class Estate(models.Model):
             candidate = f"{base_slug}-{uuid4().hex[:8]}"
             while Estate.objects.filter(slug=candidate).exists(): candidate = f"{base_slug}-{uuid4().hex[:8]}"
             self.slug = candidate
+        if self.pk:
+            original = Estate.objects.get(pk=self.pk)
+            if original.estate_government_id != self.estate_government_id: raise ValidationError('Government ID cannot be changed once set!')
         return super().save(*args, **kwargs)
 
 class EstateImage(models.Model):
