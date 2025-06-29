@@ -79,3 +79,7 @@ class EstateImage(models.Model):
         Return a string representation indicating the image is associated with a specific estate.
         """
         return f"Image for {self.estate.estate_name}"
+
+class EstateViews(models.Model):
+    estate = models.ForeignKey(Estate, on_delete=models.CASCADE, related_name='views', related_query_name='view')
+    views = models.IntegerField(default=0, editable=False)
