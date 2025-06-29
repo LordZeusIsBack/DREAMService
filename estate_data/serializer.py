@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 import estate_data.models as models
 
 
@@ -19,8 +20,8 @@ class EstateSerializer(serializers.ModelSerializer):
     )
     class Meta:
         model = models.Estate
-        fields = ['seller', 'estate_name', 'estate_type', 'estate_price', 'status', 'slug', 'latitude', 'longitude',
-                  'images', 'images_to_delete']
+        fields = ['seller', 'estate_name', 'estate_type', 'estate_government_id', 'estate_price', 'status',
+                  'slug', 'latitude', 'longitude', 'images', 'images_to_delete']
 
     def create(self, validated_data):
         if 'images_to_delete' in validated_data: validated_data.pop('images_to_delete')
@@ -30,6 +31,11 @@ class EstateSerializer(serializers.ModelSerializer):
             image_files = request.FILES.getlist('images')
             for image_file in image_files: models.EstateImage.objects.create(estate=estate, image=image_file)
         return estate
+
+    def validate(self, attrs):
+        if self.instance and 'estate_government_id' in attrs:
+            if attrs['estate_government_id'] != self.instance.estate_government_id: raise ValidationError('Government ID cannot be changed once set!')
+        return attrs
 
     def update(self, instance, validated_data):
         images_to_delete = validated_data.pop('images_to_delete', None)
