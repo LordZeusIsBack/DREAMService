@@ -1,5 +1,6 @@
 from uuid import uuid4
 from django.db import models
+from rest_framework.exceptions import ValidationError
 from seller_data.models import Seller
 from django.utils.text import slugify
 from common.utils.storage_backends import MediaStorage
@@ -24,6 +25,7 @@ def estate_image_path(instance, filename):
 # Create your models here.
 class Estate(models.Model):
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
+    estate_government_id = models.CharField(max_length=255, unique=True, db_index=True)
     estate_name = models.CharField(max_length=255)
     estate_type = models.CharField(max_length=255, choices=[
         ('apartment', 'Apartment'),
@@ -46,7 +48,7 @@ class Estate(models.Model):
     ])
     latitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True, db_index=True)
     longitude = models.DecimalField(max_digits=11, decimal_places=8, null=True, blank=True, db_index=True)
-    slug = models.SlugField(max_length=255, unique=True, blank=True, db_index=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, db_index=True, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -63,6 +65,9 @@ class Estate(models.Model):
             candidate = f"{base_slug}-{uuid4().hex[:8]}"
             while Estate.objects.filter(slug=candidate).exists(): candidate = f"{base_slug}-{uuid4().hex[:8]}"
             self.slug = candidate
+        if self.pk:
+            original = Estate.objects.get(pk=self.pk)
+            if original.estate_government_id != self.estate_government_id: raise ValidationError('Government ID cannot be changed once set!')
         return super().save(*args, **kwargs)
 
 class EstateImage(models.Model):
@@ -74,3 +79,7 @@ class EstateImage(models.Model):
         Return a string representation indicating the image is associated with a specific estate.
         """
         return f"Image for {self.estate.estate_name}"
+
+class EstateViews(models.Model):
+    estate = models.OneToOneField(Estate, on_delete=models.CASCADE, related_name='views', related_query_name='view')
+    views = models.IntegerField(default=0, editable=False)
