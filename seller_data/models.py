@@ -17,10 +17,12 @@ class SellerVerification(VerificationMixin):
     gstin = models.BigIntegerField(validators=[MaxValueValidator(9999999999)], unique=True, editable=False)
 
     def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.gstin != self.gstin: raise ValidationError('GSTIN cannot be changed once set!')
+                if original.agent_rera_id != self.agent_rera_id: return ValidationError('RERA ID cannot be changed once set!')
+            except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
-        original = type(self).objects.get(pk=self.pk)
-        if original.gstin != self.gstin: raise ValidationError('GSTIN cannot be changed once set!')
-        if original.agent_rera_id != self.agent_rera_id: return ValidationError('RERA ID cannot be changed once set!')
-        return super().save(*args, **kwargs)
 
     def __str__(self): return self.seller.business_name
