@@ -88,6 +88,11 @@ class VerificationMixin(models.Model):
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
 
     def save(self, *args, **kwargs):
+        """
+        Saves the instance while enforcing immutability of Aadhaar and PAN numbers.
+        
+        Raises a ValidationError if an attempt is made to modify the `aadhaar_number` or `pan_number` fields after they have been set.
+        """
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)

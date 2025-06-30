@@ -17,6 +17,11 @@ class SellerVerification(VerificationMixin):
     gstin = models.BigIntegerField(validators=[MaxValueValidator(9999999999)], unique=True, editable=False)
 
     def save(self, *args, **kwargs):
+        """
+        Overrides the save method to prevent changes to GSTIN and agent RERA ID after creation.
+        
+        Raises a ValidationError if an attempt is made to modify the GSTIN. Returns a ValidationError if the agent RERA ID is changed (note: this should typically raise instead of return). Allows normal saving if these fields remain unchanged or if the instance is being created.
+        """
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)
@@ -25,4 +30,7 @@ class SellerVerification(VerificationMixin):
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
-    def __str__(self): return self.seller.business_name
+    def __str__(self): """
+Return the business name of the associated seller as the string representation of the SellerVerification instance.
+"""
+return self.seller.business_name
