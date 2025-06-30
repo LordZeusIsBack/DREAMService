@@ -24,6 +24,14 @@ class EstateSerializer(serializers.ModelSerializer):
                   'slug', 'latitude', 'longitude', 'images', 'images_to_delete']
 
     def create(self, validated_data):
+        """
+        Creates a new Estate instance with the provided validated data and associates uploaded images if present.
+        
+        Removes any 'images_to_delete' field from the input data before creation. If image files are included in the request context under the 'images' key, creates EstateImage instances linked to the new estate for each uploaded image.
+        
+        Returns:
+            estate (Estate): The newly created Estate instance.
+        """
         if 'images_to_delete' in validated_data: validated_data.pop('images_to_delete')
         estate = models.Estate.objects.create(**validated_data)
         request = self.context.get('request')
@@ -33,11 +41,21 @@ class EstateSerializer(serializers.ModelSerializer):
         return estate
 
     def validate(self, attrs):
+        """
+        Ensures that the estate's government ID cannot be changed after creation.
+        
+        Raises a ValidationError if an update attempt modifies the existing estate_government_id.
+        """
         if self.instance and 'estate_government_id' in attrs:
             if attrs['estate_government_id'] != self.instance.estate_government_id: raise ValidationError('Government ID cannot be changed once set!')
         return attrs
 
     def update(self, instance, validated_data):
+        """
+        Updates an existing estate instance with new data and manages associated images.
+        
+        If a list of image IDs to delete is provided, removes those images from the estate. Adds any new uploaded images to the estate. Returns the updated estate instance.
+        """
         images_to_delete = validated_data.pop('images_to_delete', None)
         if images_to_delete: models.EstateImage.objects.filter(id__in=images_to_delete, estate=instance).delete()
         for attr, value in validated_data.items(): setattr(instance, attr, value)

@@ -13,16 +13,15 @@ from django.conf import settings
 
 def bounding_box(lat, long, radius):
     """
-    Calculates a latitude-longitude bounding box around a geographic point.
+    Compute the minimum and maximum latitude and longitude values that define a bounding box around a geographic point.
     
-    Args:
-        lat: Latitude of the center point in decimal degrees.
-        long: Longitude of the center point in decimal degrees.
-        radius: Radius in kilometers for the bounding box.
+    Parameters:
+        lat (float): Latitude of the center point in decimal degrees.
+        long (float): Longitude of the center point in decimal degrees.
+        radius (float): Radius in kilometers from the center point.
     
     Returns:
-        A tuple (min_lat, max_lat, min_long, max_long) representing the bounding box
-        that encloses all points within the specified radius of the center.
+        tuple: (min_lat, max_lat, min_long, max_long) representing the bounding box enclosing all points within the specified radius.
     """
     lat, long, earth_radius = float(lat), float(long), 6371
     delta_lat, delta_long = degrees(radius / earth_radius), degrees(radius / (earth_radius * cos(radians(lat))))
@@ -55,6 +54,12 @@ def haversine(lat1, lon1, lat2, lon2):
 # Create your views here.
 @api_view(['GET'])
 def get_estate_data(r, estate_slug):
+    """
+    Retrieve data for a specific estate by slug and increment its view count for the requesting IP address.
+    
+    Returns:
+        Response: Serialized estate data for the specified estate.
+    """
     if r.META.get('HTTP_X_FORWARDED_FOR'): ip = r.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
     else: ip = r.META.get('REMOTE_ADDR')
     estate = get_object_or_404(models.Estate, slug=estate_slug)
