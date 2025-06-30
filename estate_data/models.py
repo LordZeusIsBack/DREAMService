@@ -81,5 +81,5 @@ class EstateImage(models.Model):
         return f"Image for {self.estate.estate_name}"
 
 class EstateViews(models.Model):
-    estate = models.ForeignKey(Estate, on_delete=models.CASCADE, related_name='views', related_query_name='view')
+    estate = models.OneToOneField(Estate, on_delete=models.CASCADE, related_name='views', related_query_name='view')
     views = models.IntegerField(default=0, editable=False)
