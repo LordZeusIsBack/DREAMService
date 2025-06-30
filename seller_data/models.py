@@ -30,7 +30,8 @@ class SellerVerification(VerificationMixin):
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
-    def __str__(self): """
-Return the business name of the associated seller as the string representation of the SellerVerification instance.
-"""
-return self.seller.business_name
+    def __str__(self):
+        """
+        Return the business name of the associated seller as the string representation of the SellerVerification instance.
+        """
+        return self.seller.business_name
