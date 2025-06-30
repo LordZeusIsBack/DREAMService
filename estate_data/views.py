@@ -8,6 +8,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.decorators import api_view, parser_classes
 from rest_framework.response import Response
 import rest_framework.status as status
+from .utils.views_calculator import increase_views
 from django.conf import settings
 
 def bounding_box(lat, long, radius):
@@ -53,7 +54,12 @@ def haversine(lat1, lon1, lat2, lon2):
 
 # Create your views here.
 @api_view(['GET'])
-def get_estate_data(r, estate_slug): return Response(EstateSerializer(get_object_or_404(models.Estate, slug=estate_slug)).data)
+def get_estate_data(r, estate_slug):
+    if r.META.get('HTTP_X_FORWARDED_FOR'): ip = r.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
+    else: ip = r.META.get('REMOTE_ADDR')
+    estate = get_object_or_404(models.Estate, slug=estate_slug)
+    increase_views(estate, ip)
+    return Response(EstateSerializer(estate).data)
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
