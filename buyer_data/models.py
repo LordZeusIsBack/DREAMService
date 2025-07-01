@@ -1,7 +1,7 @@
 from django.db import models
 from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
-from estate_data.models import Estate
+from estate_data.models import Estate, EstateMetrics
 
 # Create your models here.
 class Buyer(UserExtensionMixin):
