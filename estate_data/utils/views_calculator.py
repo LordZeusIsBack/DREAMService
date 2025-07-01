@@ -1,6 +1,6 @@
 from django.core.cache import caches
 from hashlib import sha256
-from estate_data.models import EstateViews
+from estate_data.models import EstateMetrics
 
 ip_cache = caches['views_ip_cache']
 
@@ -37,6 +37,6 @@ def increase_views(estate, user_ip):
         user_ip (str): The IP address of the user attempting to increase the view count.
     """
     if can_increase_views(user_ip):
-        estate = EstateViews.objects.get(estate=estate)
+        estate = EstateMetrics.objects.get(estate=estate)
         estate.views += 1
         estate.save()
