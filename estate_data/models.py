@@ -68,7 +68,7 @@ class Estate(models.Model):
         if self.pk:
             original = Estate.objects.get(pk=self.pk)
             if original.estate_government_id != self.estate_government_id: raise ValidationError('Government ID cannot be changed once set!')
-        return super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 class EstateImage(models.Model):
     estate = models.ForeignKey(Estate, related_name='images', on_delete=models.CASCADE, related_query_name='image')
