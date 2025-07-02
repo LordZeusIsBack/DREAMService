@@ -1,5 +1,8 @@
-from django.db import models, transaction
-from django.dispatch import receiver
+# buyer_data/models.py
+
+-from django.db import models, transaction
+-from django.dispatch import receiver
++from django.db import models
 from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
 from estate_data.models import Estate, EstateMetrics
