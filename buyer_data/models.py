@@ -37,10 +37,10 @@ class PurchasedEstate(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Saves the Purchased instance, preventing changes to transaction_id after creation.
+        Save the PurchasedEstate instance, ensuring the transaction ID remains immutable after creation.
         
         Raises:
-            ValidationError: If an attempt is made to modify transaction_id on an existing record.
+            ValidationError: If an attempt is made to modify the transaction_id of an existing record.
         """
         if self.pk:
             original = type(self).objects.get(pk=self.pk)
@@ -68,7 +68,7 @@ class WishlistItem(models.Model):
 
     def __str__(self):
         """
-        Returns a string summarizing the buyer's email and the name of the bookmarked estate.
+        Return a string summarizing the buyer's email and the name of the bookmarked estate.
         """
         return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"
 

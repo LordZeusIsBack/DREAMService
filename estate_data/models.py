@@ -56,9 +56,9 @@ class Estate(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Saves the Estate instance, generating a unique slug if not already set and enforcing immutability of the government ID.
+        Saves the Estate instance, generating a unique slug if needed and preventing changes to the government ID after creation.
         
-        If the slug is missing, a unique slug is created from the estate name and a UUID segment, ensuring no conflicts with existing slugs. Raises a ValidationError if an attempt is made to change the estate_government_id after creation.
+        Raises a ValidationError if an attempt is made to modify the estate_government_id of an existing record.
         """
         if not self.slug:
             base_slug = slugify(self.estate_name)
@@ -76,7 +76,7 @@ class EstateImage(models.Model):
 
     def __str__(self):
         """
-        Return a string identifying the image as belonging to a specific estate by name.
+        Return a string representation indicating the image is associated with a specific estate by name.
         """
         return f"Image for {self.estate.estate_name}"
 

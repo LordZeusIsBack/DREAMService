@@ -6,4 +6,7 @@ class BuyerDataConfig(AppConfig):
     name = "buyer_data"
 
     def ready(self):
+        """
+        Imports application signal handlers when the Django app is fully loaded.
+        """
         from .utils import signals

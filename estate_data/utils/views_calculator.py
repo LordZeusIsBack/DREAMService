@@ -31,10 +31,10 @@ def can_increase_views(ip_address):
 
 def increase_views(estate, user_ip):
     """
-    Increments the view count for an estate if the user's IP address has not recently contributed to the count.
+    Atomically increments the view count for the given estate if the user's IP address has not recently increased it.
     
     Parameters:
-        estate: The estate object whose views are being tracked.
+        estate: The estate object whose view count should be incremented.
         user_ip (str): The IP address of the user attempting to increase the view count.
     """
     if can_increase_views(user_ip):
