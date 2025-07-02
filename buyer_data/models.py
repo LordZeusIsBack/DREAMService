@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, transaction
+from django.dispatch import receiver
 from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
 from estate_data.models import Estate, EstateMetrics
@@ -71,3 +72,16 @@ class WishlistItem(models.Model):
         Returns a string summarizing the buyer's email and the name of the bookmarked estate.
         """
         return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"
+
+
+@receiver(models.signals.post_save, sender=WishlistItem)
+def increment_bookmarks(sender, instance, created, **kwargs):
+    if created:
+        with transaction.atomic():
+            estate_metrics, _ = EstateMetrics.objects.get_or_create(estate=instance.estate)
+            EstateMetrics.objects.select_for_update().filter(pk=estate_metrics.pk).update(bookmarks=models.F('bookmarks') + 1)
+
+@receiver(models.signals.post_delete, sender=WishlistItem)
+def decrement_bookmarks(sender, instance, **kwargs):
+    with transaction.atomic():
+        EstateMetrics.objects.select_for_update().filter(estate=instance.estate).update(bookmarks=models.F('bookmarks') - 1)
