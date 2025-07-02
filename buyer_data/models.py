@@ -66,16 +66,6 @@ class WishlistItem(models.Model):
             models.Index(fields=['estate', 'added_on'])
         ]
 
-    def save(self, *args, **kwargs):
-        is_new = self._state.adding and not WishlistItem.objects.filter(buyer=self.buyer, estate=self.estate).exists()
-        super().save(*args, **kwargs)
-        if is_new: EstateMetrics.objects.filter(estate=self.estate).update(bookmarks=models.F('bookmarks') + 1)
-
-    def delete(self, *args, **kwargs):
-        updated = EstateMetrics.objects.filter(estate=self.estate).update(bookmarks=models.F('bookmarks') - 1)
-        if updated == 0: raise ValidationError("This wishlist item does not exist or has already been removed.")
-        super().delete(*args, **kwargs)
-
     def __str__(self):
         """
         Returns a string summarizing the buyer's email and the name of the bookmarked estate.
