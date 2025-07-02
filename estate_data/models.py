@@ -83,5 +83,4 @@ class EstateImage(models.Model):
 class EstateMetrics(models.Model):
     estate = models.OneToOneField(Estate, on_delete=models.CASCADE, related_name='views', related_query_name='view')
     views = models.IntegerField(default=0, editable=False)
-    likes = models.IntegerField(default=0, editable=False)
     bookmarks = models.IntegerField(default=0, editable=False)
