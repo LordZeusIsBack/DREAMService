@@ -1,11 +1,7 @@
-# buyer_data/models.py
-
--from django.db import models, transaction
--from django.dispatch import receiver
-+from django.db import models
+from django.db import models
 from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
-from estate_data.models import Estate, EstateMetrics
+from estate_data.models import Estate
 
 # Create your models here.
 class Buyer(UserExtensionMixin):
@@ -41,7 +37,7 @@ class PurchasedEstate(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Saves the PurchasedEstate instance, preventing changes to transaction_id after creation.
+        Saves the Purchased instance, preventing changes to transaction_id after creation.
         
         Raises:
             ValidationError: If an attempt is made to modify transaction_id on an existing record.
