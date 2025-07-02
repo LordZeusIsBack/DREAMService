@@ -74,14 +74,3 @@ class WishlistItem(models.Model):
         return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"
 
 
-@receiver(models.signals.post_save, sender=WishlistItem)
-def increment_bookmarks(sender, instance, created, **kwargs):
-    if created:
-        with transaction.atomic():
-            estate_metrics, _ = EstateMetrics.objects.get_or_create(estate=instance.estate)
-            EstateMetrics.objects.select_for_update().filter(pk=estate_metrics.pk).update(bookmarks=models.F('bookmarks') + 1)
-
-@receiver(models.signals.post_delete, sender=WishlistItem)
-def decrement_bookmarks(sender, instance, **kwargs):
-    with transaction.atomic():
-        EstateMetrics.objects.select_for_update().filter(estate=instance.estate).update(bookmarks=models.F('bookmarks') - 1)
