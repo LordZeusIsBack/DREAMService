@@ -42,3 +42,13 @@ class SubscriptionStage(models.TextChoices):
     STAGE_2 = '2', 'Stage 2 - Standard'
     STAGE_3 = '3', 'Stage 3 - Premium'
     STAGE_4 = '4', 'Stage 4 - Ultimate'
+
+
+class SellerSubscription(models.Model):
+    seller = models.OneToOneField(Seller, on_delete=models.CASCADE, related_name='subscription')
+    stage = models.CharField(max_length=2, choices=SubscriptionStage.choices, default=SubscriptionStage.STAGE_1)
+    start_date = models.DateTimeField(auto_now_add=True)
+    end_date = models.DateTimeField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.seller.business_name} - {self.get_stage_display()}"
