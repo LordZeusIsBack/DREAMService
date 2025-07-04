@@ -27,6 +27,7 @@ class Estate(models.Model):
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
     estate_government_id = models.CharField(max_length=255, unique=True, db_index=True)
     estate_name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
     estate_type = models.CharField(max_length=255, choices=[
         ('apartment', 'Apartment'),
         ('house', 'House'),
