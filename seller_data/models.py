@@ -35,3 +35,10 @@ class SellerVerification(VerificationMixin):
         Return the business name of the associated seller as the string representation of the SellerVerification instance.
         """
         return self.seller.business_name
+
+
+class SubscriptionStage(models.TextChoices):
+    STAGE_1 = '1', 'Stage 1 - Basic'
+    STAGE_2 = '2', 'Stage 2 - Standard'
+    STAGE_3 = '3', 'Stage 3 - Premium'
+    STAGE_4 = '4', 'Stage 4 - Ultimate'
