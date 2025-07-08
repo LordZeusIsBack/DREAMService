@@ -46,7 +46,7 @@ def _ip_key(ip):
 
 def generate_otp(length=8):
     """
-    Generate a zero-padded numeric OTP of the specified length.
+    Generate a numeric OTP of the specified length using individual random digits.
 
     Parameters:
         length (int): The desired length of the OTP. Defaults to 8.
@@ -54,7 +54,7 @@ def generate_otp(length=8):
     Returns:
         str: A string representing the generated OTP, padded with leading zeros if necessary.
     """
-    return str(secrets.randbelow(10 * length)).zfill(length)
+    return ''.join([str(secrets.randbelow(10)) for _ in range(length)])
 
 def can_resend_otp(email):
     """
@@ -72,7 +72,7 @@ def mark_otp_throttle(email, cooldown=30):
     Parameters:
 	    cooldown (int): Cooldown period in seconds during which OTP resend is blocked. Defaults to 30 seconds.
     """
-    otp_handler_cache.set(_cache_key('otp_attempts', email), True, timeout=cooldown)
+    otp_handler_cache.set(_cache_key('otp_resend', email), True, timeout=cooldown)
 
 def is_otp_brute_forced(email, max_attempts=5):
     """
