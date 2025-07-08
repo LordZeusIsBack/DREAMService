@@ -46,40 +46,43 @@ def _ip_key(ip):
 
 def generate_otp(length=8):
     """
-    Generate a numeric OTP of the specified length using individual random digits.
-
+    Generate a numeric one-time password (OTP) as a string of random digits of the specified length.
+    
     Parameters:
-        length (int): The desired length of the OTP. Defaults to 8.
-
+        length (int): Number of digits in the OTP. Defaults to 8.
+    
     Returns:
-        str: A string representing the generated OTP, padded with leading zeros if necessary.
+        str: The generated OTP consisting of random digits.
     """
     return ''.join([str(secrets.randbelow(10)) for _ in range(length)])
 
 def can_resend_otp(email):
     """
-    Check if the OTP can be resent to the specified email based on the resend cooldown period.
-
+    Determine whether the OTP resend cooldown period for the given email has expired.
+    
     Returns:
-        bool: True if the cooldown has expired and OTP can be resent, False otherwise.
+        bool: True if OTP can be resent to the email; False if still in cooldown.
     """
     return not otp_handler_cache.get(_cache_key('otp_resend', email))
 
 def mark_otp_throttle(email, cooldown=30):
     """
-    Set a throttle flag in cache for the given email to enforce a cooldown period before another OTP can be resent.
-
+    Sets a throttle flag in the cache for the specified email to enforce a cooldown period before another OTP can be resent.
+    
     Parameters:
-	    cooldown (int): Cooldown period in seconds during which OTP resend is blocked. Defaults to 30 seconds.
+        cooldown (int): Duration in seconds for which OTP resend is blocked. Defaults to 30 seconds.
     """
     otp_handler_cache.set(_cache_key('otp_resend', email), True, timeout=cooldown)
 
 def is_otp_brute_forced(email, max_attempts=5):
     """
-    Check if the number of OTP verification attempts for an email has reached or exceeded the allowed maximum.
-
+    Determine whether the OTP verification attempt limit has been reached for the specified email.
+    
+    Parameters:
+        max_attempts (int): The maximum allowed OTP verification attempts before considering it brute-forced.
+    
     Returns:
-        bool: True if the attempt count is greater than or equal to max_attempts, otherwise False.
+        bool: True if the number of OTP verification attempts for the email is greater than or equal to max_attempts; otherwise, False.
     """
     return otp_handler_cache.get(_cache_key("otp_attempts", email), 0) >= max_attempts
 
