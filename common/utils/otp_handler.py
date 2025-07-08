@@ -54,7 +54,7 @@ def generate_otp(length=8):
     Returns:
         str: A string representing the generated OTP, padded with leading zeros if necessary.
     """
-    return str(secrets.randbelow(10 * length)).zfill(length)
+    return ''.join([str(secrets.randbelow(10)) for _ in range(length)])
 
 def can_resend_otp(email):
     """
