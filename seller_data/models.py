@@ -8,6 +8,14 @@ class Seller(UserExtensionMixin):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='seller')
     business_name = models.CharField(max_length=100, editable=False)
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.business_name != self.business_name: raise ValidationError('Business name cannot be changed once set!')
+            except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
+
     def __str__(self): return self.business_name
 
 
