@@ -46,7 +46,7 @@ class SubscriptionStage(models.TextChoices):
 
 class SellerSubscription(models.Model):
     seller = models.OneToOneField(Seller, on_delete=models.CASCADE, related_name='subscription')
-    stage = models.CharField(max_length=2, choices=SubscriptionStage.choices, default=SubscriptionStage.STAGE_1)
+    stage = models.CharField(max_length=5, choices=SubscriptionStage.choices, default=SubscriptionStage.STAGE_1)
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True, blank=True)
 
