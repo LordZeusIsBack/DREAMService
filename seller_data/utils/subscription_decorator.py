@@ -1,6 +1,7 @@
 from functools import wraps
-from django.http import HttpResponseForbidden
-from seller_data.models import SubscriptionStage, SellerSubscription
+from rest_framework.response import Response
+from rest_framework.status import HTTP_403_FORBIDDEN
+from seller_data.models import SellerSubscription
 
 SUBSCRIPTION_FEATURES = {
     '1': ['basic listing', 'limited support', 'contact form', 'lead button'],
@@ -14,18 +15,18 @@ def require_seller_subscription(min_stage=None, feature=None):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):
             user = request.user
-            if not user.is_authenticated(): return HttpResponseForbidden('Login Required!')
+            if not user.is_authenticated: return Response({'detail': 'Login Required'}, status=HTTP_403_FORBIDDEN)
             try:
                 seller = user.seller
                 subscription = seller.subscription
                 user_stage = int(subscription.stage)
-            except (AttributeError, SellerSubscription.DoesNotExist): return HttpResponseForbidden('Seller Subscription Required!')
-            if min_stage and user_stage < int(min_stage): return HttpResponseForbidden(f'Upgrade to Stage {min_stage} to access this feature!')
+            except (AttributeError, SellerSubscription.DoesNotExist): return Response({'detail': 'Subscription Required'}, status=HTTP_403_FORBIDDEN)
+            if min_stage and user_stage < int(min_stage): return Response({'detail': f'Upgrade to Stage {min_stage} to access this feature!'}, status=HTTP_403_FORBIDDEN)
             if feature:
                 allowed_features = []
                 for s in range(1, user_stage + 1):
                     allowed_features += SUBSCRIPTION_FEATURES.get(str(s), [])
-                if feature not in allowed_features: return HttpResponseForbidden(f'Feature "{feature}" not available in Stage {user_stage}!')
+                if feature not in allowed_features: return Response({'detail': f'Feature "{feature}" not available in Stage {user_stage}!'}, status=HTTP_403_FORBIDDEN)
             return view_func(request, *args, **kwargs)
         return _wrapped_view
     return decorator
