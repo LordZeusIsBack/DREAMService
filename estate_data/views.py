@@ -112,8 +112,8 @@ def area_estate(request):
 
     filtered = [estate for estate in estates if haversine(lat, long, estate.latitude, estate.longitude) <= radius]
 
-    pageinator = PageNumberPagination()
-    paginated_result = pageinator.paginate_queryset(filtered, request)
+    paginator = PageNumberPagination()
+    paginated_result = paginator.paginate_queryset(filtered, request)
 
     data = EstateSerializer(paginated_result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
