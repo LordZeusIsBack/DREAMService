@@ -3,15 +3,18 @@ from math import radians, degrees, sin, cos, asin, sqrt
 
 def bounding_box(lat, long, radius):
     """
-    Compute the minimum and maximum latitude and longitude values that define a bounding box around a geographic point.
-
+    Calculate the latitude and longitude bounds of a bounding box enclosing a circle of given radius around a geographic point.
+    
     Parameters:
         lat (float): Latitude of the center point in decimal degrees.
         long (float): Longitude of the center point in decimal degrees.
         radius (float): Radius in kilometers from the center point.
-
+    
     Returns:
-        tuple: (min_lat, max_lat, min_long, max_long) representing the bounding box enclosing all points within the specified radius.
+        tuple: (min_lat, max_lat, min_long, max_long) representing the bounding box edges in decimal degrees.
+    
+    Raises:
+        ValueError: If latitude, longitude, or radius are out of valid ranges.
     """
     # Validate inputs
     if not (-90 <= lat <= 90):
@@ -33,16 +36,19 @@ def bounding_box(lat, long, radius):
 
 def haversine(lat1, lon1, lat2, lon2):
     """
-    Calculates the great-circle distance in kilometers between two geographic coordinates.
-
-    Args:
-        lat1: Latitude of the first point in decimal degrees.
-        lon1: Longitude of the first point in decimal degrees.
-        lat2: Latitude of the second point in decimal degrees.
-        lon2: Longitude of the second point in decimal degrees.
-
+    Calculate the great-circle distance in kilometers between two geographic points using the haversine formula.
+    
+    Parameters:
+        lat1 (float): Latitude of the first point in decimal degrees.
+        lon1 (float): Longitude of the first point in decimal degrees.
+        lat2 (float): Latitude of the second point in decimal degrees.
+        lon2 (float): Longitude of the second point in decimal degrees.
+    
     Returns:
-        The distance between the two points in kilometers, computed using the haversine formula.
+        float: The distance between the two points in kilometers.
+    
+    Raises:
+        ValueError: If any latitude is not between -90 and 90 degrees, or any longitude is not between -180 and 180 degrees.
     """
     # Validate coordinate ranges
     for lat in [lat1, lat2]:

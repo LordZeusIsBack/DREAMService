@@ -9,6 +9,11 @@ class Seller(UserExtensionMixin):
     business_name = models.CharField(max_length=100, editable=False)
 
     def save(self, *args, **kwargs):
+        """
+        Prevents modification of the business name after the Seller instance is created.
+        
+        Raises a ValidationError if an attempt is made to change the business_name field on an existing Seller.
+        """
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)
@@ -16,7 +21,11 @@ class Seller(UserExtensionMixin):
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
-    def __str__(self): return self.business_name
+    def __str__(self):
+        """
+        Return the business name of the seller as its string representation.
+        """
+        return self.business_name
 
 
 class SellerVerification(VerificationMixin):
@@ -40,7 +49,7 @@ class SellerVerification(VerificationMixin):
 
     def __str__(self):
         """
-        Return the business name of the associated seller as the string representation of the SellerVerification instance.
+        Return the business name of the seller associated with this SellerVerification instance.
         """
         return self.seller.business_name
 
@@ -59,4 +68,7 @@ class SellerSubscription(models.Model):
     end_date = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
+        """
+        Return a string representation of the seller subscription, combining the seller's business name and the display name of the subscription stage.
+        """
         return f"{self.seller.business_name} - {self.get_stage_display()}"

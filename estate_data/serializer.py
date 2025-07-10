@@ -25,12 +25,12 @@ class EstateSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Creates a new Estate instance with the provided validated data and associates uploaded images if present.
+        Create a new Estate instance with the given validated data and associate any uploaded images from the request.
         
-        Removes any 'images_to_delete' field from the input data before creation. If image files are included in the request context under the 'images' key, creates EstateImage instances linked to the new estate for each uploaded image.
+        Removes the 'images_to_delete' field from the input data if present. For each image file uploaded under the 'images' key in the request, creates an EstateImage linked to the new estate.
         
         Returns:
-            estate (Estate): The newly created Estate instance.
+            Estate: The newly created Estate instance.
         """
         if 'images_to_delete' in validated_data: validated_data.pop('images_to_delete')
         estate = models.Estate.objects.create(**validated_data)

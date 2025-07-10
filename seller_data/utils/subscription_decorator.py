@@ -11,6 +11,15 @@ SUBSCRIPTION_FEATURES = {
 }
 
 def require_seller_subscription(min_stage=None, feature=None):
+    """
+    Decorator for Django REST Framework views to enforce seller subscription stage and feature access.
+    
+    Restricts access to a view based on the requesting user's seller subscription stage and available features. If the user is not authenticated, lacks a seller subscription, does not meet the minimum required stage, or does not have access to the specified feature, a 403 Forbidden response is returned with an appropriate message.
+    
+    Parameters:
+        min_stage (int or str, optional): The minimum subscription stage required to access the view.
+        feature (str, optional): The name of a feature that must be available in the user's subscription stage.
+    """
     def decorator(view_func):
         @wraps(view_func)
         def _wrapped_view(request, *args, **kwargs):

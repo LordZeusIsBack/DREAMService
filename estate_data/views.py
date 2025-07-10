@@ -61,12 +61,9 @@ def update_estate_data(r, slug):
 @api_view(['GET'])
 def area_estate(request):
     """
-    Retrieves available estates of a specified type within a geographic radius.
+    Retrieve available estates of a specified type within a geographic radius of a given point.
     
-    Accepts query parameters for latitude, longitude, estate type, and optional radius (default 10 km). If a place name is provided instead of coordinates, resolves it to latitude and longitude using the Geoapify geocoding API. Returns a list of estates matching the type and located within the specified radius of the given point.
-    
-    Returns:
-        Response: A JSON array of serialized estate data with HTTP 200 status, or an error message with appropriate HTTP status if parameters are missing or invalid, or if geocoding fails.
+    Accepts query parameters for latitude, longitude, estate type, and optional radius (default 10 km). If a place name is provided instead of coordinates, attempts to resolve it to latitude and longitude using the Geoapify geocoding API. Returns a paginated list of estates matching the specified type and located within the given radius. Responds with appropriate error messages if required parameters are missing, invalid, or if geocoding fails.
     """
     place = request.query_params.get('place')
     lat = request.query_params.get('lat')
