@@ -21,10 +21,11 @@ class Seller(UserExtensionMixin):
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
-    def __str__(self): """
-Return the business name of the seller as its string representation.
-"""
-return self.business_name
+    def __str__(self):
+        """
+        Return the business name of the seller as its string representation.
+        """
+        return self.business_name
 
 
 class SellerVerification(VerificationMixin):
