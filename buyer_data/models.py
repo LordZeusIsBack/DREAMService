@@ -19,39 +19,6 @@ class BuyerVerification(VerificationMixin):
         """
         return f"{self.buyer.user.username}"
 
-class PurchasedEstate(models.Model):
-    buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, related_name='purchased_estates')
-    estate = models.ForeignKey(Estate, on_delete=models.CASCADE, related_name='purchased_by')
-    purchase_date = models.DateTimeField(auto_now_add=True)
-    purchase_price = models.DecimalField(max_digits=12, decimal_places=2)
-    transaction_id = models.CharField(max_length=100, unique=True)
-
-    class Meta:
-        unique_together = ('buyer', 'estate')
-        ordering = ['-purchase_date']
-        indexes = [
-            models.Index(fields=['buyer', 'purchase_date']),
-            models.Index(fields=['estate', 'purchase_date']),
-            models.Index(fields=['transaction_id'])
-        ]
-
-    def save(self, *args, **kwargs):
-        """
-        Save the PurchasedEstate instance, ensuring the transaction ID remains immutable after creation.
-        
-        Raises:
-            ValidationError: If an attempt is made to modify the transaction_id of an existing record.
-        """
-        if self.pk:
-            original = type(self).objects.get(pk=self.pk)
-            if original.transaction_id != self.transaction_id: raise ValidationError('transaction_id cannot be changed once set!')
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        """
-        Returns a string summarizing the buyer's email, estate name, and purchase price.
-        """
-        return f"{self.buyer.user.email} purchased {self.estate.estate_name} for INR{self.purchase_price}"
 
 class WishlistItem(models.Model):
     buyer = models.ForeignKey(Buyer, on_delete=models.CASCADE, related_name='wishlistitems')
