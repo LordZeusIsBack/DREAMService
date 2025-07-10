@@ -36,6 +36,14 @@ def haversine(lat1, lon1, lat2, lon2):
     Returns:
         The distance between the two points in kilometers, computed using the haversine formula.
     """
+    # Validate coordinate ranges
+    for lat in [lat1, lat2]:
+        if not (-90 <= float(lat) <= 90):
+            raise ValueError("Latitude must be between -90 and 90 degrees")
+    for lon in [lon1, lon2]:
+        if not (-180 <= float(lon) <= 180):
+            raise ValueError("Longitude must be between -180 and 180 degrees")
+
     lat1, lon1, lat2, lon2 = map(radians, [float(lat1), float(lon1), float(lat2), float(lon2)])
     d_lon = lon2 - lon1
     d_lat = lat2 - lat1
