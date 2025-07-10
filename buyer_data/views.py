@@ -1,10 +1,7 @@
 from django.shortcuts import get_object_or_404
-from django.db import transaction
-from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import api_view
 import buyer_data.models as buyer_models
-from buyer_data.serializer import BuyerSerializer, PurchasedEstateSerializer
+from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
@@ -33,27 +30,3 @@ def buyer_data(r, buyer_username):
         Response: Serialized buyer data if found; otherwise, a 404 error response.
     """
     return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)
-
-@api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated])
-def get_bought_estate(r, buyer_username):
-    """
-    Retrieve or create purchased estate records for a specified buyer.
-    
-    Handles GET and POST requests. On GET, returns a list of estates purchased by the buyer identified by `buyer_username`. On POST, attempts to create a new purchased estate record for the buyer using the provided data; returns validation errors or a server error message if creation fails.
-    
-    Parameters:
-        buyer_username (str): The username of the buyer whose purchased estates are being accessed.
-    
-    Returns:
-        Response: A serialized list of purchased estates on GET, the created record on successful POST, or error details on failure.
-    """
-    buyer = get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)
-    if r.method == 'GET': return Response(PurchasedEstateSerializer(buyer_models.PurchasedEstate.objects.filter(buyer=buyer).select_related('estate'), many=True).data, status=status.HTTP_200_OK)
-    elif r.method == 'POST':
-        try:
-            with transaction.atomic():
-                serializer = PurchasedEstateSerializer(data=r.data, context={'request': r})
-                if serializer.is_valid(): return Response(PurchasedEstateSerializer(serializer.save()).data, status=status.HTTP_201_CREATED)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except Exception as e: return Response({'detail': 'Purchase failed due to server error. Please try again.', 'error': e}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
