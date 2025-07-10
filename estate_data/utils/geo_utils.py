@@ -13,6 +13,14 @@ def bounding_box(lat, long, radius):
     Returns:
         tuple: (min_lat, max_lat, min_long, max_long) representing the bounding box enclosing all points within the specified radius.
     """
+    # Validate inputs
+    if not (-90 <= lat <= 90):
+        raise ValueError("Latitude must be between -90 and 90 degrees")
+    if not (-180 <= long <= 180):
+        raise ValueError("Longitude must be between -180 and 180 degrees")
+    if radius <= 0:
+        raise ValueError("Radius must be positive")
+
     lat, long, earth_radius = float(lat), float(long), 6371
     delta_lat, delta_long = degrees(radius / earth_radius), degrees(radius / (earth_radius * cos(radians(lat))))
     return (
