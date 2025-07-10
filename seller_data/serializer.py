@@ -55,6 +55,7 @@ class SellerSerializer(BaseUserSerializer):
         """
         Update an existing seller instance.
         """
+        if 'business_name' in validated_data and validated_data['business_name'] != instance.business_name: raise serializers.ValidationError({'business_name': 'Cannot modify business_name once set.'})
         return BaseUserSerializer.update_user(
             instance,
             validated_data,
