@@ -122,14 +122,14 @@ REST_FRAMEWORK = {
 
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": os.getenv('REDIS_URL_DEFAULT'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
         },
     },
     "views_ip_cache": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": os.getenv('REDIS_URL_IP_CACHE'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient"
