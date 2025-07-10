@@ -21,7 +21,7 @@ class EstateSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Estate
         fields = ['seller', 'estate_name', 'estate_type', 'estate_government_id', 'estate_price', 'status',
-                  'slug', 'latitude', 'longitude', 'images', 'images_to_delete']
+                  'slug', 'description', 'latitude', 'longitude', 'images', 'images_to_delete']
 
     def create(self, validated_data):
         """
