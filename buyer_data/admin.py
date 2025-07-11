@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Buyer, BuyerVerification, PurchasedEstate
+from .models import Buyer, BuyerVerification
 
 # Register your models here.
 @admin.register(Buyer)
@@ -89,9 +89,3 @@ class BuyerVerificationAdmin(admin.ModelAdmin):
         """
         if obj.pan_card: return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />', obj.pan_card.url)
         return "No Image"
-
-@admin.register(PurchasedEstate)
-class BuyerPurchaseAdmin(admin.ModelAdmin):
-    readonly_fields = ('purchase_date', 'transaction_id')
-    list_display = ('buyer', 'estate', 'purchase_date', 'transaction_id')
-    search_fields = ('buyer__user__email', 'estate__estate_name', 'transaction_id')
