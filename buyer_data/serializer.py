@@ -57,9 +57,12 @@ class BuyerSerializer(BaseUserSerializer):
 
     def update(self, instance, validated_data):
         """
-        Updates a buyer and associated verification details.
+        Update a buyer instance and its related verification details.
         
-        Delegates the update operation to the base user serializer, ensuring both buyer and verification data are updated together.
+        Delegates the update process to the base user serializer, ensuring that both buyer and associated verification information are updated in a single operation.
+        
+        Returns:
+            The updated buyer instance.
         """
         return BaseUserSerializer.update_user(
             instance,

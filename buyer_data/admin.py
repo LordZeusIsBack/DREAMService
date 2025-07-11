@@ -85,7 +85,10 @@ class BuyerVerificationAdmin(admin.ModelAdmin):
     @admin.display(description='PAN Card Preview')
     def pan_preview(self, obj):
         """
-        Returns an HTML image preview of the PAN card if available; otherwise, displays "No Image".
+        Render a 50x50 pixel HTML image preview of the PAN card for the given object, or display "No Image" if unavailable.
+        
+        Returns:
+            str: An HTML `<img>` tag with the PAN card preview, or "No Image" if the PAN card is not present.
         """
         if obj.pan_card: return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover;" />', obj.pan_card.url)
         return "No Image"

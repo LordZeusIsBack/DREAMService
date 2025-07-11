@@ -15,7 +15,7 @@ class BuyerVerification(VerificationMixin):
 
     def __str__(self):
         """
-        Return the username of the user associated with this buyer verification.
+        Return the username of the user linked to this buyer verification instance.
         """
         return f"{self.buyer.user.username}"
 
