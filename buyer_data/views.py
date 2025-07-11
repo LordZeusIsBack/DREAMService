@@ -21,12 +21,12 @@ buyer_resend_otp = buyer_views['resend_otp']
 @api_view(['GET'])
 def buyer_data(r, buyer_username): 
     """
-    Retrieve serialized data for a non-deleted buyer by username.
+    Retrieve and return serialized data for a buyer with the given username, excluding deleted buyers.
     
     Parameters:
-        buyer_username (str): The username of the buyer to retrieve.
+        buyer_username (str): Username of the buyer to retrieve.
     
     Returns:
-        Response: Serialized buyer data if found; otherwise, a 404 error response.
+        Response: Serialized buyer data if found; otherwise, returns a 404 error response.
     """
     return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)

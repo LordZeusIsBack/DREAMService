@@ -2,9 +2,9 @@ from django.urls import path
 
 def create_user_url_patterns(view_module, user_type):
     """
-    Generate Django URL patterns for user operations based on the specified user type.
+    Generate Django URL patterns for user-related operations based on the specified user type.
     
-    Creates a list of URL pattern objects for either "buyer" or "seller" users, mapping each route to the corresponding view function in the provided view module. The generated patterns include endpoints for viewing, updating, adding, and deleting users; password management; login; accessing estate data; email verification; and OTP resending, all tailored to the given user type.
+    Constructs and returns a list of URL pattern objects for either "buyer" or "seller" users, mapping each route to the corresponding view function in the provided view module. The generated patterns include endpoints for viewing, updating, adding, and deleting users; password management; login; email verification; and OTP resending, all tailored to the given user type.
     
     Returns:
         List of Django URL pattern objects for the specified user type.
