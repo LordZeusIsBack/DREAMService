@@ -63,6 +63,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.email != self.email: raise ValidationError('Email address once set cannot be changed!.')
+                if original.username != self.username: raise ValidationError('Username once set cannot be changed!.')
+                super().save(*args, **kwargs)
+            except type(self).DoesNotExist: pass
+
     def __str__(self):
         return self.email
 
@@ -75,6 +84,14 @@ class UserExtensionMixin(models.Model):
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.phone_number != self.phone_number: raise ValidationError('Phone number once set cannot be changed!')
+            except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
 
 
 class VerificationMixin(models.Model):
@@ -98,6 +115,8 @@ class VerificationMixin(models.Model):
                 original = type(self).objects.get(pk=self.pk)
                 if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
                 if original.pan_number != self.pan_number: raise ValidationError('Pan Number once set cannot be changed!')
+                if original.aadhaar_card != self.aadhaar_card: raise ValidationError('Aadhaar Card once set cannot be changed!')
+                if original.pan_card != self.pan_card: raise ValidationError('Pan Card once set cannot be changed!')
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
