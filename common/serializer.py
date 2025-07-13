@@ -61,6 +61,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """
         Update an existing user instance.
         """
+        if 'phone_number' in validated_data and validated_data['phone_number'] != instance.phone_number: raise ValidationError({'error': 'Phone number once set cannot be changed!'})
         user_data = validated_data.pop('user')
         validated_data.pop(verification_field, None)
         new_password = validated_data.pop('password', None)
