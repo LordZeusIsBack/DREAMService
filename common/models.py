@@ -69,8 +69,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
                 original = type(self).objects.get(pk=self.pk)
                 if original.email != self.email: raise ValidationError('Email address once set cannot be changed!.')
                 if original.username != self.username: raise ValidationError('Username once set cannot be changed!.')
-                super().save(*args, **kwargs)
             except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.email
