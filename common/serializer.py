@@ -71,6 +71,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
         if new_password: user_instance.set_password(new_password)
         user_instance.save()
         for attr, value in validated_data.items(): setattr(instance, attr, value)
+        try: instance.full_clean()
+        except Exception as e: raise ValidationError({'error': str(e)})
         instance.save()
         return instance
 
