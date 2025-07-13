@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.conf import settings
+from django.db.transaction import atomic
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """
@@ -37,17 +38,23 @@ class BaseUserSerializer(serializers.ModelSerializer):
         verification_data = validated_data.pop(verification_field)
         password = validated_data.pop('password', None)
         if not (password and verification_data): raise ValidationError({'error': 'Both password and verification data are required.'})
-        custom_user_instance = CustomUser.objects.create_user(
-            email=user_data['email'],
-            username=user_data['username'],
-            password=password,
-            first_name=user_data['first_name'],
-            last_name=user_data['last_name']
-        )
-        send_otp(custom_user_instance.email, is_resend=False)
-        user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
-        verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
-        return user_model_instance
+        try:
+            with atomic():
+                custom_user_instance = CustomUser.objects.create_user(
+                    email=user_data['email'],
+                    username=user_data['username'],
+                    password=password,
+                    first_name=user_data['first_name'],
+                    last_name=user_data['last_name']
+                )
+                send_otp(custom_user_instance.email, is_resend=False)
+                user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
+                try: user_model_instance.full_clean()
+                except Exception as e: raise ValidationError({'error': str(e)})
+                verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
+                return user_model_instance
+        except Exception as e:
+            raise ValidationError({'error': str(e)})
 
     @staticmethod
     def update_user(instance, validated_data, verification_field):
