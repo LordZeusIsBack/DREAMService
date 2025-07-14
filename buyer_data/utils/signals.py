@@ -1,8 +1,9 @@
+from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import F
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from buyer_data.models import WishlistItem
+from buyer_data.models import WishlistItem, Buyer
 from estate_data.models import EstateMetrics
 
 
@@ -26,3 +27,7 @@ def decrement_bookmarks(sender, instance, **kwargs):
     This function is intended as a Django post_delete signal handler for the WishlistItem model. It atomically decrements the `bookmarks` field of the related EstateMetrics record, ensuring consistency during concurrent updates.
     """
     with transaction.atomic(): EstateMetrics.objects.select_for_update().filter(estate=instance.estate).update(bookmarks=F('bookmarks') - 1)
+
+@receiver(post_delete, sender=Buyer)
+def delete_buyer_profile_picture(sender, instance, **kwargs):
+    if instance.profile_picture and default_storage.exists(instance.profile_picture.name): default_storage.delete(instance.profile_picture.name)
