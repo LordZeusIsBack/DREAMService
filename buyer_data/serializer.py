@@ -36,10 +36,13 @@ class BuyerSerializer(BaseUserSerializer):
 
     def create(self, validated_data):
         """
-        Creates a new buyer along with associated verification data.
+        Create a new buyer instance along with related verification details.
+        
+        Parameters:
+            validated_data (dict): Validated data containing buyer and verification fields.
         
         Returns:
-            Buyer: The newly created buyer instance.
+            Buyer: The created buyer instance with associated verification data.
         """
         verification_data = {
             'aadhaar_number': validated_data.pop('aadhaar_number'),
@@ -56,6 +59,17 @@ class BuyerSerializer(BaseUserSerializer):
         )
 
     def validate(self, attrs):
+        """
+        Validates that `aadhaar_number` and `pan_number` are provided when creating a new buyer.
+        
+        Raises a validation error if either field is missing during creation. No validation is performed for these fields during updates.
+        
+        Parameters:
+            attrs (dict): The input data to validate.
+        
+        Returns:
+            dict: The validated attributes.
+        """
         if self.instance is None:
             if not attrs.get('aadhaar_number'): raise serializers.ValidationError({'aadhaar_number': 'This field is required during creation.'})
             if not attrs.get('pan_number'): raise serializers.ValidationError({'pan_number': 'This field is required during creation.'})
@@ -63,9 +77,9 @@ class BuyerSerializer(BaseUserSerializer):
 
     def update(self, instance, validated_data):
         """
-        Update a buyer instance and its related verification details.
+        Update a buyer instance along with its associated verification details.
         
-        Delegates the update process to the base user serializer, ensuring that both buyer and associated verification information are updated in a single operation.
+        Delegates the update process to the base user serializer to ensure both buyer and verification information are updated together.
         
         Returns:
             The updated buyer instance.
