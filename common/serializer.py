@@ -14,8 +14,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
     Base seller_serializer for user models.
     """
     password = serializers.CharField(write_only=True, required=False)
-    phone_number = serializers.CharField(required=False)
-    aadhaar_number = serializers.CharField(required=False, read_only=True)
+    phone_number = serializers.IntegerField(required=False)
+    aadhaar_number = serializers.IntegerField(required=False, read_only=True)
     pan_number = serializers.CharField(required=False, read_only=True)
 
     class Meta:
