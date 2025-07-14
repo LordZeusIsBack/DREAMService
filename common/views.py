@@ -182,27 +182,29 @@ def create_user_views(model_class, serializer_class, user_type_name):
         dict: A mapping of operation names to their corresponding DRF view functions.
     """
     @api_view(['DELETE'])
-    def delete_user(r, username): """
-Deletes a user by marking their associated profile as deleted.
+    def delete_user(r, username):
+        """
+        Deletes a user by marking their associated profile as deleted.
 
-Returns:
-	Response: HTTP 204 on success, HTTP 404 if no associated profile is found.
-"""
-return soft_delete_user(model_class, username)
+        Returns:
+	        Response: HTTP 204 on success, HTTP 404 if no associated profile is found.
+        """
+        return soft_delete_user(model_class, username)
 
     @api_view(['PATCH'])
     @parser_classes([MultiPartParser, FormParser])
-    def update_user(r, username): """
-Updates the details of a user profile identified by username using the provided request data.
+    def update_user(r, username):
+        """
+        Updates the details of a user profile identified by username using the provided request data.
 
-Parameters:
-	r: The HTTP request containing user data for the update.
-	username (str): The username of the user whose profile is to be updated.
+        Parameters:
+	        r: The HTTP request containing user data for the update.
+	        username (str): The username of the user whose profile is to be updated.
 
-Returns:
-	Response: A DRF Response object with the updated profile data and status code, or an error response if the update fails.
-"""
-return update_user_details(r.data, username, model_class, serializer_class)
+        Returns:
+	        Response: A DRF Response object with the updated profile data and status code, or an error response if the update fails.
+        """
+        return update_user_details(r.data, username, model_class, serializer_class)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
