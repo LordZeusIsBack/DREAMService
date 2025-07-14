@@ -52,11 +52,10 @@ class BaseUserSerializer(serializers.ModelSerializer):
                 send_otp(custom_user_instance.email, is_resend=False)
                 user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
                 try: user_model_instance.full_clean()
-                except Exception as e: raise ValidationError({'error': str(e)})
+                except Exception as e: raise ValidationError({'error': str(e)}) from e
                 verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
                 return user_model_instance
-        except Exception as e:
-            raise ValidationError({'error': str(e)})
+        except Exception as e: raise ValidationError({'error': str(e)}) from e
 
     @staticmethod
     def update_user(instance, validated_data, verification_field):
@@ -74,7 +73,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         user_instance.save()
         for attr, value in validated_data.items(): setattr(instance, attr, value)
         try: instance.full_clean()
-        except Exception as e: raise ValidationError({'error': str(e)})
+        except Exception as e: raise ValidationError({'error': str(e)}) from e
         instance.save()
         return instance
 
