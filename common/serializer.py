@@ -15,6 +15,8 @@ class BaseUserSerializer(serializers.ModelSerializer):
     """
     password = serializers.CharField(write_only=True, required=False)
     phone_number = serializers.CharField(required=False)
+    aadhaar_number = serializers.CharField(required=False, read_only=True)
+    pan_number = serializers.CharField(required=False, read_only=True)
 
     class Meta:
         abstract = True
@@ -47,7 +49,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
                     first_name=user_data['first_name'],
                     last_name=user_data['last_name']
                 )
-                send_otp(custom_user_instance.email, is_resend=False)
+                # send_otp(custom_user_instance.email, is_resend=False)
                 user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
                 try: user_model_instance.full_clean()
                 except Exception as e: raise ValidationError({'error': str(e)})
