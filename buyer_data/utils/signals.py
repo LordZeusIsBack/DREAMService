@@ -3,7 +3,7 @@ from django.db import transaction
 from django.db.models import F
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from buyer_data.models import WishlistItem, Buyer
+from buyer_data.models import WishlistItem, Buyer, BuyerVerification
 from estate_data.models import EstateMetrics
 
 
@@ -31,3 +31,8 @@ def decrement_bookmarks(sender, instance, **kwargs):
 @receiver(post_delete, sender=Buyer)
 def delete_buyer_profile_picture(sender, instance, **kwargs):
     if instance.profile_picture and default_storage.exists(instance.profile_picture.name): default_storage.delete(instance.profile_picture.name)
+
+@receiver(post_save, sender=BuyerVerification)
+def delete_buyer_verification_picture(sender, instance, **kwargs):
+    if instance.aadhaar_card and default_storage.exists(instance.aadhaar_card.name): default_storage.delete(instance.aadhaar_card.name)
+    if instance.pan_card and default_storage.exists(instance.pan_card.name): default_storage.delete(instance.pan_card.name)
