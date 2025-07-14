@@ -20,8 +20,8 @@ class BuyerSerializer(BaseUserSerializer):
     """
     Serializer for buyer model.
     """
-    aadhaar_number = serializers.IntegerField(write_only=True)
-    pan_number = serializers.CharField(write_only=True)
+    aadhaar_number = serializers.IntegerField(required=False, write_only=True)
+    pan_number = serializers.CharField(required=False, write_only=True)
     aadhaar_card = serializers.ImageField(required=False, write_only=True)
     pan_card = serializers.ImageField(required=False, write_only=True)
     first_name = serializers.CharField(source='user.first_name')
@@ -54,6 +54,12 @@ class BuyerSerializer(BaseUserSerializer):
             models.BuyerVerification,
             'buyerverification'
         )
+
+    def validate(self, attrs):
+        if self.instance is None:
+            if not attrs.get('aadhaar_number'): raise serializers.ValidationError({'aadhaar_number': 'This field is required during creation.'})
+            if not attrs.get('pan_number'): raise serializers.ValidationError({'pan_number': 'This field is required during creation.'})
+        return attrs
 
     def update(self, instance, validated_data):
         """

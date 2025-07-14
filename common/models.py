@@ -3,7 +3,7 @@ from django.db import models
 from django.utils.text import slugify
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 from common.utils.storage_backends import MediaStorage
 from uuid import uuid4
 
@@ -63,6 +63,15 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
     objects = CustomUserManager()
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.email != self.email: raise ValidationError('Email address once set cannot be changed!.')
+                if original.username != self.username: raise ValidationError('Username once set cannot be changed!.')
+            except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return self.email
 
@@ -70,11 +79,19 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 class UserExtensionMixin(models.Model):
     is_deleted = models.BooleanField(default=False)
     profile_picture = models.ImageField(upload_to=profile_picture_path, null=True, blank=True, storage=MediaStorage)
-    phone_number = models.CharField(max_length=10, unique=True, null=True, blank=True, editable=False)
+    phone_number = models.IntegerField(validators=[MinValueValidator(10 ** 9), MaxValueValidator(10 ** 10 - 1)], unique=True, editable=False)
     is_verified = models.BooleanField(default=False, editable=False)
 
     class Meta:
         abstract = True
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.phone_number != self.phone_number: raise ValidationError('Phone number once set cannot be changed!')
+            except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
 
 
 class VerificationMixin(models.Model):
@@ -98,6 +115,12 @@ class VerificationMixin(models.Model):
                 original = type(self).objects.get(pk=self.pk)
                 if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
                 if original.pan_number != self.pan_number: raise ValidationError('Pan Number once set cannot be changed!')
+                if original.aadhaar_card and self.aadhaar_card:
+                    if original.aadhaar_card.name != self.aadhaar_card.name:
+                        raise ValidationError('Aadhaar Card once set cannot be changed!')
+                if original.pan_card and self.pan_card:
+                    if original.pan_card.name != self.pan_card.name:
+                        raise ValidationError('Pan Card once set cannot be changed!')
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 

@@ -7,13 +7,16 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.conf import settings
+from django.db.transaction import atomic
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """
     Base seller_serializer for user models.
     """
     password = serializers.CharField(write_only=True, required=False)
-    phone_number = serializers.CharField()
+    phone_number = serializers.IntegerField(required=False)
+    aadhaar_number = serializers.IntegerField(required=False, read_only=True)
+    pan_number = serializers.CharField(required=False, read_only=True)
 
     class Meta:
         abstract = True
@@ -37,31 +40,40 @@ class BaseUserSerializer(serializers.ModelSerializer):
         verification_data = validated_data.pop(verification_field)
         password = validated_data.pop('password', None)
         if not (password and verification_data): raise ValidationError({'error': 'Both password and verification data are required.'})
-        custom_user_instance = CustomUser.objects.create_user(
-            email=user_data['email'],
-            username=user_data['username'],
-            password=password,
-            first_name=user_data['first_name'],
-            last_name=user_data['last_name']
-        )
-        send_otp(custom_user_instance.email, is_resend=False)
-        user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
-        verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
-        return user_model_instance
+        try:
+            with atomic():
+                custom_user_instance = CustomUser.objects.create_user(
+                    email=user_data['email'],
+                    username=user_data['username'],
+                    password=password,
+                    first_name=user_data['first_name'],
+                    last_name=user_data['last_name']
+                )
+                send_otp(custom_user_instance.email, is_resend=False)
+                user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
+                try: user_model_instance.full_clean()
+                except Exception as e: raise ValidationError({'error': str(e)}) from e
+                verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
+                return user_model_instance
+        except Exception as e: raise ValidationError({'error': str(e)}) from e
 
     @staticmethod
     def update_user(instance, validated_data, verification_field):
         """
         Update an existing user instance.
         """
+        if 'phone_number' in validated_data and validated_data['phone_number'] != instance.phone_number: raise ValidationError({'error': 'Phone number once set cannot be changed!'})
         user_data = validated_data.pop('user')
-        validated_data.pop(verification_field, None)
+        validated_data.pop('aadhaar_number', None)
+        validated_data.pop('pan_number', None)
         new_password = validated_data.pop('password', None)
         user_instance = instance.user
         for attr, value in user_data.items(): setattr(user_instance, attr, value)
         if new_password: user_instance.set_password(new_password)
         user_instance.save()
         for attr, value in validated_data.items(): setattr(instance, attr, value)
+        try: instance.full_clean()
+        except Exception as e: raise ValidationError({'error': str(e)}) from e
         instance.save()
         return instance
 
