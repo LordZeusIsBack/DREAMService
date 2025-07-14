@@ -64,6 +64,12 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     objects = CustomUserManager()
 
     def save(self, *args, **kwargs):
+        """
+        Override the save method to prevent changes to the email and username fields after initial creation.
+        
+        Raises:
+            ValidationError: If an attempt is made to modify the email or username of an existing user.
+        """
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)
@@ -73,6 +79,9 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         super().save(*args, **kwargs)
 
     def __str__(self):
+        """
+        Return the string representation of the user as their email address.
+        """
         return self.email
 
 
@@ -86,6 +95,12 @@ class UserExtensionMixin(models.Model):
         abstract = True
 
     def save(self, *args, **kwargs):
+        """
+        Override the save method to prevent changes to the phone number after initial creation.
+        
+        Raises:
+            ValidationError: If an attempt is made to modify the phone number once it has been set.
+        """
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)
@@ -106,9 +121,9 @@ class VerificationMixin(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Saves the instance while enforcing immutability of Aadhaar and PAN numbers.
+        Save the instance while enforcing immutability of Aadhaar and PAN numbers and their associated card images.
         
-        Raises a ValidationError if an attempt is made to modify the `aadhaar_number` or `pan_number` fields after they have been set.
+        Raises a ValidationError if an attempt is made to modify the `aadhaar_number`, `pan_number`, `aadhaar_card`, or `pan_card` fields after they have been set.
         """
         if self.pk:
             try:

@@ -174,19 +174,37 @@ def resend_user_otp(request, email, model_class, user_type='user'):
 
 def create_user_views(model_class, serializer_class, user_type_name):
     """
-    Factory function that generates a set of Django REST framework view functions for user management operations.
+    Generate a dictionary of Django REST framework view functions for user management operations, including creation, update, deletion, authentication, password reset, OTP verification, and OTP resending.
     
-    Returns a dictionary mapping operation names to DRF views for deleting, updating, creating users, password reset and confirmation, authentication, OTP verification, and OTP resending. Each view is configured for the specified user model, serializer, and user type, with appropriate HTTP methods, permissions, and request parsers.
-     
+    Each view is configured for the specified user model, serializer, and user type, with appropriate HTTP methods, permissions, and request parsers.
+    
     Returns:
-        dict: Mapping of operation names to their corresponding DRF view functions.
+        dict: A mapping of operation names to their corresponding DRF view functions.
     """
     @api_view(['DELETE'])
-    def delete_user(r, username): return soft_delete_user(model_class, username)
+    def delete_user(r, username):
+        """
+        Deletes a user by marking their associated profile as deleted.
+
+        Returns:
+	        Response: HTTP 204 on success, HTTP 404 if no associated profile is found.
+        """
+        return soft_delete_user(model_class, username)
 
     @api_view(['PATCH'])
     @parser_classes([MultiPartParser, FormParser])
-    def update_user(r, username): return update_user_details(r.data, username, model_class, serializer_class)
+    def update_user(r, username):
+        """
+        Updates the details of a user profile identified by username using the provided request data.
+
+        Parameters:
+	        r: The HTTP request containing user data for the update.
+	        username (str): The username of the user whose profile is to be updated.
+
+        Returns:
+	        Response: A DRF Response object with the updated profile data and status code, or an error response if the update fails.
+        """
+        return update_user_details(r.data, username, model_class, serializer_class)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])

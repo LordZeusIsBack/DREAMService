@@ -24,17 +24,19 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def create_user(validated_data, user_model, verification_model, verification_field):
         """
-        Create a new user and associated verification record, sending an OTP to the user's email.
+        Creates a new user and an associated verification record within a database transaction, sending an OTP to the user's email.
         
         Parameters:
-            validated_data (dict): Dictionary containing nested user data, password, and verification information.
-            verification_field (str): Key in validated_data for the verification data.
+            validated_data (dict): Contains nested user data, password, and verification information.
+            user_model: The model class for the user profile to be created.
+            verification_model: The model class for the verification record to be created.
+            verification_field (str): The key in validated_data containing verification data.
         
         Returns:
-            The created instance of the specified user model.
+            An instance of the created user model.
         
         Raises:
-            ValidationError: If the password or verification data is missing.
+            ValidationError: If required password or verification data is missing, or if any error occurs during creation or validation.
         """
         user_data = validated_data.pop('user')
         verification_data = validated_data.pop(verification_field)
@@ -60,7 +62,13 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def update_user(instance, validated_data, verification_field):
         """
-        Update an existing user instance.
+        Updates an existing user and related instance with validated data, enforcing immutability of the phone number and preventing changes to Aadhaar and PAN numbers.
+        
+        Raises:
+            ValidationError: If attempting to change the phone number or if data validation fails.
+        
+        Returns:
+            The updated instance after applying changes and validation.
         """
         if 'phone_number' in validated_data and validated_data['phone_number'] != instance.phone_number: raise ValidationError({'error': 'Phone number once set cannot be changed!'})
         user_data = validated_data.pop('user')
