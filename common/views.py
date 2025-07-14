@@ -184,7 +184,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['DELETE'])
     def delete_user(r, username): return soft_delete_user(model_class, username)
 
-    @api_view(['PUT', 'PATCH'])
+    @api_view(['PATCH'])
     @parser_classes([MultiPartParser, FormParser])
     def update_user(r, username): return update_user_details(r.data, username, model_class, serializer_class)
 
