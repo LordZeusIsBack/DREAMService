@@ -115,8 +115,12 @@ class VerificationMixin(models.Model):
                 original = type(self).objects.get(pk=self.pk)
                 if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
                 if original.pan_number != self.pan_number: raise ValidationError('Pan Number once set cannot be changed!')
-                if original.aadhaar_card.name != self.aadhaar_card.name: raise ValidationError('Aadhaar Card once set cannot be changed!')
-                if original.pan_card.name != self.pan_card.name: raise ValidationError('Pan Card once set cannot be changed!')
+                if original.aadhaar_card and self.aadhaar_card:
+                    if original.aadhaar_card.name != self.aadhaar_card.name:
+                        raise ValidationError('Aadhaar Card once set cannot be changed!')
+                if original.pan_card and self.pan_card:
+                    if original.pan_card.name != self.pan_card.name:
+                        raise ValidationError('Pan Card once set cannot be changed!')
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
