@@ -63,7 +63,7 @@ class BaseUserSerializer(serializers.ModelSerializer):
         """
         if 'phone_number' in validated_data and validated_data['phone_number'] != instance.phone_number: raise ValidationError({'error': 'Phone number once set cannot be changed!'})
         user_data = validated_data.pop('user')
-        validated_data.pop('aadhaar_card', None)
+        validated_data.pop('aadhaar_number', None)
         validated_data.pop('pan_number', None)
         new_password = validated_data.pop('password', None)
         user_instance = instance.user
