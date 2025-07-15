@@ -6,4 +6,7 @@ class CommonConfig(AppConfig):
     name = "common"
 
     def ready(self):
+        """
+        Registers signal handlers for the application when the app is ready.
+        """
         from .utils import signals

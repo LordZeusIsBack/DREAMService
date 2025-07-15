@@ -35,6 +35,6 @@ class WishlistItem(models.Model):
 
     def __str__(self):
         """
-        Return a string summarizing the buyer's email and the name of the bookmarked estate.
+        Return a summary string showing the buyer's email and the name of the bookmarked estate.
         """
         return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"
