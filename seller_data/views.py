@@ -26,7 +26,7 @@ def seller_data(r, seller_username):
     Returns:
         Response: Serialized seller data if found; otherwise, a 404 error is returned.
     """
-    return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username, is_deleted=False)).data)
+    return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username)).data)
 
 @api_view(['GET'])
 def get_listed_estates(r, seller_username):

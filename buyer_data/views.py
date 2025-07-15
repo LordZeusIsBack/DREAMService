@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
-import buyer_data.models as buyer_models
+from buyer_data.models import Buyer
 from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
@@ -29,4 +29,4 @@ def buyer_data(r, buyer_username):
     Returns:
         Response: Serialized buyer data if found; otherwise, returns a 404 error response.
     """
-    return Response(BuyerSerializer(get_object_or_404(buyer_models.Buyer, user__username=buyer_username, is_deleted=False)).data)
+    return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data)
