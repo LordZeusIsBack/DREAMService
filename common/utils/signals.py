@@ -18,5 +18,13 @@ def delete_user_profile_picture(sender, instance, **kwargs):
 @receiver(post_delete, sender=BuyerVerification)
 @receiver(post_delete, sender=SellerVerification)
 def delete_user_verification_documents(sender, instance, **kwargs):
-    if instance.aadhaar_card and default_storage.exists(instance.aadhaar_card.name): default_storage.delete(instance.aadhaar_card.name)
-    if instance.pan_card and default_storage.exists(instance.pan_card.name): default_storage.delete(instance.pan_card.name)
+    if instance.aadhaar_card:
+        try:
+            storage = instance.aadhaar_card.storage
+            if storage.exists(instance.aadhaar_card.name): storage.delete(instance.aadhaar_card.name)
+        except Exception as e: print(f"Error deleting Aadhaar card: {e}")
+    if instance.pan_card:
+        try:
+            storage = instance.pan_card.storage
+            if storage.exists(instance.pan_card.name): storage.delete(instance.pan_card.name)
+        except Exception as e: print(f"Error deleting PAN card: {e}")
