@@ -1,9 +1,8 @@
-from django.core.files.storage import default_storage
 from django.db import transaction
 from django.db.models import F
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-from buyer_data.models import WishlistItem, Buyer, BuyerVerification
+from buyer_data.models import WishlistItem
 from estate_data.models import EstateMetrics
 
 
