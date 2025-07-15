@@ -14,17 +14,17 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 # Create your views here.
 def process_serializer(serializer_class, data, instance=None, success_status=status.HTTP_200_OK, create_status=status.HTTP_201_CREATED):
     """
-    Validate and save data using the provided serializer, returning serialized data and appropriate HTTP status.
+    Validates and saves data using the specified serializer, supporting both creation and update operations.
     
     Parameters:
-        serializer_class: The serializer class to use for validation and saving.
-        data: The input data to be validated and saved.
-        instance: Optional existing instance to update; if None, a new instance is created.
-        success_status: HTTP status code to return on successful update.
-        create_status: HTTP status code to return on successful creation.
+        serializer_class: The serializer class used for validation and saving.
+        data: The input data to validate and save.
+        instance: An existing object to update; if None, a new object is created.
+        success_status: HTTP status code for a successful update.
+        create_status: HTTP status code for a successful creation.
     
     Returns:
-        A tuple containing either the serialized data or error details, and the corresponding HTTP status code.
+        tuple: A pair containing either serialized data or error details, and the corresponding HTTP status code.
     """
     serializer_instance = serializer_class(instance, data=data) if instance else serializer_class(data=data)
     if serializer_instance.is_valid():
@@ -36,11 +36,22 @@ def process_serializer(serializer_class, data, instance=None, success_status=sta
     return serializer_instance.errors, status.HTTP_400_BAD_REQUEST
 
 def remove_user_information(model, username):
+    """
+    Deletes a user object identified by username from the specified model.
+    
+    Returns:
+        Response: HTTP 204 No Content on successful deletion.
+    """
     obj = get_object_or_404(model, username=username)
     obj.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def update_user_details(request_data, username, model_class, serializer_class):
+    """
+    Updates a user's buyer or seller profile with the provided data.
+    
+    If the user or their profile is deleted or missing, returns an appropriate error response. Otherwise, updates the profile using the specified serializer and returns the serialized data with the corresponding HTTP status code.
+    """
     user = get_object_or_404(model_class, username=username)
     if hasattr(user, 'buyer'):
         profile = user.buyer
@@ -166,9 +177,9 @@ def resend_user_otp(request, email, model_class, user_type='user'):
 
 def create_user_views(model_class, serializer_class, user_type_name):
     """
-    Generate a dictionary of Django REST framework view functions for user management operations, including creation, update, deletion, authentication, password reset, OTP verification, and OTP resending.
+    Generate a dictionary of Django REST framework view functions for user management, including user creation, update, deletion, authentication, password reset, OTP verification, and OTP resending.
     
-    Each view is configured for the specified user model, serializer, and user type, with appropriate HTTP methods, permissions, and request parsers.
+    Each view is configured for the specified user model, serializer, and user type, and is ready to be used in DRF routing.
     
     Returns:
         dict: A mapping of operation names to their corresponding DRF view functions.
@@ -176,10 +187,10 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @api_view(['DELETE'])
     def delete_user(r, username):
         """
-        Deletes a user by marking their associated profile as deleted.
-
+        Deletes a user by removing their user object from the database.
+        
         Returns:
-	        Response: HTTP 204 on success, HTTP 404 if no associated profile is found.
+            Response: HTTP 204 No Content on success, or HTTP 404 if the user does not exist.
         """
         return remove_user_information(model_class, username)
 

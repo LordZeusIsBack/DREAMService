@@ -8,6 +8,11 @@ from seller_data.models import Seller, SellerVerification
 @receiver(post_delete, sender=Buyer)
 @receiver(post_delete, sender=Seller)
 def delete_user_profile_picture(sender, instance, **kwargs):
+    """
+    Deletes the profile picture file from storage when a Buyer or Seller instance is deleted.
+    
+    This function is intended to be used as a Django post-delete signal handler. If the deleted instance has a profile picture, the file is removed from its associated storage backend.
+    """
     if instance.profile_picture:
         try:
             storage = instance.profile_picture.storage
@@ -18,6 +23,11 @@ def delete_user_profile_picture(sender, instance, **kwargs):
 @receiver(post_delete, sender=BuyerVerification)
 @receiver(post_delete, sender=SellerVerification)
 def delete_user_verification_documents(sender, instance, **kwargs):
+    """
+    Deletes Aadhaar card and PAN card files from storage when a user verification instance is deleted.
+    
+    This function is intended to be used as a Django post-delete signal handler for verification models. It checks for the presence of associated document files and removes them from their respective storage backends if they exist.
+    """
     if instance.aadhaar_card:
         try:
             storage = instance.aadhaar_card.storage

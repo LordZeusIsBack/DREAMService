@@ -21,19 +21,19 @@ seller_resend_otp = seller_views['resend_otp']
 @api_view(['GET'])
 def seller_data(r, seller_username):
     """
-    Retrieve serialized seller information for a seller identified by username if the seller is active.
+    Retrieve serialized seller information for a seller identified by username.
     
     Returns:
-        Response: Serialized seller data if found; otherwise, a 404 error is returned.
+        Response: Serialized seller data if the seller exists; otherwise, returns a 404 error response.
     """
     return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username)).data)
 
 @api_view(['GET'])
 def get_listed_estates(r, seller_username):
     """
-    Retrieves a list of estates associated with a given seller username.
+    Retrieve all estates listed by a seller identified by username.
     
-    Returns a 204 No Content response with a message if the seller has no estates. Otherwise, returns serialized estate data for the seller with a 200 OK status.
+    If the seller has no estates, returns a 204 No Content response with a message. Otherwise, returns serialized estate data with a 200 OK status.
     """
     from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
     from estate_data.models import Estate
