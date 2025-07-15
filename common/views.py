@@ -37,13 +37,7 @@ def process_serializer(serializer_class, data, instance=None, success_status=sta
 
 def remove_user_information(model, username):
     obj = get_object_or_404(model, username=username)
-    if hasattr(obj, 'buyer'):
-        profile = obj.buyer
-        profile.delete()
-    elif hasattr(obj, 'seller'):
-        profile = obj.seller
-        profile.delete()
-    else: return Response({'error': 'User has no profile.'}, status=status.HTTP_404_NOT_FOUND)
+    obj.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def update_user_details(request_data, username, model_class, serializer_class):
