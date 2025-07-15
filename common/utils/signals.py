@@ -8,7 +8,12 @@ from seller_data.models import Seller, SellerVerification
 @receiver(post_delete, sender=Buyer)
 @receiver(post_delete, sender=Seller)
 def delete_user_profile_picture(sender, instance, **kwargs):
-    if instance.profile_picture and default_storage.exists(instance.profile_picture.name): default_storage.delete(instance.profile_picture.name)
+    if instance.profile_picture:
+        try:
+            storage = instance.profile_picture.storage
+            print(storage)
+            if storage.exists(instance.profile_picture.name): storage.delete(instance.profile_picture.name)
+        except Exception as e: print(f"Error deleting profile picture: {e}")
 
 @receiver(post_delete, sender=BuyerVerification)
 @receiver(post_delete, sender=SellerVerification)
