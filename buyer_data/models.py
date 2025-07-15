@@ -38,5 +38,3 @@ class WishlistItem(models.Model):
         Return a string summarizing the buyer's email and the name of the bookmarked estate.
         """
         return f"{self.buyer.user.email} bookmarked {self.estate.estate_name}"
-
-

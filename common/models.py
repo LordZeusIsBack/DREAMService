@@ -86,7 +86,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
 
 
 class UserExtensionMixin(models.Model):
-    is_deleted = models.BooleanField(default=False)
     profile_picture = models.ImageField(upload_to=profile_picture_path, null=True, blank=True, storage=MediaStorage)
     phone_number = models.IntegerField(validators=[MinValueValidator(10 ** 9), MaxValueValidator(10 ** 10 - 1)], unique=True, editable=False)
     is_verified = models.BooleanField(default=False, editable=False)

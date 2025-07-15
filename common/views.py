@@ -35,17 +35,9 @@ def process_serializer(serializer_class, data, instance=None, success_status=sta
             return {'error': str(e)}, status.HTTP_500_INTERNAL_SERVER_ERROR
     return serializer_instance.errors, status.HTTP_400_BAD_REQUEST
 
-def soft_delete_user(model, username):
+def remove_user_information(model, username):
     obj = get_object_or_404(model, username=username)
-    if hasattr(obj, 'buyer'):
-        profile = obj.buyer
-        profile.is_deleted = True
-        profile.save()
-    elif hasattr(obj, 'seller'):
-        profile = obj.seller
-        profile.is_deleted = True
-        profile.save()
-    else: return Response({'error': 'User has no profile.'}, status=status.HTTP_404_NOT_FOUND)
+    obj.delete()
     return Response(status=status.HTTP_204_NO_CONTENT)
 
 def update_user_details(request_data, username, model_class, serializer_class):
@@ -189,7 +181,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         Returns:
 	        Response: HTTP 204 on success, HTTP 404 if no associated profile is found.
         """
-        return soft_delete_user(model_class, username)
+        return remove_user_information(model_class, username)
 
     @api_view(['PATCH'])
     @parser_classes([MultiPartParser, FormParser])
