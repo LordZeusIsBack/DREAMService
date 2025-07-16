@@ -85,7 +85,7 @@ def password_reset_conformation(request_data, model_class, serializer_class):
     if success: return Response({'success': message}, status=status.HTTP_200_OK)
     return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
-def user_login(request_data, model_class, serializer_class, user_type_name='user'):
+def user_login(request, model_class, user_type_name='user'):
     """
     Authenticate a user by username or email and password, returning an authentication token and user profile data if successful.
     
@@ -241,7 +241,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         Returns:
             Response containing authentication token and serialized user profile data on success, or an error response on failure.
         """
-        return user_login(r.data, model_class, serializer_class, user_type_name)
+        return user_login(r, model_class, user_type_name)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
