@@ -234,7 +234,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['PUT', 'PATCH'])
     @permission_classes([AllowAny])
-    def login(r):
+    def login_user(r):
         """
         Authenticates a user and returns an authentication token and user data.
 
@@ -273,7 +273,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         'add_user': add_new_user,
         'forgot_password': forgot_password,
         'reset_password': reset_password,
-        'login': login,
+        'login': login_user,
         'verify': verify,
         'resend_otp': resend_otp
     }
