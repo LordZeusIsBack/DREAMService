@@ -185,6 +185,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         dict: A mapping of operation names to their corresponding DRF view functions.
     """
     @api_view(['DELETE'])
+    @permission_classes([IsAuthenticated])
     def delete_user(r, username):
         """
         Deletes a user by removing their user object from the database.
