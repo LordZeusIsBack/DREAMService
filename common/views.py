@@ -171,6 +171,10 @@ def resend_user_otp(request, email, model_class, user_type='user'):
     except ValueError as e: return Response({'error': 'Please wait before requesting another OTP.', 'message': str(e)}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e: return Response({'error':'Unable to send OTP. Please try again later.', 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def log_user_out(request):
+    logout(request)
+    return Response({'success': 'User logged out successfully.'}, status=status.HTTP_200_OK)
+
 def create_user_views(model_class, serializer_class, user_type_name):
     """
     Generate a dictionary of Django REST framework view functions for user management, including user creation, update, deletion, authentication, password reset, OTP verification, and OTP resending.
