@@ -224,13 +224,13 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def forgot_password(r): return password_reset(r.data, model_class, settings.FRONTEND_URL,
-                                                  common_serializer.PasswordResetRequestSerializer)
+    def forgot_password(r):
+        return password_reset(r.data, model_class, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def reset_password(r): return password_reset_conformation(r.data, model_class,
-                                                              common_serializer.PasswordResetConfirmSerializer)
+    def reset_password(r):
+        return password_reset_conformation(r.data, model_class, common_serializer.PasswordResetConfirmSerializer)
 
     @api_view(['PUT', 'PATCH'])
     @permission_classes([AllowAny])
@@ -242,6 +242,11 @@ def create_user_views(model_class, serializer_class, user_type_name):
             Response containing authentication token and serialized user profile data on success, or an error response on failure.
         """
         return user_login(r, model_class, user_type_name)
+
+    @api_view([])
+    @permission_classes([IsAuthenticated])
+    def user_logout(r):
+        return log_user_out(r)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
@@ -274,6 +279,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         'forgot_password': forgot_password,
         'reset_password': reset_password,
         'login': login_user,
+        'logout': user_logout,
         'verify': verify,
         'resend_otp': resend_otp
     }
