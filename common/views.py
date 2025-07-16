@@ -243,7 +243,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         """
         return user_login(r, model_class, user_type_name)
 
-    @api_view([])
+    @api_view(['POST'])
     @permission_classes([IsAuthenticated])
     def user_logout(r):
         return log_user_out(r)
