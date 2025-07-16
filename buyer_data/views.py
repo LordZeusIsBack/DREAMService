@@ -15,6 +15,7 @@ add_buyer = buyer_views['add_user']
 buyer_forgot_password = buyer_views['forgot_password']
 buyer_reset_password = buyer_views['reset_password']
 buyer_login = buyer_views['login']
+buyer_logout = buyer_views['logout']
 buyer_verify_email = buyer_views['verify']
 buyer_resend_otp = buyer_views['resend_otp']
 

@@ -23,9 +23,10 @@ def create_user_url_patterns(view_module, user_type):
         path(f'update-{user_type}/<str:username>', getattr(view_module, f'update_{user_type}_data'), name=update_name),
         path(f'add-{user_type}', getattr(view_module, f'add_{user_type}'), name=f'add_{user_type}'),
         path(f'delete-{user_type}/<str:username>', getattr(view_module, f'delete_{user_type}'), name=f'delete_{user_type}'),
-        path('forgot-password/', getattr(view_module, f'{user_type}_forgot_password'), name=forgot_name),
-        path('reset-password/', getattr(view_module, f'{user_type}_reset_password'), name=reset_name),
-        path(f'{user_type}-login/', getattr(view_module, f'{user_type}_login'), name=f'{user_type}_login'),
+        path('forgot-password', getattr(view_module, f'{user_type}_forgot_password'), name=forgot_name),
+        path('reset-password', getattr(view_module, f'{user_type}_reset_password'), name=reset_name),
+        path(f'{user_type}-login', getattr(view_module, f'{user_type}_login'), name=f'{user_type}_login'),
+        path(f'{user_type}-logout', getattr(view_module, f'{user_type}_logout'), name=f'{user_type}_logout'),
         path(f'{user_type}-verify-email/<str:email>', getattr(view_module, f'{user_type}_verify_email'), name=f'{user_type}_email_verification'),
         path('resend-otp/<str:email>', getattr(view_module, f'{user_type}_resend_otp'), name=f'resend_{user_type}_otp'),
     ]

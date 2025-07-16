@@ -1,12 +1,12 @@
 from django.conf import settings
+from django.middleware.csrf import get_token
 from rest_framework.parsers import MultiPartParser, FormParser
 import common.serializer as common_serializer
 from .utils.otp_handler import verify_otp, is_ip_throttled, track_ip_request, is_otp_brute_forced, increase_backoff, clear_otp_attempts, can_resend_otp, send_otp, mark_otp_throttle
 import rest_framework.status as status
-from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
+from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import get_object_or_404
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, parser_classes
 
@@ -85,38 +85,34 @@ def password_reset_conformation(request_data, model_class, serializer_class):
     if success: return Response({'success': message}, status=status.HTTP_200_OK)
     return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
-def user_login(request_data, model_class, serializer_class, user_type_name='user'):
-    """
-    Authenticate a user by username or email and password, returning an authentication token and user profile data if successful.
-    
-    Checks that the user exists, matches the specified user type (buyer or seller), and that their profile is verified and not deleted. Returns appropriate error responses for invalid credentials, unverified or deleted profiles, or incorrect user type.
-    
-    Returns:
-        Response: On success, a response containing the authentication token, a flag indicating if the token was newly created, and serialized user profile data. On failure, a response with an error message and the relevant HTTP status code.
-    """
-    username = request_data.get('username', '')
-    email = request_data.get('email', '')
-    password = request_data.get('password', '')
-    if username:
-        try: user = authenticate(email=model_class.objects.get(username=username).email, password=password)
-        except model_class.DoesNotExist: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
-    elif email: user = authenticate(email=email, password=password)
-    else: return Response({'error': 'Username or password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+def user_login(request, model_class, user_type_name='user'):
+    username = request.data.get('username', '')
+    email = request.data.get('email', '')
+    password = request.data.get('password', '')
+    if not password: return Response({'error': 'Password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        if username: user_obj = model_class.objects.get(username=username)
+        elif email: user_obj = model_class.objects.get(email=email)
+        else: return Response({'error': 'Username or email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    except model_class.DoesNotExist: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+    if not user_obj.is_active: return Response({'error': 'Account is deactivated. Please contact support.'}, status=status.HTTP_403_FORBIDDEN)
+    user = authenticate(email=user_obj.email, password=password)
     if user:
-        try:
-            if user_type_name == 'buyer':
-                if hasattr(user, 'buyer'): profile = user.buyer
-                else: return Response({'error': 'You are not registered as a buyer.'}, status=status.HTTP_400_BAD_REQUEST)
-            elif user_type_name == 'seller':
-                if hasattr(user, 'seller'): profile = user.seller
-                else: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_400_BAD_REQUEST)
-            else: return Response({'error': 'Invalid User Type'}, status=status.HTTP_400_BAD_REQUEST)
-            if not profile.is_verified: return Response({'error': 'Your profile is not verified.'}, status=status.HTTP_403_FORBIDDEN)
-            if profile.is_deleted: return Response({'error': 'Your account does not exist.'}, status=status.HTTP_410_GONE)
-            token, created = Token.objects.get_or_create(user=user)
-            serializer = serializer_class(profile)
-            return Response({'token': token.key, 'created': created, 'user': serializer.data}, status=status.HTTP_200_OK)
-        except AttributeError: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
+        if user_type_name == 'buyer':
+            if hasattr(user, 'buyer'): profile = user.buyer
+            else: return Response({'error': 'You are not registered as a buyer.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif user_type_name == 'seller':
+            if hasattr(user, 'seller'): profile = user.seller
+            else: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_400_BAD_REQUEST)
+        else: return Response({'error': 'Invalid user type.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not profile.is_verified: return Response({'error': 'User is not verified.'}, status=status.HTTP_403_FORBIDDEN)
+        login(request, user)
+        return Response({
+            'success': True,
+            'message': 'Login successful.',
+            'email': user.get_username(),
+            'csrf_token': get_token(request)
+        }, status=status.HTTP_200_OK)
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 def verify_user(request, email, model_class, user_type='user'):
@@ -175,6 +171,10 @@ def resend_user_otp(request, email, model_class, user_type='user'):
     except ValueError as e: return Response({'error': 'Please wait before requesting another OTP.', 'message': str(e)}, status=status.HTTP_429_TOO_MANY_REQUESTS)
     except Exception as e: return Response({'error':'Unable to send OTP. Please try again later.', 'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+def log_user_out(request):
+    logout(request)
+    return Response({'success': 'User logged out successfully.'}, status=status.HTTP_200_OK)
+
 def create_user_views(model_class, serializer_class, user_type_name):
     """
     Generate a dictionary of Django REST framework view functions for user management, including user creation, update, deletion, authentication, password reset, OTP verification, and OTP resending.
@@ -185,6 +185,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         dict: A mapping of operation names to their corresponding DRF view functions.
     """
     @api_view(['DELETE'])
+    @permission_classes([IsAuthenticated])
     def delete_user(r, username):
         """
         Deletes a user by removing their user object from the database.
@@ -223,24 +224,29 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def forgot_password(r): return password_reset(r.data, model_class, settings.FRONTEND_URL,
-                                                  common_serializer.PasswordResetRequestSerializer)
+    def forgot_password(r):
+        return password_reset(r.data, model_class, settings.FRONTEND_URL, common_serializer.PasswordResetRequestSerializer)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
-    def reset_password(r): return password_reset_conformation(r.data, model_class,
-                                                              common_serializer.PasswordResetConfirmSerializer)
+    def reset_password(r):
+        return password_reset_conformation(r.data, model_class, common_serializer.PasswordResetConfirmSerializer)
 
     @api_view(['PUT', 'PATCH'])
     @permission_classes([AllowAny])
-    def login(r):
+    def login_user(r):
         """
         Authenticates a user and returns an authentication token and user data.
 
         Returns:
             Response containing authentication token and serialized user profile data on success, or an error response on failure.
         """
-        return user_login(r.data, model_class, serializer_class, user_type_name)
+        return user_login(r, model_class, user_type_name)
+
+    @api_view(['POST'])
+    @permission_classes([IsAuthenticated])
+    def user_logout(r):
+        return log_user_out(r)
 
     @api_view(['POST'])
     @permission_classes([AllowAny])
@@ -272,7 +278,8 @@ def create_user_views(model_class, serializer_class, user_type_name):
         'add_user': add_new_user,
         'forgot_password': forgot_password,
         'reset_password': reset_password,
-        'login': login,
+        'login': login_user,
+        'logout': user_logout,
         'verify': verify,
         'resend_otp': resend_otp
     }

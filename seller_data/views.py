@@ -15,6 +15,7 @@ add_seller = seller_views['add_user']
 seller_forgot_password = seller_views['forgot_password']
 seller_reset_password = seller_views['reset_password']
 seller_login = seller_views['login']
+seller_logout = seller_views['logout']
 seller_verify_email = seller_views['verify']
 seller_resend_otp = seller_views['resend_otp']
 
