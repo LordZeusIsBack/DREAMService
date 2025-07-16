@@ -86,14 +86,6 @@ def password_reset_conformation(request_data, model_class, serializer_class):
     return Response({'error': message}, status=status.HTTP_400_BAD_REQUEST)
 
 def user_login(request, model_class, user_type_name='user'):
-    """
-    Authenticate a user by username or email and password, returning an authentication token and user profile data if successful.
-    
-    Checks that the user exists, matches the specified user type (buyer or seller), and that their profile is verified and not deleted. Returns appropriate error responses for invalid credentials, unverified or deleted profiles, or incorrect user type.
-    
-    Returns:
-        Response: On success, a response containing the authentication token, a flag indicating if the token was newly created, and serialized user profile data. On failure, a response with an error message and the relevant HTTP status code.
-    """
     username = request.data.get('username', '')
     email = request.data.get('email', '')
     password = request.data.get('password', '')
