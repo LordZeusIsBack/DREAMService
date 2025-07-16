@@ -94,9 +94,9 @@ def user_login(request, model_class, user_type_name='user'):
     Returns:
         Response: On success, a response containing the authentication token, a flag indicating if the token was newly created, and serialized user profile data. On failure, a response with an error message and the relevant HTTP status code.
     """
-    username = request_data.get('username', '')
-    email = request_data.get('email', '')
-    password = request_data.get('password', '')
+    username = request.data.get('username', '')
+    email = request.data.get('email', '')
+    password = request.data.get('password', '')
     if username:
         try: user = authenticate(email=model_class.objects.get(username=username).email, password=password)
         except model_class.DoesNotExist: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
