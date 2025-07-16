@@ -89,26 +89,30 @@ def user_login(request, model_class, user_type_name='user'):
     username = request.data.get('username', '')
     email = request.data.get('email', '')
     password = request.data.get('password', '')
-    if username:
-        try: user = authenticate(email=model_class.objects.get(username=username).email, password=password)
-        except model_class.DoesNotExist: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
-    elif email: user = authenticate(email=email, password=password)
-    else: return Response({'error': 'Username or password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    if not password: return Response({'error': 'Password is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    try:
+        if username: user_obj = model_class.objects.get(username=username)
+        elif email: user_obj = model_class.objects.get(email=email)
+        else: return Response({'error': 'Username or email is required.'}, status=status.HTTP_400_BAD_REQUEST)
+    except model_class.DoesNotExist: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
+    if not user_obj.is_active: return Response({'error': 'Account is deactivated. Please contact support.'}, status=status.HTTP_403_FORBIDDEN)
+    user = authenticate(email=user_obj.email, password=password)
     if user:
-        try:
-            if user_type_name == 'buyer':
-                if hasattr(user, 'buyer'): profile = user.buyer
-                else: return Response({'error': 'You are not registered as a buyer.'}, status=status.HTTP_400_BAD_REQUEST)
-            elif user_type_name == 'seller':
-                if hasattr(user, 'seller'): profile = user.seller
-                else: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_400_BAD_REQUEST)
-            else: return Response({'error': 'Invalid User Type'}, status=status.HTTP_400_BAD_REQUEST)
-            if not profile.is_verified: return Response({'error': 'Your profile is not verified.'}, status=status.HTTP_403_FORBIDDEN)
-            if profile.is_deleted: return Response({'error': 'Your account does not exist.'}, status=status.HTTP_410_GONE)
-            token, created = Token.objects.get_or_create(user=user)
-            serializer = serializer_class(profile)
-            return Response({'token': token.key, 'created': created, 'user': serializer.data}, status=status.HTTP_200_OK)
-        except AttributeError: return Response({'error': f'You are not registered as a {user_type_name}.'}, status=status.HTTP_400_BAD_REQUEST)
+        if user_type_name == 'buyer':
+            if hasattr(user, 'buyer'): profile = user.buyer
+            else: return Response({'error': 'You are not registered as a buyer.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif user_type_name == 'seller':
+            if hasattr(user, 'seller'): profile = user.seller
+            else: return Response({'error': 'You are not registered as a seller.'}, status=status.HTTP_400_BAD_REQUEST)
+        else: return Response({'error': 'Invalid user type.'}, status=status.HTTP_400_BAD_REQUEST)
+        if not profile.is_verified: return Response({'error': 'User is not verified.'}, status=status.HTTP_403_FORBIDDEN)
+        login(request, user)
+        return Response({
+            'success': True,
+            'message': 'Login successful.',
+            'email': user.get_username(),
+            'csrf_token': get_token(request)
+        }, status=status.HTTP_200_OK)
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
 
 def verify_user(request, email, model_class, user_type='user'):
