@@ -27,7 +27,7 @@ def get_verification_document_upload_path(instance, filename, subfolder):
     Returns:
         str: The constructed file path for storing the uploaded file.
     """
-    user_type = 'buyer' if hasattr(instance.user, 'buyer') else 'seller'
+    user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
     safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
     return f'{user_type}/{instance.user}/{subfolder}/{safe_filename}'
