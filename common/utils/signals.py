@@ -9,9 +9,9 @@ from seller_data.models import Seller, SellerVerification
 @receiver(post_delete, sender=Seller)
 def delete_user_profile_picture(sender, instance, **kwargs):
     """
-    Deletes the profile picture file from storage when a Buyer or Seller instance is deleted.
+    Removes the profile picture file from storage when a Buyer or Seller instance is deleted.
     
-    This function is intended to be used as a Django post-delete signal handler. If the deleted instance has a profile picture, the file is removed from its associated storage backend.
+    Intended as a Django post-delete signal handler. If the deleted instance has a profile picture, the associated file is deleted from its storage backend.
     """
     if instance.profile_picture:
         try:
