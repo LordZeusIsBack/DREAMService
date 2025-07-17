@@ -7,7 +7,13 @@ from django.core.exceptions import ValidationError
 from common.utils.storage_backends import MediaStorage
 from uuid import uuid4
 
-def get_user_document_upload_path(instance, filename, subfolder):
+def get_profile_picture_upload_path(instance, filename, subfolder):
+    user_type = 'buyer' if hasattr(instance.user, 'buyer') else 'seller'
+    base, extension = filename.rsplit('.', 1)
+    safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
+    return f'{user_type}/{instance.user}/{subfolder}/{safe_filename}'
+
+def get_verification_document_upload_path(instance, filename, subfolder):
     """
     Generate a unique and organized file upload path for a user's document or image.
     
@@ -24,11 +30,11 @@ def get_user_document_upload_path(instance, filename, subfolder):
     user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
     safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
-    return f'{user_type}/{instance}/{subfolder}/{safe_filename}'
+    return f'{user_type}/{getattr(instance, user_type).user}/{subfolder}/{safe_filename}'
 
-profile_picture_path = partial(get_user_document_upload_path, subfolder='profile_pictures')
-aadhaar_card_image_path = partial(get_user_document_upload_path, subfolder='verification/aadhaar_card')
-pan_card_image_path = partial(get_user_document_upload_path, subfolder='verification/pan_card')
+profile_picture_path = partial(get_profile_picture_upload_path, subfolder='profile_pictures')
+aadhaar_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/aadhaar_card')
+pan_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/pan_card')
 
 # Create your models here.
 class CustomUserManager(BaseUserManager):
