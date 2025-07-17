@@ -8,6 +8,19 @@ from common.utils.storage_backends import MediaStorage
 from uuid import uuid4
 
 def get_profile_picture_upload_path(instance, filename, subfolder):
+    """
+    Generate a secure upload path for a user's profile picture based on user type.
+    
+    The path includes the user type ('buyer' or 'seller'), the user's identifier, a specified subfolder, and a sanitized filename with a short UUID to ensure uniqueness.
+    
+    Parameters:
+        instance: The model instance containing a `user` attribute.
+        filename: The original name of the uploaded file.
+        subfolder: The subfolder within the user's directory for storing the file.
+    
+    Returns:
+        str: The constructed file path for uploading the profile picture.
+    """
     user_type = 'buyer' if hasattr(instance.user, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
     safe_filename = f'{slugify(base)}.{uuid4().hex[:8]}.{extension}'
@@ -15,17 +28,17 @@ def get_profile_picture_upload_path(instance, filename, subfolder):
 
 def get_verification_document_upload_path(instance, filename, subfolder):
     """
-    Generate a unique and organized file upload path for a user's document or image.
+    Constructs a unique file upload path for a user's verification document or image.
     
-    The path includes the user type ('buyer' or 'seller'), a specified subfolder, and a sanitized filename with a short UUID to prevent collisions.
+    The path includes the user type ('buyer' or 'seller'), the related user's identifier, a specified subfolder, and a sanitized filename with a short UUID to ensure uniqueness.
     
     Parameters:
-        instance: The model instance associated with the file upload.
+        instance: The model instance containing either a 'buyer' or 'seller' attribute.
         filename (str): The original name of the uploaded file.
-        subfolder (str): The subdirectory under the user type where the file will be stored.
+        subfolder (str): The subdirectory under the user type for storing the file.
     
     Returns:
-        str: The constructed file path for storing the uploaded file.
+        str: The generated file path for the uploaded verification document.
     """
     user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
