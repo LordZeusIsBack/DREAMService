@@ -76,7 +76,7 @@ def get_log_handler(app_name):
     return {
         'level': 'WARNING',
         'class': 'logging.handlers.TimedRotatingFileHandler',
-        'filename': LOG_BASE_DIR / f"{app_name}_logs"/f"{app_name}.log",
+        'filename': str(LOG_BASE_DIR / f"{app_name}_logs"/f"{app_name}.log"),
         'interval': 1,
         'backupCount': 7,
         'formatter': 'verbose',
