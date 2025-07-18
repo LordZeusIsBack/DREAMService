@@ -5,6 +5,9 @@ from seller_data.models import Seller
 from seller_data.serializer import SellerSerializer
 from common.views import create_user_views
 from common.models import CustomUser
+import logging
+
+logger = logging.getLogger('seller_data')
 
 # Create your views here.
 seller_views = create_user_views(CustomUser, SellerSerializer, 'seller')
