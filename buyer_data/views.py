@@ -9,10 +9,6 @@ from common.models import CustomUser
 
 logger = logging.getLogger('buyer_data')
 
-logger.warning("This is a warning message")
-logger.error("This is an error message")
-logger.critical("This is a critical message")
-
 # Create your views here.
 buyer_views = create_user_views(CustomUser, BuyerSerializer, 'buyer')
 
