@@ -14,5 +14,5 @@ pytz==2025.1
 redis==6.2.0
 requests==2.32.4
 sqlparse==0.5.3
-tzdata==2025.1
+tzdata==2025.2
 whitenoise==6.9.0
