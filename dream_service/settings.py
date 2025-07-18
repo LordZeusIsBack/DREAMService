@@ -67,6 +67,68 @@ CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "dream_service.urls"
 
+def get_log_handler(app_name):
+    return {
+        'level': 'WARNING',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': LOG_BASE_DIR / f"{app_name}_logs"/f"{app_name}.log",
+        'interval': 1,
+        'backupCount': 7,
+        'formatter': 'verbose',
+    }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'seller_data_logs': get_log_handler('seller_data'),
+        'buyer_data_logs': get_log_handler('buyer_data'),
+        'estate_data_logs': get_log_handler('estate_data'),
+        'common_logs': get_log_handler('common'),
+    },
+    'loggers': {
+        'seller_data': {
+            'handlers': ['seller_data_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },'buyer_data': {
+            'handlers': ['buyer_data_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },'estate_data': {
+            'handlers': ['estate_data_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },'common': {
+            'handlers': ['common_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },
+    }
+}
+
+CELERY_BEAT_SCHEDULE = {
+    'upload-logs-to-s3': {
+        'task': 'common.utils.upload_logs.upload_logs_to_s3',
+        'schedule': crontab(hour=0, minute=0)
+    }
+}
+
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
