@@ -129,7 +129,7 @@ LOGGING = {
 
 CELERY_BEAT_SCHEDULE = {
     'upload-logs-to-s3': {
-        'task': 'common.utils.upload_logs.upload_logs_to_s3',
+        'task': 'common.tasks.upload_to_s3',
         'schedule': crontab(hour=0, minute=0)
     }
 }
