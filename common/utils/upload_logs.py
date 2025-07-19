@@ -51,9 +51,7 @@ def upload_logs_now():
                             logger.error(f'AWS error uploading {file_path}: {e}')
                             failed_uploads.append(str(file_path))
                         except Exception as e:
-                            logger.error(f'Unexpected error uploading {file_path}: {e}')
-                            failed_uploads.append(str(file_path))
-
+                            logger.error(f'Failed to upload or verify {file_path}: {e}')
                 except Exception as e:
                     logger.error(f'Error checking file timestamp for {file_path}: {e}')
 
