@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     "common",
     "estate_data",
     "storages",
-    "corsheaders"
+    "corsheaders",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
