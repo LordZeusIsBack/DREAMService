@@ -7,7 +7,7 @@ from django.core.mail import send_mail
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.conf import settings
-from django.db.transaction import atomic
+from django.db.transaction import atomic, on_commit
 
 class BaseUserSerializer(serializers.ModelSerializer):
     """
@@ -51,11 +51,11 @@ class BaseUserSerializer(serializers.ModelSerializer):
                     first_name=user_data['first_name'],
                     last_name=user_data['last_name']
                 )
-                send_mail_containing_otp(email=custom_user_instance.email).delay()
                 user_model_instance = user_model.objects.create(user=custom_user_instance, **validated_data)
                 try: user_model_instance.full_clean()
                 except Exception as e: raise ValidationError({'error': str(e)}) from e
                 verification_model.objects.create(**{user_model.__name__.lower(): user_model_instance}, **verification_data)
+                on_commit(lambda: send_mail_containing_otp.delay(email=custom_user_instance.email))
                 return user_model_instance
         except Exception as e: raise ValidationError({'error': str(e)}) from e
 
