@@ -128,12 +128,6 @@ LOGGING = {
     }
 }
 
-CELERY_BEAT_SCHEDULE = {
-    'upload-logs-to-s3': {
-        'task': 'common.tasks.upload_to_s3',
-        'schedule': crontab(hour=0, minute=0)
-    }
-}
 
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
