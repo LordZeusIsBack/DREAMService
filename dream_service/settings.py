@@ -12,11 +12,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
+from celery.bin.worker import CELERY_BEAT
+from celery.contrib.rdb import CELERY_RDB_HOST
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv()
+
+LOG_BASE_DIR = BASE_DIR / "logs"
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -47,7 +52,8 @@ INSTALLED_APPS = [
     "common",
     "estate_data",
     "storages",
-    "corsheaders"
+    "corsheaders",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -67,6 +73,62 @@ CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "dream_service.urls"
 
+def get_log_handler(app_name):
+    return {
+        'level': 'WARNING',
+        'class': 'logging.handlers.TimedRotatingFileHandler',
+        'filename': str(LOG_BASE_DIR / f"{app_name}_logs"/f"{app_name}.log"),
+        'interval': 1,
+        'backupCount': 7,
+        'formatter': 'verbose',
+    }
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {name} {process:d} {thread:d} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '{levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'seller_data_logs': get_log_handler('seller_data'),
+        'buyer_data_logs': get_log_handler('buyer_data'),
+        'estate_data_logs': get_log_handler('estate_data'),
+        'common_logs': get_log_handler('common'),
+    },
+    'loggers': {
+        'seller_data': {
+            'handlers': ['seller_data_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },'buyer_data': {
+            'handlers': ['buyer_data_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },'estate_data': {
+            'handlers': ['estate_data_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },'common': {
+            'handlers': ['common_logs'],
+            'level': 'WARNING',
+            'propagate': False
+        },
+    }
+}
+
+
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('S3_BUCKET_NAME')
@@ -76,6 +138,9 @@ AWS_S3_FILE_OVERWRITE = False
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = True
 AWS_QUERYSTRING_EXPIRE = 900
+
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND')
 
 DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 

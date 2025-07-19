@@ -28,6 +28,12 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
+    - name: Create Log Directories
+      run: |
+        mkdir -p logs/buyer_data_logs
+        mkdir -p logs/seller_data_logs
+        mkdir -p logs/estate_data_logs
+        mkdir -p logs/common_logs
     - name: Run Tests
       run: |
         python manage.py test
