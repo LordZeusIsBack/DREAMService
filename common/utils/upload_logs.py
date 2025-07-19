@@ -42,6 +42,7 @@ def upload_logs_now():
 
                         try:
                             s3.upload_file(str(file_path), bucket_name, s3_key)
+                            s3.head_object(Bucket=bucket_name, Key=s3_key)
                             uploaded_files.append(s3_key)
                             logger.info(f'Successfully uploaded {file_path} to {s3_key}!')
                             file_path.unlink()
