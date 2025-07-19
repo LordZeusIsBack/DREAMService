@@ -1,6 +1,7 @@
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
 
+from django.utils import timezone
 import boto3
 from botocore.exceptions import ClientError
 from django.conf import settings
@@ -23,7 +24,7 @@ def upload_logs_now():
         failed_uploads = []
 
         # Calculate yesterday's date
-        yesterday = datetime.now() - timedelta(days=1)
+        yesterday = timezone.now() - timedelta(days=1)
 
         for folder in log_root.glob('*_logs'):
             if not folder.is_dir():
