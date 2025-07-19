@@ -74,6 +74,15 @@ CORS_ALLOW_CREDENTIALS = True
 ROOT_URLCONF = "dream_service.urls"
 
 def get_log_handler(app_name):
+    """
+    Create a logging handler configuration for an app that writes warning-level logs to a timed rotating file.
+    
+    Parameters:
+        app_name (str): The name of the application for which the log handler is configured.
+    
+    Returns:
+        dict: A dictionary suitable for Django's LOGGING setting, configuring a TimedRotatingFileHandler for the specified app.
+    """
     return {
         'level': 'WARNING',
         'class': 'logging.handlers.TimedRotatingFileHandler',

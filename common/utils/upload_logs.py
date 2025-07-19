@@ -9,6 +9,12 @@ from django.conf import settings
 logger = logging.getLogger('common')
 
 def upload_logs_now():
+    """
+    Uploads log files modified yesterday from local log directories to AWS S3, verifies uploads, deletes local copies, and cleans up old log files.
+    
+    Returns:
+        dict: A summary containing lists of successfully uploaded files, failed uploads, and their respective counts.
+    """
     log_root = settings.LOG_BASE_DIR
     bucket_name = settings.AWS_STORAGE_BUCKET_NAME
 
@@ -72,6 +78,13 @@ def upload_logs_now():
 
 
 def cleanup_old_files(log_root, days_to_keep=7):
+    """
+    Delete log files older than a specified number of days from log directories.
+    
+    Parameters:
+    	log_root (Path): The root directory containing log folders.
+    	days_to_keep (int, optional): The number of days to retain log files. Files older than this will be deleted. Defaults to 7.
+    """
     cutoff_date = timezone.now() - timedelta(days=days_to_keep)
 
     for folder in log_root.glob('*_logs'):
