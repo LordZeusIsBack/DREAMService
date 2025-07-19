@@ -21,9 +21,12 @@ def upload_to_s3(self):
 
 @shared_task(bind=True, autoretry_for=(SMTPException, SMTPRecipientsRefused, TimeoutError), retry_kwargs={'max_retries': 3, 'countdown': 20})
 def send_mail_containing_otp(self, email):
+    logger.info(f'Sending OTP to email: {email}')
     try:
-        logger.info(f'Sending OTP to email: {email}')
         send_otp(email, is_resend=False)
-    except Exception as e:
+    except (SMTPException, SMTPRecipientsRefused, TimeoutError) as e:
         logger.warning(f"Retrying sending OTP to {email} due to {e}")
-        raise self.retry(exc=e, countdown=20)
+        raise self.retry(exc=e, countdown=20) from e
+    except Exception as e:
+        logger.error(f"Failed to send OTP to {email}: {e}")
+        raise
