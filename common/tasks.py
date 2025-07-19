@@ -25,8 +25,8 @@ def send_mail_containing_otp(self, email):
     try:
         send_otp(email, is_resend=False)
     except (SMTPException, SMTPRecipientsRefused, TimeoutError) as e:
-        logger.warning(f"Retrying sending OTP to {email} due to {e}")
-        raise self.retry(exc=e, countdown=20) from e
+        logger.warning(f"SMTP error sending OTP to {email}: {e}")
+        raise  # Let autoretry_for handle the retry
     except Exception as e:
         logger.error(f"Failed to send OTP to {email}: {e}")
         raise
