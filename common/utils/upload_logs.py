@@ -39,7 +39,6 @@ def upload_logs_now():
                     if file_mtime.date() == yesterday.date():
                         date_str = yesterday.strftime("%Y-%m-%d")
                         s3_key = f'logs/{app_name}/{date_str}/{file_path.name}'
-
                         try:
                             s3.upload_file(str(file_path), bucket_name, s3_key)
                             s3.head_object(Bucket=bucket_name, Key=s3_key)
@@ -73,7 +72,7 @@ def upload_logs_now():
 
 
 def cleanup_old_files(log_root, days_to_keep=7):
-    cutoff_date = datetime.now() - timedelta(days=days_to_keep)
+    cutoff_date = timezone.now() - timedelta(days=days_to_keep)
 
     for folder in log_root.glob('*_logs'):
         if not folder.is_dir():
@@ -81,7 +80,7 @@ def cleanup_old_files(log_root, days_to_keep=7):
 
         for file_path in folder.glob('*.log*'):
             try:
-                file_mtime = datetime.fromtimestamp(file_path.stat().st_mtime)
+                file_mtime = datetime.fromtimestamp(file_path.stat().st_mtime, tz=timezone.get_current_timezone())
                 if file_mtime < cutoff_date:
                     file_path.unlink()
                     logger.info(f'Deleted old log file: {file_path}')
