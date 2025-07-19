@@ -10,6 +10,14 @@ logger = logging.getLogger('common')
 
 
 def upload_logs_now():
+    """
+    Uploads log files from local application log directories to an AWS S3 bucket if they were last modified on the previous day.
+    
+    For each log file in directories ending with "_logs", the function uploads files modified yesterday to a structured S3 path, verifies the upload, deletes the local file upon success, and tracks both successful and failed uploads. After processing, it cleans up old log files beyond the retention period.
+    
+    Returns:
+        dict: A summary containing lists of uploaded and failed files, and their respective counts.
+    """
     log_root = settings.LOG_BASE_DIR
     bucket_name = settings.AWS_STORAGE_BUCKET_NAME
     try:
@@ -61,6 +69,13 @@ def upload_logs_now():
         raise
 
 def cleanup_old_files(log_root, days_to_keep=7):
+    """
+    Delete log files older than a specified number of days from all subdirectories ending with '_logs'.
+    
+    Parameters:
+    	log_root: The root directory containing log subdirectories.
+    	days_to_keep (int): The number of days to retain log files. Files older than this will be deleted.
+    """
     current_tz = timezone.get_current_timezone()
     cutoff_date = timezone.localtime() - timedelta(days=days_to_keep)
     for folder in log_root.glob('*_logs'):
