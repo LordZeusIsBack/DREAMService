@@ -25,6 +25,17 @@ class BuyerVerification(VerificationMixin):
         editable=False
     )
 
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
+                if original.aadhaar_card and self.aadhaar_card:
+                    if original.aadhaar_card.name != self.aadhaar_card.name:
+                        raise ValidationError('Aadhaar Card once set cannot be changed!')
+            except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
+
     def __str__(self):
         """
         Return the username of the user linked to this buyer verification instance.
