@@ -1,7 +1,13 @@
 from django.db import models
+from functools import partial
+from common.models import get_verification_document_upload_path
+from common.utils.storage_backends import MediaStorage
+from django.core.validators import MaxValueValidator, MinValueValidator
 from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
 from estate_data.models import Estate
+
+aadhaar_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/aadhaar_card')
 
 # Create your models here.
 class Buyer(UserExtensionMixin):
