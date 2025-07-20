@@ -12,6 +12,12 @@ class Buyer(UserExtensionMixin):
 
 class BuyerVerification(VerificationMixin):
     buyer = models.OneToOneField(Buyer, on_delete=models.CASCADE, related_name='buyerverification')
+    aadhaar_card = models.ImageField(upload_to=aadhaar_card_image_path, null=True, blank=True, storage=MediaStorage)
+    aadhaar_number = models.BigIntegerField(
+        validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
+        unique=True,
+        editable=False
+    )
 
     def __str__(self):
         """
