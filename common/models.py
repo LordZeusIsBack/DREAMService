@@ -128,12 +128,6 @@ class UserExtensionMixin(models.Model):
 
 
 class VerificationMixin(models.Model):
-    aadhaar_card = models.ImageField(upload_to=aadhaar_card_image_path, null=True, blank=True, storage=MediaStorage)
-    aadhaar_number = models.BigIntegerField(
-        validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
-        unique=True,
-        editable=False
-    )
     pan_card = models.ImageField(upload_to=pan_card_image_path, null=True, blank=True, storage=MediaStorage)
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
 
