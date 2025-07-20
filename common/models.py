@@ -28,17 +28,17 @@ def get_profile_picture_upload_path(instance, filename, subfolder):
 
 def get_verification_document_upload_path(instance, filename, subfolder):
     """
-    Constructs a unique file upload path for a user's verification document or image.
+    Generate a unique and secure upload path for a user's verification document or image.
     
-    The path includes the user type ('buyer' or 'seller'), the related user's identifier, a specified subfolder, and a sanitized filename with a short UUID to ensure uniqueness.
+    The path incorporates the user type ('buyer' or 'seller'), the associated user's identifier, a specified subfolder, and a sanitized filename with a short UUID to prevent naming collisions.
     
     Parameters:
-        instance: The model instance containing either a 'buyer' or 'seller' attribute.
-        filename (str): The original name of the uploaded file.
-        subfolder (str): The subdirectory under the user type for storing the file.
+        instance: Model instance with either a 'buyer' or 'seller' attribute.
+        filename (str): Original name of the uploaded file.
+        subfolder (str): Subdirectory under the user type for storing the file.
     
     Returns:
-        str: The generated file path for the uploaded verification document.
+        str: The constructed file path for the uploaded verification document.
     """
     user_type = 'buyer' if hasattr(instance, 'buyer') else 'seller'
     base, extension = filename.rsplit('.', 1)
@@ -132,9 +132,9 @@ class VerificationMixin(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Save the instance while enforcing immutability of Aadhaar and PAN numbers and their associated card images.
+        Save the instance while enforcing immutability of the PAN number and PAN card image.
         
-        Raises a ValidationError if an attempt is made to modify the `aadhaar_number`, `pan_number`, `aadhaar_card`, or `pan_card` fields after they have been set.
+        Raises a ValidationError if an attempt is made to modify the `pan_number` or `pan_card` fields after they have been set.
         """
         if self.pk:
             try:

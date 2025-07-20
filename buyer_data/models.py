@@ -26,6 +26,12 @@ class BuyerVerification(VerificationMixin):
     )
 
     def save(self, *args, **kwargs):
+        """
+        Override the save method to prevent changes to Aadhaar number and Aadhaar card image after initial set.
+        
+        Raises:
+            ValidationError: If an attempt is made to modify the Aadhaar number or replace the Aadhaar card image after they have been set.
+        """
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)
@@ -38,7 +44,7 @@ class BuyerVerification(VerificationMixin):
 
     def __str__(self):
         """
-        Return the username of the user linked to this buyer verification instance.
+        Return the username associated with the buyer linked to this verification instance.
         """
         return f"{self.buyer.user.username}"
 
