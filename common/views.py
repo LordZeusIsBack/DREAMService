@@ -48,9 +48,9 @@ def remove_user_information(model, username):
 
 def update_user_details(request_data, username, model_class, serializer_class):
     """
-    Updates a user's buyer or seller profile with the provided data.
+    Update a user's buyer or seller profile with the provided data.
     
-    If the user or their profile is deleted or missing, returns an appropriate error response. Otherwise, updates the profile using the specified serializer and returns the serialized data with the corresponding HTTP status code.
+    Retrieves the user by username and determines the associated buyer or seller profile. If the profile is found, updates it using the specified serializer and returns the serialized data with the appropriate HTTP status code. Returns a 404 response if the user does not have a buyer or seller profile.
     """
     user = get_object_or_404(model_class, username=username)
     if hasattr(user, 'buyer'):

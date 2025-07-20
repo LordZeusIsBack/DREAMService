@@ -62,13 +62,15 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def update_user(instance, validated_data, verification_field):
         """
-        Updates an existing user and related instance with validated data, enforcing immutability of the phone number and preventing changes to Aadhaar and PAN numbers.
+        Update an existing user and related instance with validated data, while preventing changes to phone number, Aadhaar, and PAN fields.
         
-        Raises:
-            ValidationError: If attempting to change the phone number or if data validation fails.
+        Attempts to modify the phone number will raise a validation error. Aadhaar and PAN numbers and card fields are ignored if present in the update data. The linked user instance is updated with provided user data, and the password is changed if specified. The updated instance is validated and saved.
         
         Returns:
             The updated instance after applying changes and validation.
+        
+        Raises:
+            ValidationError: If attempting to change the phone number or if data validation fails.
         """
         if 'phone_number' in validated_data and validated_data['phone_number'] != instance.phone_number: raise ValidationError({'error': 'Phone number once set cannot be changed!'})
         user_data = validated_data.pop('user')

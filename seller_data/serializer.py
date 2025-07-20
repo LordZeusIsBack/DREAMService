@@ -34,10 +34,21 @@ class SellerSerializer(BaseUserSerializer):
 
     @staticmethod
     def get_agent_rera_id(obj):
+        """
+        Retrieve the agent RERA ID from the related seller verification object.
+        
+        Returns:
+            str or None: The agent RERA ID if available; otherwise, None.
+        """
         try: return obj.sellerverification.agent_rera_id
         except AttributeError: return None
 
     def create(self, validated_data):
+        """
+        Creates a new Seller instance along with associated SellerVerification data.
+        
+        Extracts verification-related fields from the validated data, assigns them to the related SellerVerification, and creates both records using the base user serializer.
+        """
         verification_data = {
             'pan_number': validated_data.pop('pan_number'),
             'pan_card': validated_data.pop('pan_card', None),
@@ -54,11 +65,11 @@ class SellerSerializer(BaseUserSerializer):
 
     def update(self, instance, validated_data):
         """
-        Update an existing seller instance with new data, preventing modification of the business name once it is set.
-
+        Update a seller instance with new data, disallowing changes to the business name once it has been set.
+        
         Raises:
-            serializers.ValidationError: If an attempt is made to change the business name after it has been set.
-
+            serializers.ValidationError: If an attempt is made to change the business name after it is set.
+        
         Returns:
             The updated seller instance.
         """

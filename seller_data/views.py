@@ -35,9 +35,9 @@ def seller_data(r, seller_username):
 @api_view(['GET'])
 def get_listed_estates(r, seller_username):
     """
-    Retrieve all estates listed by a seller identified by username.
+    Retrieve all estates associated with a seller by username.
     
-    If the seller has no estates, returns a 204 No Content response with a message. Otherwise, returns serialized estate data with a 200 OK status.
+    If the seller has no estates, returns a 204 No Content response with a message. Otherwise, returns a list of serialized estate data with a 200 OK status.
     """
     from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
     from estate_data.models import Estate

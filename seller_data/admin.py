@@ -42,12 +42,12 @@ class SellerVerificationAdmin(admin.ModelAdmin):
     @admin.display(description='Seller Username')
     def seller_username(self, obj):
         """
-        Returns the username of the user associated with the seller for the given SellerVerification instance.
+        Return the username of the user associated with the seller for the given SellerVerification instance.
         
         Parameters:
-            obj: The SellerVerification instance being displayed.
+            obj: The SellerVerification instance for which to retrieve the seller's username.
         
         Returns:
-            str: The username of the related user.
+            str: Username of the related user.
         """
         return obj.seller.user.username
