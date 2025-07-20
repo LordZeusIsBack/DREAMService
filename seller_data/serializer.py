@@ -18,7 +18,8 @@ class SellerSerializer(BaseUserSerializer):
     pan_number = serializers.CharField(write_only=True)
     pan_card = serializers.ImageField(required=False, write_only=True)
     gstin = serializers.IntegerField(write_only=True)
-    agent_rera_id = serializers.CharField(write_only=True)
+    agent_rera_id = serializers.SerializerMethodField(read_only=True)
+    agent_rera_id_write = serializers.CharField(write_only=True, source='agent_rera_id')
     profile_picture = serializers.ImageField(required=False)
     business_name = serializers.CharField()
     first_name = serializers.CharField(source='user.first_name')
@@ -29,7 +30,12 @@ class SellerSerializer(BaseUserSerializer):
     class Meta(BaseUserSerializer.Meta):
         model = models.Seller
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'business_name', 'username', 'password',
-                  'pan_number', 'pan_card', 'gstin', 'agent_rera_id', 'profile_picture')
+                  'pan_number', 'pan_card', 'gstin', 'agent_rera_id', 'agent_rera_id_write', 'profile_picture')
+
+    @staticmethod
+    def get_agent_rera_id(obj):
+        try: return obj.sellerverification.agent_rera_id
+        except AttributeError: return None
 
     def create(self, validated_data):
         verification_data = {
@@ -49,7 +55,7 @@ class SellerSerializer(BaseUserSerializer):
     def update(self, instance, validated_data):
         """
         Update an existing seller instance with new data, preventing modification of the business name once it is set.
-        
+
         Raises:
             serializers.ValidationError: If an attempt is made to change the business name after it has been set.
 
