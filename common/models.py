@@ -46,7 +46,6 @@ def get_verification_document_upload_path(instance, filename, subfolder):
     return f'{user_type}/{getattr(instance, user_type).user}/{subfolder}/{safe_filename}'
 
 profile_picture_path = partial(get_profile_picture_upload_path, subfolder='profile_pictures')
-aadhaar_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/aadhaar_card')
 pan_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/pan_card')
 
 # Create your models here.
