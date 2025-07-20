@@ -55,10 +55,8 @@ def update_user_details(request_data, username, model_class, serializer_class):
     user = get_object_or_404(model_class, username=username)
     if hasattr(user, 'buyer'):
         profile = user.buyer
-        if profile.is_deleted: return Response({'error': 'User not found or deleted'}, status=status.HTTP_410_GONE)
     elif hasattr(user, 'seller'):
         profile = user.seller
-        if profile.is_deleted: return Response({'error': 'User not found or deleted'}, status=status.HTTP_410_GONE)
     else: return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
     data, resp_status = process_serializer(serializer_class, data=request_data, instance=profile)
     return Response(data, status=resp_status)
