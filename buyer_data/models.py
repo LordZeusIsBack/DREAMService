@@ -1,7 +1,13 @@
 from django.db import models
+from functools import partial
+from common.models import get_verification_document_upload_path
+from common.utils.storage_backends import MediaStorage
+from django.core.validators import MaxValueValidator, MinValueValidator
 from rest_framework.exceptions import ValidationError
 from common.models import CustomUser, UserExtensionMixin, VerificationMixin
 from estate_data.models import Estate
+
+aadhaar_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/aadhaar_card')
 
 # Create your models here.
 class Buyer(UserExtensionMixin):
@@ -12,6 +18,23 @@ class Buyer(UserExtensionMixin):
 
 class BuyerVerification(VerificationMixin):
     buyer = models.OneToOneField(Buyer, on_delete=models.CASCADE, related_name='buyerverification')
+    aadhaar_card = models.ImageField(upload_to=aadhaar_card_image_path, null=True, blank=True, storage=MediaStorage)
+    aadhaar_number = models.BigIntegerField(
+        validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
+        unique=True,
+        editable=False
+    )
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            try:
+                original = type(self).objects.get(pk=self.pk)
+                if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
+                if original.aadhaar_card and self.aadhaar_card:
+                    if original.aadhaar_card.name != self.aadhaar_card.name:
+                        raise ValidationError('Aadhaar Card once set cannot be changed!')
+            except type(self).DoesNotExist: pass
+        super().save(*args, **kwargs)
 
     def __str__(self):
         """

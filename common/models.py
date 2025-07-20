@@ -46,7 +46,6 @@ def get_verification_document_upload_path(instance, filename, subfolder):
     return f'{user_type}/{getattr(instance, user_type).user}/{subfolder}/{safe_filename}'
 
 profile_picture_path = partial(get_profile_picture_upload_path, subfolder='profile_pictures')
-aadhaar_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/aadhaar_card')
 pan_card_image_path = partial(get_verification_document_upload_path, subfolder='verification/pan_card')
 
 # Create your models here.
@@ -128,12 +127,6 @@ class UserExtensionMixin(models.Model):
 
 
 class VerificationMixin(models.Model):
-    aadhaar_card = models.ImageField(upload_to=aadhaar_card_image_path, null=True, blank=True, storage=MediaStorage)
-    aadhaar_number = models.BigIntegerField(
-        validators=[MinValueValidator(10 ** 12), MaxValueValidator(10 ** 13 - 1)],
-        unique=True,
-        editable=False
-    )
     pan_card = models.ImageField(upload_to=pan_card_image_path, null=True, blank=True, storage=MediaStorage)
     pan_number = models.CharField(max_length=10, unique=True, editable=False)
 
@@ -146,11 +139,7 @@ class VerificationMixin(models.Model):
         if self.pk:
             try:
                 original = type(self).objects.get(pk=self.pk)
-                if original.aadhaar_number != self.aadhaar_number: raise ValidationError('Aadhaar Number once set cannot be changed!')
                 if original.pan_number != self.pan_number: raise ValidationError('Pan Number once set cannot be changed!')
-                if original.aadhaar_card and self.aadhaar_card:
-                    if original.aadhaar_card.name != self.aadhaar_card.name:
-                        raise ValidationError('Aadhaar Card once set cannot be changed!')
                 if original.pan_card and self.pan_card:
                     if original.pan_card.name != self.pan_card.name:
                         raise ValidationError('Pan Card once set cannot be changed!')
