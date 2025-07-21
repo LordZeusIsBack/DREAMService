@@ -8,12 +8,12 @@ from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
-from numpy import power
+from math import pow
 
 logger = logging.getLogger('buyer_data')
 
 def calculate_interest_power(r, n):
-    return power(1 + r, n)
+    return pow(1 + r, n)
 
 # Create your views here.
 buyer_views = create_user_views(CustomUser, BuyerSerializer, 'buyer')
