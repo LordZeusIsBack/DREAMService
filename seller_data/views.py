@@ -1,3 +1,4 @@
+from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -39,7 +40,6 @@ def get_listed_estates(r, seller_username):
     
     If the seller has no estates, returns a 204 No Content response with a message. Otherwise, returns a list of serialized estate data with a 200 OK status.
     """
-    from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
     from estate_data.models import Estate
     from estate_data.serializer import EstateSerializer
     estates = Estate.objects.filter(seller__user__username=seller_username).select_related('seller__user').prefetch_related('images')
