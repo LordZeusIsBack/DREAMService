@@ -43,6 +43,7 @@ def buyer_data(r, buyer_username):
     return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
+@parser_classes([AllowAny])
 def affordability_calculator(r):
     try:
         down_payment = float(r.query_params.get('down_payment'))
