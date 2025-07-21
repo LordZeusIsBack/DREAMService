@@ -46,17 +46,19 @@ def buyer_data(r, buyer_username):
 @parser_classes([AllowAny])
 def affordability_calculator(r):
     try:
-        down_payment = float(r.query_params.get('down_payment'))
-        interest_rate = float(r.query_params.get('interest_rate')) / (12 * 100)
-        tenure = int(r.query_params.get('tenure_in_years')) * 12
-        remaining_capacity = (float(r.query_params.get('income')) / 2) - float(r.query_params.get('existing_debt'))
-        if remaining_capacity <= 0: return Response({'message': 'You are already above the mandated DTI.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
-        elif interest_rate == 0: principal_amount = remaining_capacity * tenure
+        dp = float(r.query_params.get('dp'))
+        p = float(r.query_params.get('ir')) / (12 * 100)
+        n = int(r.query_params.get('ty')) * 12
+        inc = float(r.query_params.get('inc'))
+        d = float(r.query_params.get('debt'))
+        emi = (inc / 2) - d
+        if emi <= 0: return Response({'message': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
+        if p == 0: L = emi * n
         else:
-            powered_rate = calculate_interest_power(interest_rate, tenure)
-            principal_amount = remaining_capacity * ((powered_rate - 1) / (interest_rate * powered_rate))
-        return Response({'principal_amount': round(principal_amount, 2), 'total_available_cost': round(principal_amount + down_payment, 2)}, status=HTTP_200_OK)
-    except (TypeError, AttributeError): return Response({'error': 'Invalid input. Please check your query parameters.'}, status=HTTP_400_BAD_REQUEST)
+            r_power_n = calculate_interest_power(p, n)
+            L = emi * ((r_power_n - 1) / (p * r_power_n))
+        return Response({'L': round(L, 2), 'C': round((L + dp), 2)}, status=HTTP_200_OK)
+    except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @parser_classes([AllowAny])
