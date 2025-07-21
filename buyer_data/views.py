@@ -1,6 +1,7 @@
 import logging
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, parser_classes
+from rest_framework.permissions import IsAuthenticated
 from buyer_data.models import Buyer
 from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
@@ -23,7 +24,8 @@ buyer_verify_email = buyer_views['verify']
 buyer_resend_otp = buyer_views['resend_otp']
 
 @api_view(['GET'])
-def buyer_data(r, buyer_username): 
+@parser_classes([IsAuthenticated])
+def buyer_data(r, buyer_username):
     """
     Retrieve serialized data for a buyer identified by username.
     
