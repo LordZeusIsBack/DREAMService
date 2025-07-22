@@ -39,7 +39,7 @@ def calculate_new_tenure_after_prepayment(principal, rate, tenure_months, months
         return balance_k, new_principal, remaining_months, months_saved
     balance_k = calculate_outstanding_balance(principal, rate, emi, months_paid)
     new_principal = balance_k - prepayment_amount
-    if new_principal <= 0: return 0, 0, 0, True
+    if new_principal <= 0: return 0, 0, 0, 0
     numerator = emi
     denominator = emi - (rate * new_principal)
     if denominator <= 0: raise ValueError('EMI too low for the remaining principal and interest rate')
