@@ -19,3 +19,7 @@ def calculate_max_loan(emi, rate, tenure_months):
     if rate == 0: return emi * tenure_months
     power_n = calculate_interest_power(rate, tenure_months)
     return emi * (power_n - 1) / (rate * power_n)
+
+def calculate_outstanding_balance(principal, rate, emi, months_paid):
+    power_k = calculate_interest_power(rate, months_paid)
+    return (principal * power_k) - (emi * (power_k - 1) / rate)
