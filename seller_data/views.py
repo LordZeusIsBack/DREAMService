@@ -1,6 +1,7 @@
+from rest_framework.permissions import AllowAny
 from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from seller_data.models import Seller
 from seller_data.serializer import SellerSerializer
@@ -24,6 +25,7 @@ seller_verify_email = seller_views['verify']
 seller_resend_otp = seller_views['resend_otp']
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def seller_data(r, seller_username):
     """
     Retrieve serialized seller information for a seller identified by username.
@@ -34,6 +36,7 @@ def seller_data(r, seller_username):
     return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username)).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_listed_estates(r, seller_username):
     """
     Retrieve all estates associated with a seller by username.

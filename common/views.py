@@ -212,6 +212,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         return remove_user_information(model_class, username)
 
     @api_view(['PATCH'])
+    @permission_classes([IsAuthenticated])
     @parser_classes([MultiPartParser, FormParser])
     def update_user(r, username):
         """
