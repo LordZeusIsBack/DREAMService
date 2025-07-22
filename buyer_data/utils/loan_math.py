@@ -9,3 +9,8 @@ def get_query_params(request, key, type_cast=float, required=True):
 def calculate_interest_power(rate, tenure_months):
     if rate == 0: return 1
     return pow(1 + rate, tenure_months)
+
+def calculate_emi(principal, rate, tenure_months):
+    if rate == 0: return principal / tenure_months
+    power_n = calculate_interest_power(rate, tenure_months)
+    return (principal * rate * power_n) / (power_n - 1)
