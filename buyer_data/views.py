@@ -47,7 +47,7 @@ def buyer_data(r, buyer_username):
 def eligibility_calculator(r):
     try:
         dp = float(r.query_params.get('dp')) # Down-Payment
-        p = float(r.query_params.get('r')) / (12 * 100) # Interest Rate
+        p = float(r.query_params.get('r')) / 1200 # Interest Rate
         n = int(r.query_params.get('n')) * 12 # Tenure
         inc = float(r.query_params.get('inc')) # Income
         d = float(r.query_params.get('d')) #Existing Debt
@@ -94,3 +94,18 @@ def emi_calculator(r):
             "months_saved": round(months_saved, 2)
         }, status=HTTP_200_OK)
     except (TypeError, ValueError): return Response({"error": "Invalid or missing query parameters."}, status=HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def affordability_calculator(r):
+    try:
+        tenure = int(r.query_params.get('n')) * 12
+        interest_rate = float(r.query_params.get('r')) / 1200
+        affordable_emi = float(r.query_params.get('inc')) - float(r.query_params.get('exp')) - float(r.query_params.get('d')) - float(r.query_params.get('s'))
+        if affordable_emi <= 0: return Response({'error': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
+        if interest_rate == 0: max_loan = affordable_emi * tenure
+        else:
+            r_power_n = calculate_interest_power(interest_rate, tenure)
+            max_loan = affordable_emi * (r_power_n - 1) / (interest_rate * r_power_n)
+        return Response({'max_loan': round(max_loan, 2)}, status=HTTP_200_OK)
+    except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
