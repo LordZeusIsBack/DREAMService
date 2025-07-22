@@ -213,6 +213,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
 
     @api_view(['PATCH'])
     @parser_classes([MultiPartParser, FormParser])
+    @permission_classes([IsAuthenticated])
     def update_user(r, username):
         """
         Updates the details of a user profile identified by username using the provided request data.
