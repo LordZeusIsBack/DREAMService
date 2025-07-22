@@ -193,18 +193,18 @@ def log_user_out(request):
 
 def create_user_views(model_class, serializer_class, user_type_name):
     """
-    Creates a dictionary of Django REST framework view functions for user management operations tailored to the specified user model, serializer, and user type.
+    Returns a dictionary of Django REST framework view functions for user management, configured for the specified user model, serializer, and user type.
     
-    The returned dictionary includes views for user creation, update, deletion, authentication, password reset, OTP verification, OTP resending, and logout, each configured for use in DRF routing.
+    The returned views support user creation, update, deletion, authentication, password reset, OTP verification and resending, and logout, each with appropriate permissions and request handling for integration into DRF routing.
     
     Returns:
-        dict: Mapping of operation names to their corresponding DRF view functions.
+        dict: A mapping of operation names to their corresponding DRF view functions.
     """
     @api_view(['DELETE'])
     @permission_classes([IsAuthenticated])
     def delete_user(r, username):
         """
-        Deletes a user identified by username from the database.
+        Delete a user identified by username.
         
         Returns:
             Response: HTTP 204 No Content if the user is deleted successfully, or HTTP 404 if the user does not exist.
@@ -216,14 +216,10 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @parser_classes([MultiPartParser, FormParser])
     def update_user(r, username):
         """
-        Updates the details of a user profile identified by username using the provided request data.
-
-        Parameters:
-	        r: The HTTP request containing user data for the update.
-	        username (str): The username of the user whose profile is to be updated.
-
+        Update a user's profile details identified by username with the provided request data.
+        
         Returns:
-	        Response: A DRF Response object with the updated profile data and status code, or an error response if the update fails.
+            Response: A DRF Response containing the updated profile data and status code, or an error response if the update fails.
         """
         return update_user_details(r.data, username, model_class, serializer_class)
 

@@ -29,19 +29,29 @@ buyer_resend_otp = buyer_views['resend_otp']
 @permission_classes([IsAuthenticated])
 def buyer_data(r, buyer_username):
     """
-    Retrieve serialized data for a buyer identified by username.
+    Retrieve buyer information by username for an authenticated user.
     
     Parameters:
-        buyer_username (str): The username of the buyer whose data is requested.
+        buyer_username (str): Username of the buyer to retrieve.
     
     Returns:
-        Response: A REST framework response containing the serialized buyer data, or a 404 error if not found.
+        Response: Serialized buyer data with HTTP 200 status, or 404 if the buyer does not exist.
     """
     return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def eligibility_calculator(r):
+    """
+    Calculate the maximum eligible loan amount and property cost based on down payment, interest rate, tenure, income, and existing debt.
+    
+    Accepts query parameters for down payment (`dp`), annual interest rate (`r`), tenure in years (`n`), monthly income (`inc`), and existing debt (`d`). Returns the maximum loan amount (`L`) and maximum property cost (`C`) as a JSON response. If the calculated EMI is non-positive, returns a 422 error indicating the debt-to-income (DTI) limit is exceeded. Returns a 400 error for invalid or missing parameters.
+    
+    Returns:
+        JSON response with keys:
+            - L: Maximum eligible loan amount (float, rounded to 2 decimals)
+            - C: Maximum property cost (float, rounded to 2 decimals)
+    """
     try:
         dp = loan_math.get_query_params(r, 'dp') # Down-Payment
         rate = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
@@ -57,6 +67,14 @@ def eligibility_calculator(r):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def emi_calculator(r):
+    """
+    Calculates the EMI for a loan and provides detailed amortization information, including the impact of prepayment if specified.
+    
+    Accepts query parameters for principal amount (`P`), annual interest rate (`r`), tenure in months (`n`), optional months paid (`k`), optional prepayment amount (`A`), and optional EMI override (`emi`).  
+    If only principal, rate, and tenure are provided, returns the calculated EMI.  
+    If both `k` and `A` are provided, returns outstanding balance after `k` EMIs, new principal after prepayment, remaining months, new total tenure, and months saved due to prepayment.  
+    Returns an error if required parameters are missing or if prepayment is excessive.
+    """
     try:
         principal = loan_math.get_query_params(r, 'P') # Principal Loan Amount
         rate = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
@@ -82,6 +100,14 @@ def emi_calculator(r):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def affordability_calculator(r):
+    """
+    Calculate the maximum affordable loan amount based on income, expenses, debts, savings, tenure, and interest rate.
+    
+    Accepts query parameters for tenure in years (`n`), annual interest rate (`r`), income (`inc`), expenses (`exp`), existing debt (`d`), and savings (`s`). Returns the maximum loan amount the user can afford, or an error if debt-to-income constraints are violated or input is invalid.
+    
+    Returns:
+        Response: JSON with the maximum affordable loan amount rounded to two decimals and HTTP 200 status, or an error message with appropriate HTTP status code.
+    """
     try:
         tenure = loan_math.get_query_params(r, 'n', int) * 12
         interest_rate = loan_math.get_query_params(r, 'r') / 1200
