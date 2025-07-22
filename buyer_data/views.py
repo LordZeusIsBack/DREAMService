@@ -44,7 +44,7 @@ def buyer_data(r, buyer_username):
 
 @api_view(['GET'])
 @parser_classes([AllowAny])
-def affordability_calculator(r):
+def eligibility_calculator(r):
     try:
         dp = float(r.query_params.get('dp'))
         p = float(r.query_params.get('ir')) / (12 * 100)
