@@ -46,30 +46,30 @@ def buyer_data(r, buyer_username):
 @parser_classes([AllowAny])
 def eligibility_calculator(r):
     try:
-        dp = float(r.query_params.get('dp'))
-        p = float(r.query_params.get('ir')) / (12 * 100)
-        n = int(r.query_params.get('ty')) * 12
-        inc = float(r.query_params.get('inc'))
-        d = float(r.query_params.get('debt'))
+        dp = float(r.query_params.get('dp')) # Down-Payment
+        p = float(r.query_params.get('r')) / (12 * 100) # Interest Rate
+        n = int(r.query_params.get('n')) * 12 # Tenure
+        inc = float(r.query_params.get('inc')) # Income
+        d = float(r.query_params.get('d')) #Existing Debt
         emi = (inc / 2) - d
         if emi <= 0: return Response({'message': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         if p == 0: L = emi * n
         else:
             r_power_n = calculate_interest_power(p, n)
             L = emi * ((r_power_n - 1) / (p * r_power_n))
-        return Response({'L': round(L, 2), 'C': round((L + dp), 2)}, status=HTTP_200_OK)
+        return Response({'L': round(L, 2), 'C': round((L + dp), 2)}, status=HTTP_200_OK) # L: Maximum Loan Amount, C: Maximum Cost of Property
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @parser_classes([AllowAny])
 def emi_calculator(request):
     try:
-        P = float(request.GET.get('P'))
-        r = float(request.GET.get('r'))
-        n = int(request.GET.get('n'))
-        k = int(request.GET.get('k'))
-        A = float(request.GET.get('A'))
-        emi = request.GET.get('emi')
+        P = float(request.GET.get('P')) # Principal Loan Amount
+        r = float(request.GET.get('r')) # Interest Rate
+        n = int(request.GET.get('n')) # Tenure in months
+        k = int(request.GET.get('k')) # Number of months for which EMI has been paid
+        A = float(request.GET.get('A')) # Prepayment Amount
+        emi = request.GET.get('emi') # EMI Amount, optional
         if emi: EMI = float(emi)
         else:
             power_n = calculate_interest_power(r, n)
