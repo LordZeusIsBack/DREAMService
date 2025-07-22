@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
 from math import pow, log
+from .utils import loan_math
 
 logger = logging.getLogger('buyer_data')
 
@@ -46,11 +47,11 @@ def buyer_data(r, buyer_username):
 @permission_classes([AllowAny])
 def eligibility_calculator(r):
     try:
-        dp = float(r.query_params.get('dp')) # Down-Payment
-        p = float(r.query_params.get('r')) / 1200 # Interest Rate
-        n = int(r.query_params.get('n')) * 12 # Tenure
-        inc = float(r.query_params.get('inc')) # Income
-        d = float(r.query_params.get('d')) #Existing Debt
+        dp = loan_math.get_query_params(r, 'dp') # Down-Payment
+        p = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
+        n = loan_math.get_query_params(r, 'n', int) * 12 # Tenure
+        inc = loan_math.get_query_params(r, 'inc') # Income
+        d = loan_math.get_query_params(r, 'd') #Existing Debt
         emi = (inc / 2) - d
         if emi <= 0: return Response({'message': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         if p == 0: L = emi * n
@@ -64,13 +65,13 @@ def eligibility_calculator(r):
 @permission_classes([AllowAny])
 def emi_calculator(r):
     try:
-        P = float(r.query_params.get('P')) # Principal Loan Amount
-        rate = float(r.query_params.get('r')) # Interest Rate
-        n = int(r.query_params.get('n')) # Tenure in months
-        k = int(r.query_params.get('k')) # Number of months for which EMI has been paid
-        A = float(r.query_params.get('A')) # Prepayment Amount
-        emi = r.query_params.get('emi') # EMI Amount, optional
-        if emi: EMI = float(emi)
+        P = loan_math.get_query_params(r, 'P') # Principal Loan Amount
+        rate = loan_math.get_query_params(r, 'r') # Interest Rate
+        n = loan_math.get_query_params(r, 'n', int) # Tenure in months
+        k = loan_math.get_query_params(r, 'k', int) # Number of months for which EMI has been paid
+        A = loan_math.get_query_params(r, 'A') # Prepayment Amount
+        emi = loan_math.get_query_params(r, 'emi', required=False) # EMI Amount, optional
+        if emi: EMI = emi
         else:
             power_n = calculate_interest_power(rate, n)
             EMI = (P * rate * power_n) / (power_n - 1)
@@ -99,9 +100,9 @@ def emi_calculator(r):
 @permission_classes([AllowAny])
 def affordability_calculator(r):
     try:
-        tenure = int(r.query_params.get('n')) * 12
-        interest_rate = float(r.query_params.get('r')) / 1200
-        affordable_emi = float(r.query_params.get('inc')) - float(r.query_params.get('exp')) - float(r.query_params.get('d')) - float(r.query_params.get('s'))
+        tenure = loan_math.get_query_params(r, 'n', int) * 12
+        interest_rate = loan_math.get_query_params(r, 'r') / 1200
+        affordable_emi = loan_math.get_query_params(r, 'inc') - loan_math.get_query_params(r, 'exp') - loan_math.get_query_params(r, 'd') - loan_math.get_query_params(r, 's')
         if affordable_emi <= 0: return Response({'error': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         if interest_rate == 0: max_loan = affordable_emi * tenure
         else:
