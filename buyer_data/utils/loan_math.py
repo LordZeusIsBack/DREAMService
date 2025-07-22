@@ -44,7 +44,6 @@ def calculate_new_tenure_after_prepayment(principal, rate, tenure_months, months
     denominator = emi - (rate * new_principal)
     if denominator <= 0: raise ValueError('EMI too low for the remaining principal and interest rate')
     tenure_ratio = numerator / denominator
-    if rate == 0: raise ValueError('Cannot calculate logarithm for zero interest rate')
     power_n_prime = log(tenure_ratio) / log(1 + rate)
     new_total_tenure = round(months_paid + power_n_prime, 2)
     month_saved = tenure_months - new_total_tenure
