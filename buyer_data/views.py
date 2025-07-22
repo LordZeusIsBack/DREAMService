@@ -62,14 +62,14 @@ def eligibility_calculator(r):
 
 @api_view(['GET'])
 @parser_classes([AllowAny])
-def emi_calculator(request):
+def emi_calculator(r):
     try:
-        P = float(request.GET.get('P')) # Principal Loan Amount
-        r = float(request.GET.get('r')) # Interest Rate
-        n = int(request.GET.get('n')) # Tenure in months
-        k = int(request.GET.get('k')) # Number of months for which EMI has been paid
-        A = float(request.GET.get('A')) # Prepayment Amount
-        emi = request.GET.get('emi') # EMI Amount, optional
+        P = float(r.GET.get('P')) # Principal Loan Amount
+        r = float(r.GET.get('r')) # Interest Rate
+        n = int(r.GET.get('n')) # Tenure in months
+        k = int(r.GET.get('k')) # Number of months for which EMI has been paid
+        A = float(r.GET.get('A')) # Prepayment Amount
+        emi = r.GET.get('emi') # EMI Amount, optional
         if emi: EMI = float(emi)
         else:
             power_n = calculate_interest_power(r, n)
@@ -79,9 +79,8 @@ def emi_calculator(request):
         new_principal = balance_k - A
         numerator = EMI
         denominator = EMI - (r * new_principal)
-        if denominator <= 0:
-            return Response({"error": "Prepayment too high, loan can be closed immediately."},
-                            status=HTTP_400_BAD_REQUEST)
+        if denominator <= 0: return Response({"error": "Prepayment too high, loan can be closed immediately."},
+                                             status=HTTP_400_BAD_REQUEST)
         tenure_ratio = numerator / denominator
         power_n_prime = log(tenure_ratio) / log(1 + r)
         new_total_tenure = round(k + power_n_prime, 2)
@@ -94,5 +93,4 @@ def emi_calculator(request):
             "new_total_tenure": round(new_total_tenure, 2),
             "months_saved": round(months_saved, 2)
         }, status=HTTP_200_OK)
-    except (TypeError, ValueError):
-        return Response({"error": "Invalid or missing query parameters."}, status=HTTP_400_BAD_REQUEST)
+    except (TypeError, ValueError): return Response({"error": "Invalid or missing query parameters."}, status=HTTP_400_BAD_REQUEST)
