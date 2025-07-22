@@ -74,6 +74,7 @@ def emi_calculator(r):
     If only principal, rate, and tenure are provided, returns the calculated EMI.  
     If both `k` and `A` are provided, returns outstanding balance after `k` EMIs, new principal after prepayment, remaining months, new total tenure, and months saved due to prepayment.  
     Returns an error if required parameters are missing or if prepayment is excessive.
+    """
     try:
         principal = loan_math.get_query_params(r, 'P') # Principal Loan Amount
         rate = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
