@@ -102,8 +102,6 @@ def affordability_calculator(r):
         affordable_emi = loan_math.get_query_params(r, 'inc') - loan_math.get_query_params(r, 'exp') - loan_math.get_query_params(r, 'd') - loan_math.get_query_params(r, 's')
         if affordable_emi <= 0: return Response({'error': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         if interest_rate == 0: max_loan = affordable_emi * tenure
-        else:
-            r_power_n = loan_math.calculate_interest_power(interest_rate, tenure)
-            max_loan = affordable_emi * (r_power_n - 1) / (interest_rate * r_power_n)
+        max_loan = loan_math.calculate_max_loan(affordable_emi, interest_rate, tenure)
         return Response({'max_loan': round(max_loan, 2)}, status=HTTP_200_OK)
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
