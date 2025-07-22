@@ -1,7 +1,7 @@
 import logging
 from django.shortcuts import get_object_or_404
 from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from buyer_data.models import Buyer
 from buyer_data.serializer import BuyerSerializer
@@ -29,7 +29,7 @@ buyer_verify_email = buyer_views['verify']
 buyer_resend_otp = buyer_views['resend_otp']
 
 @api_view(['GET'])
-@parser_classes([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def buyer_data(r, buyer_username):
     """
     Retrieve serialized data for a buyer identified by username.
@@ -43,7 +43,7 @@ def buyer_data(r, buyer_username):
     return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
-@parser_classes([AllowAny])
+@permission_classes([AllowAny])
 def eligibility_calculator(r):
     try:
         dp = float(r.query_params.get('dp')) # Down-Payment
@@ -61,28 +61,28 @@ def eligibility_calculator(r):
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
-@parser_classes([AllowAny])
+@permission_classes([AllowAny])
 def emi_calculator(r):
     try:
-        P = float(r.GET.get('P')) # Principal Loan Amount
-        r = float(r.GET.get('r')) # Interest Rate
-        n = int(r.GET.get('n')) # Tenure in months
-        k = int(r.GET.get('k')) # Number of months for which EMI has been paid
-        A = float(r.GET.get('A')) # Prepayment Amount
-        emi = r.GET.get('emi') # EMI Amount, optional
+        P = float(r.query_params.get('P')) # Principal Loan Amount
+        rate = float(r.query_params.get('r')) # Interest Rate
+        n = int(r.query_params.get('n')) # Tenure in months
+        k = int(r.query_params.get('k')) # Number of months for which EMI has been paid
+        A = float(r.query_params.get('A')) # Prepayment Amount
+        emi = r.query_params.get('emi') # EMI Amount, optional
         if emi: EMI = float(emi)
         else:
-            power_n = calculate_interest_power(r, n)
-            EMI = (P * r * power_n) / (power_n - 1)
-        power_k = calculate_interest_power(r, k)
-        balance_k = (P * power_k) - (EMI * (power_k - 1) / r)
+            power_n = calculate_interest_power(rate, n)
+            EMI = (P * rate * power_n) / (power_n - 1)
+        power_k = calculate_interest_power(rate, k)
+        balance_k = (P * power_k) - (EMI * (power_k - 1) / rate)
         new_principal = balance_k - A
         numerator = EMI
-        denominator = EMI - (r * new_principal)
+        denominator = EMI - (rate * new_principal)
         if denominator <= 0: return Response({"error": "Prepayment too high, loan can be closed immediately."},
                                              status=HTTP_400_BAD_REQUEST)
         tenure_ratio = numerator / denominator
-        power_n_prime = log(tenure_ratio) / log(1 + r)
+        power_n_prime = log(tenure_ratio) / log(1 + rate)
         new_total_tenure = round(k + power_n_prime, 2)
         months_saved = n - new_total_tenure
         return Response({
