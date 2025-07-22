@@ -14,3 +14,8 @@ def calculate_emi(principal, rate, tenure_months):
     if rate == 0: return principal / tenure_months
     power_n = calculate_interest_power(rate, tenure_months)
     return (principal * rate * power_n) / (power_n - 1)
+
+def calculate_max_loan(emi, rate, tenure_months):
+    if rate == 0: return emi * tenure_months
+    power_n = calculate_interest_power(rate, tenure_months)
+    return emi * (power_n - 1) / (rate * power_n)
