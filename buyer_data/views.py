@@ -61,21 +61,23 @@ def emi_calculator(r):
         principal = loan_math.get_query_params(r, 'P') # Principal Loan Amount
         rate = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
         tenure = loan_math.get_query_params(r, 'n', int) # Tenure in months
-        k = loan_math.get_query_params(r, 'k', int, required=False) # Number of months for which EMI has been paid
+        k = loan_math.get_query_params(r, 'k', int, required=False) # Number of months for which EMI has been paid, optional
         prepayment_amount = loan_math.get_query_params(r, 'A', required=False) # Prepayment Amount
         emi = loan_math.get_query_params(r, 'emi', required=False) # EMI Amount, optional
         if not emi: emi = loan_math.calculate_emi(principal, rate, tenure)
+        if k is None and prepayment_amount is None: return Response({'emi': round(emi, 2)}, status=HTTP_200_OK)
+        if k is None or prepayment_amount is None: return Response({'error': 'Both k (months paid) and A (prepayment) must be provided for prepayment calculation.'}, status=HTTP_400_BAD_REQUEST)
         balance_k, new_principal, power_n_prime, months_saved = loan_math.calculate_new_tenure_after_prepayment(principal, rate, tenure, k, prepayment_amount, emi)
-        if months_saved == 0: return Response({"error": "Prepayment too high, loan can be closed immediately."}, status=HTTP_422_UNPROCESSABLE_ENTITY)
+        if months_saved == 0: return Response({'error': 'Prepayment too high, loan can be closed immediately.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         return Response({
-            "original_emi": round(emi, 2),
-            "outstanding_balance_after_k_emis": round(balance_k, 2),
-            "new_principal_after_prepayment": round(new_principal, 2),
-            "remaining_months_after_prepayment": round(power_n_prime, 2),
-            "new_total_tenure": round(k + power_n_prime, 2),
-            "months_saved": round(months_saved, 2)
+            'original_emi': round(emi, 2),
+            'outstanding_balance_after_k_emis': round(balance_k, 2),
+            'new_principal_after_prepayment': round(new_principal, 2),
+            'remaining_months_after_prepayment': round(power_n_prime, 2),
+            'new_total_tenure': round(k + power_n_prime, 2),
+            'months_saved': round(months_saved, 2)
         }, status=HTTP_200_OK)
-    except (TypeError, ValueError): return Response({"error": "Invalid or missing query parameters."}, status=HTTP_400_BAD_REQUEST)
+    except (TypeError, ValueError): return Response({'error': 'Invalid or missing query parameters.'}, status=HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
