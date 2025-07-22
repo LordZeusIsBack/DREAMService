@@ -8,7 +8,6 @@ from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
-from math import log
 from .utils import loan_math
 
 logger = logging.getLogger('buyer_data')
@@ -59,33 +58,21 @@ def eligibility_calculator(r):
 @permission_classes([AllowAny])
 def emi_calculator(r):
     try:
-        P = loan_math.get_query_params(r, 'P') # Principal Loan Amount
-        rate = loan_math.get_query_params(r, 'r') # Interest Rate
-        n = loan_math.get_query_params(r, 'n', int) # Tenure in months
-        k = loan_math.get_query_params(r, 'k', int) # Number of months for which EMI has been paid
-        A = loan_math.get_query_params(r, 'A') # Prepayment Amount
+        principal = loan_math.get_query_params(r, 'P') # Principal Loan Amount
+        rate = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
+        tenure = loan_math.get_query_params(r, 'n', int) # Tenure in months
+        k = loan_math.get_query_params(r, 'k', int, required=False) # Number of months for which EMI has been paid
+        prepayment_amount = loan_math.get_query_params(r, 'A', required=False) # Prepayment Amount
         emi = loan_math.get_query_params(r, 'emi', required=False) # EMI Amount, optional
-        if emi: EMI = emi
-        else:
-            power_n = loan_math.calculate_interest_power(rate, n)
-            EMI = (P * rate * power_n) / (power_n - 1)
-        power_k = loan_math.calculate_interest_power(rate, k)
-        balance_k = (P * power_k) - (EMI * (power_k - 1) / rate)
-        new_principal = balance_k - A
-        numerator = EMI
-        denominator = EMI - (rate * new_principal)
-        if denominator <= 0: return Response({"error": "Prepayment too high, loan can be closed immediately."},
-                                             status=HTTP_400_BAD_REQUEST)
-        tenure_ratio = numerator / denominator
-        power_n_prime = log(tenure_ratio) / log(1 + rate)
-        new_total_tenure = round(k + power_n_prime, 2)
-        months_saved = n - new_total_tenure
+        if not emi: emi = loan_math.calculate_emi(principal, rate, tenure)
+        balance_k, new_principal, power_n_prime, months_saved = loan_math.calculate_new_tenure_after_prepayment(principal, rate, tenure, k, prepayment_amount, emi)
+        if months_saved == 0: return Response({"error": "Prepayment too high, loan can be closed immediately."}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         return Response({
-            "original_emi": round(EMI, 2),
+            "original_emi": round(emi, 2),
             "outstanding_balance_after_k_emis": round(balance_k, 2),
             "new_principal_after_prepayment": round(new_principal, 2),
             "remaining_months_after_prepayment": round(power_n_prime, 2),
-            "new_total_tenure": round(new_total_tenure, 2),
+            "new_total_tenure": round(k + power_n_prime, 2),
             "months_saved": round(months_saved, 2)
         }, status=HTTP_200_OK)
     except (TypeError, ValueError): return Response({"error": "Invalid or missing query parameters."}, status=HTTP_400_BAD_REQUEST)
