@@ -8,13 +8,10 @@ from buyer_data.serializer import BuyerSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
-from math import pow, log
+from math import log
 from .utils import loan_math
 
 logger = logging.getLogger('buyer_data')
-
-def calculate_interest_power(r, n):
-    return pow(1 + r, n)
 
 # Create your views here.
 buyer_views = create_user_views(CustomUser, BuyerSerializer, 'buyer')
@@ -56,7 +53,7 @@ def eligibility_calculator(r):
         if emi <= 0: return Response({'message': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         if p == 0: L = emi * n
         else:
-            r_power_n = calculate_interest_power(p, n)
+            r_power_n = loan_math.calculate_interest_power(p, n)
             L = emi * ((r_power_n - 1) / (p * r_power_n))
         return Response({'L': round(L, 2), 'C': round((L + dp), 2)}, status=HTTP_200_OK) # L: Maximum Loan Amount, C: Maximum Cost of Property
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
@@ -73,9 +70,9 @@ def emi_calculator(r):
         emi = loan_math.get_query_params(r, 'emi', required=False) # EMI Amount, optional
         if emi: EMI = emi
         else:
-            power_n = calculate_interest_power(rate, n)
+            power_n = loan_math.calculate_interest_power(rate, n)
             EMI = (P * rate * power_n) / (power_n - 1)
-        power_k = calculate_interest_power(rate, k)
+        power_k = loan_math.calculate_interest_power(rate, k)
         balance_k = (P * power_k) - (EMI * (power_k - 1) / rate)
         new_principal = balance_k - A
         numerator = EMI
@@ -106,7 +103,7 @@ def affordability_calculator(r):
         if affordable_emi <= 0: return Response({'error': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
         if interest_rate == 0: max_loan = affordable_emi * tenure
         else:
-            r_power_n = calculate_interest_power(interest_rate, tenure)
+            r_power_n = loan_math.calculate_interest_power(interest_rate, tenure)
             max_loan = affordable_emi * (r_power_n - 1) / (interest_rate * r_power_n)
         return Response({'max_loan': round(max_loan, 2)}, status=HTTP_200_OK)
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
