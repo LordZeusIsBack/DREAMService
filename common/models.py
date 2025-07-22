@@ -122,6 +122,9 @@ class UserExtensionMixin(models.Model):
             try:
                 original = type(self).objects.get(pk=self.pk)
                 if original.phone_number != self.phone_number: raise ValidationError('Phone number once set cannot be changed!')
+                if original.profile_picture and self.profile_picture:
+                    storage = original.profile_picture.storage
+                    if storage.exists(original.profile_picture.name): storage.delete(original.profile_picture.name)
             except type(self).DoesNotExist: pass
         super().save(*args, **kwargs)
 
