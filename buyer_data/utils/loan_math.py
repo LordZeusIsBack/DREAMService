@@ -1,4 +1,4 @@
-from math import pow
+from math import pow, log
 
 def get_query_params(request, key, type_cast=float, required=True):
     value = request.query_params.get(key)
@@ -23,3 +23,15 @@ def calculate_max_loan(emi, rate, tenure_months):
 def calculate_outstanding_balance(principal, rate, emi, months_paid):
     power_k = calculate_interest_power(rate, months_paid)
     return (principal * power_k) - (emi * (power_k - 1) / rate)
+
+def calculate_new_tenure_after_prepayment(principal, rate, tenure_months, months_paid, prepayment_amount, emi):
+    balance_k = calculate_outstanding_balance(principal, rate, emi, months_paid)
+    new_principal = balance_k - prepayment_amount
+    if new_principal <= 0: return 0, 0, 0, True
+    numerator = emi
+    denominator = emi - (rate * new_principal)
+    tenure_ratio = numerator / denominator
+    power_n_prime = log(tenure_ratio) / log(1 + rate)
+    new_total_tenure = round(months_paid + power_n_prime, 2)
+    month_saved = tenure_months - new_total_tenure
+    return balance_k, new_principal, power_n_prime, month_saved
