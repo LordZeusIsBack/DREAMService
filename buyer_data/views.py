@@ -45,17 +45,14 @@ def buyer_data(r, buyer_username):
 def eligibility_calculator(r):
     try:
         dp = loan_math.get_query_params(r, 'dp') # Down-Payment
-        p = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
+        rate = loan_math.get_query_params(r, 'r') / 1200 # Interest Rate
         n = loan_math.get_query_params(r, 'n', int) * 12 # Tenure
         inc = loan_math.get_query_params(r, 'inc') # Income
         d = loan_math.get_query_params(r, 'd') #Existing Debt
         emi = (inc / 2) - d
         if emi <= 0: return Response({'message': 'DTI limit exceeded.'}, status=HTTP_422_UNPROCESSABLE_ENTITY)
-        if p == 0: L = emi * n
-        else:
-            r_power_n = loan_math.calculate_interest_power(p, n)
-            L = emi * ((r_power_n - 1) / (p * r_power_n))
-        return Response({'L': round(L, 2), 'C': round((L + dp), 2)}, status=HTTP_200_OK) # L: Maximum Loan Amount, C: Maximum Cost of Property
+        loan_amount = loan_math.calculate_max_loan(emi, rate, n)
+        return Response({'L': round(loan_amount, 2), 'C': round((loan_amount + dp), 2)}, status=HTTP_200_OK) # L: Maximum Loan Amount, C: Maximum Cost of Property
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
