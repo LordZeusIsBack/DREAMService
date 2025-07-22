@@ -13,7 +13,7 @@ def calculate_interest_power(rate, tenure_months):
 
 def calculate_emi(principal, rate, tenure_months):
     if principal < 0: raise ValueError('Principle must be positive.')
-    if tenure_months <= 0: return ValueError('Tenure months must be positive')
+    if tenure_months <= 0: raise ValueError('Tenure months must be positive')
     if rate < 0 or rate > 1: raise ValueError('Rate must be between 0 and 1')
     if rate == 0: return principal / tenure_months
     power_n = calculate_interest_power(rate, tenure_months)
