@@ -1,7 +1,7 @@
 import requests
 from rest_framework.pagination import PageNumberPagination
 import estate_data.models as models
-from estate_data.serializer import EstateSerializer
+from estate_data.serializer import EstateSerializer, EstateListSerializer
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework.parsers import MultiPartParser, FormParser
@@ -107,7 +107,7 @@ def area_estate(request):
         status='available'
     )
 
-    filtered = [estate for estate in estates if haversine(lat, long, estate.latitude, estate.longitude) <= radius]
+    filtered = [estate for estate in estates if haversine(lat, long, float(estate.latitude), float(estate.longitude)) <= radius]
 
     paginator = PageNumberPagination()
     paginated_result = paginator.paginate_queryset(filtered, request)
