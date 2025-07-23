@@ -26,13 +26,21 @@ class BuyerSerializer(BaseUserSerializer):
     pan_card = serializers.ImageField(required=False, write_only=True)
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
-    email = serializers.EmailField(source='user.email')
-    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email', required=False)
+    username = serializers.CharField(source='user.username', required=False)
     profile_picture = serializers.ImageField(required=False)
     class Meta(BaseUserSerializer.Meta):
         model = models.Buyer
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'password', 'aadhaar_number',
                   'pan_number', 'aadhaar_card', 'pan_card', 'profile_picture')
+
+    def __init__(self, *args, **kwargs):
+        super(BuyerSerializer, self).__init__(*args, **kwargs)
+        if self.instance is None:
+            self.fields['aadhaar_number'].required = True
+            self.fields['pan_number'].required = True
+            self.fields['email_number'].required = True
+            self.fields['username_number'].required = True
 
     def create(self, validated_data):
         """

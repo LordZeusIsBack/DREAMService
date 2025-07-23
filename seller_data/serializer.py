@@ -15,22 +15,32 @@ class SellerSerializer(BaseUserSerializer):
     """
     Serializer for seller model.
     """
-    pan_number = serializers.CharField(write_only=True)
+    pan_number = serializers.CharField(write_only=True, required=False)
     pan_card = serializers.ImageField(required=False, write_only=True)
-    gstin = serializers.IntegerField(write_only=True)
+    gstin = serializers.IntegerField(write_only=True, required=False)
     agent_rera_id = serializers.SerializerMethodField(read_only=True)
-    agent_rera_id_write = serializers.CharField(write_only=True, source='agent_rera_id')
+    agent_rera_id_write = serializers.CharField(write_only=True, source='agent_rera_id', required=False)
     profile_picture = serializers.ImageField(required=False)
-    business_name = serializers.CharField()
+    business_name = serializers.CharField(required=False)
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
-    email = serializers.EmailField(source='user.email')
-    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email', required=False)
+    username = serializers.CharField(source='user.username', required=False)
 
     class Meta(BaseUserSerializer.Meta):
         model = models.Seller
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'business_name', 'username', 'password',
                   'pan_number', 'pan_card', 'gstin', 'agent_rera_id', 'agent_rera_id_write', 'profile_picture')
+
+    def __init__(self, *args, **kwargs):
+        super(SellerSerializer, self).__init__(*args, **kwargs)
+        if self.instance is None:
+            self.fields['pan_number'].required = True
+            self.fields['gstin'].required = True
+            self.fields['agent_rera_id_write'].required = True
+            self.fields['business_name'].required = True
+            self.fields['username'].required = True
+            self.fields['email'].required = True
 
     @staticmethod
     def get_agent_rera_id(obj):

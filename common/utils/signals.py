@@ -27,7 +27,7 @@ def delete_user_verification_documents(sender, instance, **kwargs):
     
     This function is intended to be used as a Django post-delete signal handler for verification models. It checks for the presence of associated document files and removes them from their respective storage backends if they exist.
     """
-    if instance.aadhaar_card:
+    if hasattr(instance, 'aadhaar_card') and instance.aadhaar_card:
         try:
             storage = instance.aadhaar_card.storage
             if storage.exists(instance.aadhaar_card.name): storage.delete(instance.aadhaar_card.name)
