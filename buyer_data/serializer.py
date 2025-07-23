@@ -34,6 +34,14 @@ class BuyerSerializer(BaseUserSerializer):
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'username', 'password', 'aadhaar_number',
                   'pan_number', 'aadhaar_card', 'pan_card', 'profile_picture')
 
+    def __init__(self, *args, **kwargs):
+        super(BuyerSerializer, self).__init__(*args, **kwargs)
+        if self.instance is None:
+            self.fields['aadhaar_number'].required = True
+            self.fields['pan_number'].required = True
+            self.fields['email_number'].required = True
+            self.fields['username_number'].required = True
+
     def create(self, validated_data):
         """
         Create a new buyer instance along with related verification details.
