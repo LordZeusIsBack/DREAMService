@@ -1,5 +1,7 @@
+from rest_framework.permissions import AllowAny
+from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
 from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from seller_data.models import Seller
 from seller_data.serializer import SellerSerializer
@@ -23,23 +25,27 @@ seller_verify_email = seller_views['verify']
 seller_resend_otp = seller_views['resend_otp']
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def seller_data(r, seller_username):
     """
-    Retrieve serialized seller information for a seller identified by username.
+    Retrieve seller information by username and return it as serialized data.
+    
+    Parameters:
+        seller_username (str): The username of the seller whose data is requested.
     
     Returns:
-        Response: Serialized seller data if the seller exists; otherwise, returns a 404 error response.
+        Response: Serialized seller data with HTTP 200 OK if found; otherwise, automatically returns HTTP 404 Not Found if the seller does not exist.
     """
-    return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username)).data)
+    return Response(SellerSerializer(get_object_or_404(Seller, user__username=seller_username)).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_listed_estates(r, seller_username):
     """
-    Retrieve all estates associated with a seller by username.
+    Retrieve all estates listed by a seller identified by username.
     
-    If the seller has no estates, returns a 204 No Content response with a message. Otherwise, returns a list of serialized estate data with a 200 OK status.
+    If the seller has no estates, returns a 204 No Content response with a message. Otherwise, returns a 200 OK response containing a list of serialized estate data.
     """
-    from rest_framework.status import HTTP_200_OK, HTTP_204_NO_CONTENT
     from estate_data.models import Estate
     from estate_data.serializer import EstateSerializer
     estates = Estate.objects.filter(seller__user__username=seller_username).select_related('seller__user').prefetch_related('images')

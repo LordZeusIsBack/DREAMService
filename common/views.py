@@ -204,7 +204,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @permission_classes([IsAuthenticated])
     def delete_user(r, username):
         """
-        Deletes a user identified by username from the database.
+        Delete a user identified by username.
         
         Returns:
             Response: HTTP 204 No Content if the user is deleted successfully, or HTTP 404 if the user does not exist.
@@ -212,6 +212,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
         return remove_user_information(model_class, username)
 
     @api_view(['PATCH'])
+    @permission_classes([IsAuthenticated])
     @parser_classes([MultiPartParser, FormParser])
     @permission_classes([IsAuthenticated])
     def update_user(r, username):
