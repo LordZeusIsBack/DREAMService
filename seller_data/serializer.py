@@ -39,6 +39,8 @@ class SellerSerializer(BaseUserSerializer):
             self.fields['gstin'].required = True
             self.fields['agent_rera_id_write'].required = True
             self.fields['business_name'].required = True
+            self.fields['username'].required = True
+            self.fields['email'].required = True
 
     @staticmethod
     def get_agent_rera_id(obj):
