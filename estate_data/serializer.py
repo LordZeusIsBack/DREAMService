@@ -65,3 +65,11 @@ class EstateSerializer(serializers.ModelSerializer):
             image_files = request.FILES.getlist('images')
             for image_file in image_files: models.EstateImage.objects.create(estate=instance, image=image_file)
         return instance
+
+
+class EstateListSerializer(serializers.ModelSerializer):
+    images = EstateImageSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = models.Estate
+        fields = ['slug', 'estate_name', 'estate_price', 'estate_type', 'images']
