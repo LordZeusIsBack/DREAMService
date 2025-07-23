@@ -23,9 +23,9 @@ def delete_user_profile_picture(sender, instance, **kwargs):
 @receiver(post_delete, sender=SellerVerification)
 def delete_user_verification_documents(sender, instance, **kwargs):
     """
-    Deletes Aadhaar card and PAN card files from storage when a user verification instance is deleted.
+    Removes Aadhaar card and PAN card files from storage when a user verification instance is deleted.
     
-    This function is intended to be used as a Django post-delete signal handler for verification models. It checks for the presence of associated document files and removes them from their respective storage backends if they exist.
+    Intended as a Django post-delete signal handler for verification models. Checks for the presence of associated document files and deletes them from storage if they exist.
     """
     if hasattr(instance, 'aadhaar_card') and instance.aadhaar_card:
         try:

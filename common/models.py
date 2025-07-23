@@ -113,10 +113,10 @@ class UserExtensionMixin(models.Model):
 
     def save(self, *args, **kwargs):
         """
-        Override the save method to prevent changes to the phone number after initial creation.
+        Prevents modification of the phone number after creation and deletes the old profile picture file when a new one is set.
         
         Raises:
-            ValidationError: If an attempt is made to modify the phone number once it has been set.
+            ValidationError: If an attempt is made to change the phone number after it has been set.
         """
         if self.pk:
             try:
