@@ -22,7 +22,7 @@ class SellerSerializer(BaseUserSerializer):
     agent_rera_id_write = serializers.CharField(write_only=True, source='agent_rera_id', required=False)
     profile_picture = serializers.ImageField(required=False)
     business_name = serializers.CharField(required=False)
-    first_name = serializers.CharField(source='user.first_name', required=False)
+    first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
     email = serializers.EmailField(source='user.email', required=False)
     username = serializers.CharField(source='user.username', required=False)
