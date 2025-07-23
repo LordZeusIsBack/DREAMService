@@ -195,7 +195,7 @@ def create_user_views(model_class, serializer_class, user_type_name):
     """
     Returns a dictionary of Django REST framework view functions for user management, configured for the specified user model, serializer, and user type.
     
-    The returned views support user creation, update, deletion, authentication, password reset, OTP verification and resending, and logout, each with appropriate permissions and request handling for integration into DRF routing.
+    The returned dictionary includes views for user creation, update, deletion, authentication, password reset, OTP verification, OTP resending, and logout, each with appropriate permissions and request handling for integration into DRF routing.
     
     Returns:
         dict: A mapping of operation names to their corresponding DRF view functions.
@@ -217,10 +217,10 @@ def create_user_views(model_class, serializer_class, user_type_name):
     @permission_classes([IsAuthenticated])
     def update_user(r, username):
         """
-        Update a user's profile details identified by username with the provided request data.
+        Update the profile details of a user identified by username with the provided request data.
         
         Returns:
-            Response: A DRF Response containing the updated profile data and status code, or an error response if the update fails.
+            Response: A DRF Response containing the updated user profile data and status code, or an error response if the update fails.
         """
         return update_user_details(r.data, username, model_class, serializer_class)
 

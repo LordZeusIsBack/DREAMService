@@ -33,6 +33,11 @@ class SellerSerializer(BaseUserSerializer):
                   'pan_number', 'pan_card', 'gstin', 'agent_rera_id', 'agent_rera_id_write', 'profile_picture')
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the serializer and enforces certain fields as required only when creating a new seller instance.
+        
+        Fields `pan_number`, `gstin`, `agent_rera_id_write`, `business_name`, `username`, and `email` are set as required if no existing instance is provided.
+        """
         super(SellerSerializer, self).__init__(*args, **kwargs)
         if self.instance is None:
             self.fields['pan_number'].required = True
@@ -45,10 +50,13 @@ class SellerSerializer(BaseUserSerializer):
     @staticmethod
     def get_agent_rera_id(obj):
         """
-        Retrieve the agent RERA ID from the related seller verification object.
+        Returns the agent RERA ID from the related seller verification object if available.
+        
+        Parameters:
+            obj: The seller instance whose related verification data is accessed.
         
         Returns:
-            str or None: The agent RERA ID if available; otherwise, None.
+            str or None: The agent RERA ID if present; otherwise, None.
         """
         try: return obj.sellerverification.agent_rera_id
         except AttributeError: return None

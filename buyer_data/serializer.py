@@ -35,6 +35,11 @@ class BuyerSerializer(BaseUserSerializer):
                   'pan_number', 'aadhaar_card', 'pan_card', 'profile_picture')
 
     def __init__(self, *args, **kwargs):
+        """
+        Initializes the serializer and sets specific fields as required when creating a new buyer.
+        
+        Fields 'aadhaar_number', 'pan_number', 'email_number', and 'username_number' are marked as required only if the serializer is used for creation (i.e., no existing instance is provided).
+        """
         super(BuyerSerializer, self).__init__(*args, **kwargs)
         if self.instance is None:
             self.fields['aadhaar_number'].required = True
@@ -44,13 +49,13 @@ class BuyerSerializer(BaseUserSerializer):
 
     def create(self, validated_data):
         """
-        Create a new buyer instance along with related verification details.
+        Create a new buyer and associated verification record using the provided validated data.
         
         Parameters:
-            validated_data (dict): Validated data containing buyer and verification fields.
+            validated_data (dict): Data containing buyer and verification fields.
         
         Returns:
-            Buyer: The created buyer instance with associated verification data.
+            Buyer: The newly created buyer instance with linked verification details.
         """
         verification_data = {
             'aadhaar_number': validated_data.pop('aadhaar_number'),
