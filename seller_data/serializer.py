@@ -32,6 +32,14 @@ class SellerSerializer(BaseUserSerializer):
         fields = ('id', 'first_name', 'last_name', 'email', 'phone_number', 'business_name', 'username', 'password',
                   'pan_number', 'pan_card', 'gstin', 'agent_rera_id', 'agent_rera_id_write', 'profile_picture')
 
+    def __init__(self, *args, **kwargs):
+        super(SellerSerializer, self).__init__(*args, **kwargs)
+        if self.instance is None:
+            self.fields['pan_number'].required = True
+            self.fields['gstin'].required = True
+            self.fields['agent_rera_id_write'].required = True
+            self.fields['business_name'].required = True
+
     @staticmethod
     def get_agent_rera_id(obj):
         """
