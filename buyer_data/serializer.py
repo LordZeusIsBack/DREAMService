@@ -26,8 +26,8 @@ class BuyerSerializer(BaseUserSerializer):
     pan_card = serializers.ImageField(required=False, write_only=True)
     first_name = serializers.CharField(source='user.first_name')
     last_name = serializers.CharField(source='user.last_name')
-    email = serializers.EmailField(source='user.email')
-    username = serializers.CharField(source='user.username')
+    email = serializers.EmailField(source='user.email', required=False)
+    username = serializers.CharField(source='user.username', required=False)
     profile_picture = serializers.ImageField(required=False)
     class Meta(BaseUserSerializer.Meta):
         model = models.Buyer
