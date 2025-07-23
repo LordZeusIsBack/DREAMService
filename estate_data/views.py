@@ -112,5 +112,5 @@ def area_estate(request):
     paginator = PageNumberPagination()
     paginated_result = paginator.paginate_queryset(filtered, request)
 
-    data = EstateSerializer(paginated_result, many=True).data
+    data = EstateListSerializer(paginated_result, many=True).data
     return Response(data, status=status.HTTP_200_OK)
