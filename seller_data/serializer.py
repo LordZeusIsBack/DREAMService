@@ -3,14 +3,6 @@ import seller_data.models as models
 from common.serializer import BaseUserSerializer
 
 
-class SellerVerificationSerializer(serializers.ModelSerializer):
-    gstin = serializers.IntegerField()
-    pan_number = serializers.CharField()
-    class Meta:
-        model = models.SellerVerification
-        fields = ('gstin', 'pan_number')
-
-
 class SellerSerializer(BaseUserSerializer):
     """
     Serializer for seller model.
