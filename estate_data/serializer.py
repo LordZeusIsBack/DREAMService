@@ -57,7 +57,12 @@ class EstateSerializer(serializers.ModelSerializer):
         If a list of image IDs to delete is provided, removes those images from the estate. Adds any new uploaded images to the estate. Returns the updated estate instance.
         """
         images_to_delete = validated_data.pop('images_to_delete', None)
-        if images_to_delete: models.EstateImage.objects.filter(id__in=images_to_delete, estate=instance).delete()
+        if images_to_delete:
+            images_to_remove = models.EstateImage.objects.filter(id__in=images_to_delete, estate=instance)
+            for img in images_to_remove:
+                storage = img.image.storage
+                if storage.exists(img.image.name): storage.delete(img.image.name)
+            images_to_remove.delete()
         for attr, value in validated_data.items(): setattr(instance, attr, value)
         instance.save()
         request = self.context.get('request')
