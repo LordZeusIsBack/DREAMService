@@ -1,11 +1,12 @@
 import requests
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import AllowAny, IsAuthenticated
 import estate_data.models as models
-from estate_data.serializer import EstateSerializer
+from estate_data.serializer import EstateSerializer, EstateListSerializer
 from django.shortcuts import get_object_or_404
 from django.db import transaction
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.decorators import api_view, parser_classes
+from rest_framework.decorators import api_view, parser_classes, permission_classes
 from rest_framework.response import Response
 import rest_framework.status as status
 from .utils.views_calculator import increase_views
@@ -15,6 +16,7 @@ from .utils.geo_utils import bounding_box, haversine
 
 # Create your views here.
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_estate_data(r, estate_slug):
     """
     Retrieve data for a specific estate by slug and increment its view count for the requesting IP address.
@@ -30,6 +32,7 @@ def get_estate_data(r, estate_slug):
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])
+@permission_classes([IsAuthenticated])
 def add_new_estate(r):
     """
     Creates a new estate entry from the provided request data.
@@ -44,6 +47,7 @@ def add_new_estate(r):
 
 @api_view(['PUT', 'PATCH'])
 @parser_classes([MultiPartParser, FormParser])
+@permission_classes([IsAuthenticated])
 def update_estate_data(r, slug):
     """
     Updates an existing estate with new data provided in the request.
@@ -59,6 +63,7 @@ def update_estate_data(r, slug):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def area_estate(request):
     """
     Retrieve available estates of a specified type within a geographic radius of a given point.
@@ -107,10 +112,10 @@ def area_estate(request):
         status='available'
     )
 
-    filtered = [estate for estate in estates if haversine(lat, long, estate.latitude, estate.longitude) <= radius]
+    filtered = [estate for estate in estates if haversine(lat, long, float(estate.latitude), float(estate.longitude)) <= radius]
 
     paginator = PageNumberPagination()
     paginated_result = paginator.paginate_queryset(filtered, request)
 
-    data = EstateSerializer(paginated_result, many=True).data
+    data = EstateListSerializer(paginated_result, many=True).data
     return Response(data, status=status.HTTP_200_OK)

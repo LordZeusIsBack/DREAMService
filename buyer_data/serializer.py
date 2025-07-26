@@ -3,19 +3,6 @@ from common.serializer import BaseUserSerializer
 import buyer_data.models as models
 
 
-class BuyerVerificationSerializer(serializers.ModelSerializer):
-    """
-    Serializer for buyer verification.
-    """
-    aadhaar_number = serializers.IntegerField()
-    pan_number = serializers.CharField()
-    aadhaar_card = serializers.ImageField(required=False)
-    pan_card = serializers.ImageField(required=False)
-    class Meta:
-        model = models.BuyerVerification
-        fields = ('aadhaar_number', 'pan_number', 'aadhaar_card', 'pan_card')
-
-
 class BuyerSerializer(BaseUserSerializer):
     """
     Serializer for buyer model.
