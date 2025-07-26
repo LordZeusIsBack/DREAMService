@@ -19,10 +19,13 @@ from .utils.geo_utils import bounding_box, haversine
 @permission_classes([AllowAny])
 def get_estate_data(r, estate_slug):
     """
-    Retrieve data for a specific estate by slug and increment its view count for the requesting IP address.
+    Retrieve a specific estate by its slug and increment the view count for the requesting IP address.
+    
+    Parameters:
+        estate_slug (str): The unique slug identifier for the estate.
     
     Returns:
-        Response: Serialized estate data for the specified estate.
+        Response: Serialized data of the requested estate.
     """
     if r.META.get('HTTP_X_FORWARDED_FOR'): ip = r.META.get('HTTP_X_FORWARDED_FOR').split(',')[0]
     else: ip = r.META.get('REMOTE_ADDR')
@@ -35,9 +38,9 @@ def get_estate_data(r, estate_slug):
 @permission_classes([IsAuthenticated])
 def add_new_estate(r):
     """
-    Creates a new estate entry from the provided request data.
+    Create a new estate entry using data from the authenticated user's request.
     
-    Validates the input using the EstateSerializer and saves the estate if valid. Returns the serialized estate data with HTTP 201 status on success, or validation errors with HTTP 400 status on failure.
+    Validates the input with EstateSerializer and saves the estate if valid. Returns serialized estate data with HTTP 201 Created on success, or validation errors with HTTP 400 Bad Request on failure.
     """
     serializer = EstateSerializer(data=r.data, context={'request': r})
     if serializer.is_valid():
@@ -50,9 +53,9 @@ def add_new_estate(r):
 @permission_classes([IsAuthenticated])
 def update_estate_data(r, slug):
     """
-    Updates an existing estate with new data provided in the request.
+    Partially updates an existing estate identified by its slug with data from the request.
     
-    Performs a partial update on the estate identified by the given slug. Validates the input data and returns the updated estate data on success, or validation errors with HTTP 400 status on failure.
+    Validates the provided data and returns the updated estate information if successful, or validation errors with HTTP 400 status if validation fails.
     """
     with transaction.atomic():
         estate = get_object_or_404(models.Estate, slug=slug)
@@ -68,7 +71,7 @@ def area_estate(request):
     """
     Retrieve available estates of a specified type within a geographic radius of a given point.
     
-    Accepts query parameters for latitude, longitude, estate type, and optional radius (default 10 km). If a place name is provided instead of coordinates, attempts to resolve it to latitude and longitude using the Geoapify geocoding API. Returns a paginated list of estates matching the specified type and located within the given radius. Responds with appropriate error messages if required parameters are missing, invalid, or if geocoding fails.
+    Accepts query parameters for latitude, longitude, estate type, and optional radius (default 10 km). If a place name is provided instead of coordinates, attempts to resolve it to latitude and longitude using the Geoapify geocoding API. Returns a paginated list of estates matching the specified type and located within the given radius. Responds with error messages if required parameters are missing, invalid, or if geocoding fails.
     """
     place = request.query_params.get('place')
     lat = request.query_params.get('lat')
