@@ -52,9 +52,9 @@ class EstateSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         """
-        Updates an existing estate instance with new data and manages associated images.
+        Update an existing estate instance with new data and manage its associated images.
         
-        If a list of image IDs to delete is provided, removes those images from the estate. Adds any new uploaded images to the estate. Returns the updated estate instance.
+        If a list of image IDs to delete is provided, removes both the image files from storage and their database records. Adds any new uploaded images from the request to the estate. Returns the updated estate instance.
         """
         images_to_delete = validated_data.pop('images_to_delete', None)
         if images_to_delete:
