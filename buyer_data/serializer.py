@@ -31,8 +31,9 @@ class BuyerSerializer(BaseUserSerializer):
         if self.instance is None:
             self.fields['aadhaar_number'].required = True
             self.fields['pan_number'].required = True
-            self.fields['email_number'].required = True
-            self.fields['username_number'].required = True
+            self.fields['phone_number'].required = True
+            self.fields['email'].required = True
+            self.fields['username'].required = True
 
     def create(self, validated_data):
         """
