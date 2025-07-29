@@ -68,7 +68,7 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-CORS_ALLOWED_ORIGINS = ["https://dream-market-eight.vercel.app"]
+CORS_ALLOWED_ORIGINS = ["https://dream-market-psi.vercel.app"]
 CORS_ALLOW_CREDENTIALS = True
 
 ROOT_URLCONF = "dream_service.urls"
