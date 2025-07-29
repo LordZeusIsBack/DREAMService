@@ -1,10 +1,10 @@
 import logging
 from django.shortcuts import get_object_or_404
-from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from buyer_data.models import Buyer
-from buyer_data.serializer import BuyerSerializer
+from buyer_data.models import Buyer, WishlistItem
+from buyer_data.serializer import BuyerSerializer, WishlistItemSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
@@ -38,6 +38,13 @@ def buyer_data(r, buyer_username):
         Response: Serialized buyer data with HTTP 200 status, or 404 if the buyer does not exist.
     """
     return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data, status=HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def bookmarked_estates(r):
+    user = r.user
+    if not hasattr(user, 'buyer'): return Response({'error': 'You are not registered as a buyer.'}, status=HTTP_403_FORBIDDEN)
+    return Response(WishlistItemSerializer(WishlistItem.objects.filter(buyer=user.buyer).select_related('estate'), many=True).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
