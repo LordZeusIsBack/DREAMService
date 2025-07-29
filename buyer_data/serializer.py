@@ -102,7 +102,7 @@ class EstateImagesSerializer(serializers.ModelSerializer):
 
 
 class EstateDataSerializer(serializers.ModelSerializer):
-    images = EstateImagesSerializer(source='images', many=True, read_only=True)
+    images = EstateImagesSerializer(many=True, read_only=True)
     class Meta:
         model = estate_models.Estate
         fields = ('id', 'estate_name', 'estate_price', 'slug', 'images')
