@@ -41,10 +41,8 @@ def buyer_data(r, buyer_username):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def bookmarked_estates(r):
-    user = r.user
-    if not hasattr(user, 'buyer'): return Response({'error': 'You are not registered as a buyer.'}, status=HTTP_403_FORBIDDEN)
-    return Response(WishlistItemSerializer(WishlistItem.objects.filter(buyer=user.buyer).select_related('estate'), many=True).data, status=HTTP_200_OK)
+def bookmarked_estates(r, buyer_username):
+    return Response(WishlistItemSerializer(WishlistItem.objects.filter(buyer=get_object_or_404(Buyer, user__username=buyer_username)).select_related('estate'), many=True).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
