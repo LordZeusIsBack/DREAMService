@@ -1,9 +1,11 @@
 import logging
 from django.shortcuts import get_object_or_404
-from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
+from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, \
+    HTTP_201_CREATED
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from buyer_data.models import Buyer, WishlistItem
+from estate_data.models import Estate
 from buyer_data.serializer import BuyerSerializer, WishlistItemSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
@@ -122,3 +124,16 @@ def affordability_calculator(r):
         max_loan = loan_math.calculate_max_loan(affordable_emi, interest_rate, tenure)
         return Response({'max_loan': round(max_loan, 2)}, status=HTTP_200_OK)
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_bookmarks(r):
+    slug = r.data.get('slug')
+    username = r.data.get('username')
+    if not slug or not username: return Response({'error': 'Both slug and username are required'}, status=HTTP_400_BAD_REQUEST)
+    estate = get_object_or_404(Estate, slug=slug)
+    buyer = get_object_or_404(Buyer, user__username=username)
+    if estate.status != 'available': return Response({'error': 'Cannot add unavailable properties to wishlist'}, status=HTTP_400_BAD_REQUEST)
+    wishlist_item, created = WishlistItem.objects.get_or_create(buyer=buyer, estate=estate)
+    if created: return Response({'message': 'Estate added to wishlist successfully', 'estate_name': estate.estate_name, 'estate_type': estate.estate_type, 'added_on': wishlist_item.added_on}, status=HTTP_201_CREATED)
+    return Response({'error': 'Estate already in wishlist', 'estate_name': estate.estate_name}, status=HTTP_400_BAD_REQUEST)
