@@ -118,7 +118,7 @@ def user_login(request, model_class, user_type_name='user'):
         return Response({
             'success': True,
             'message': 'Login successful.',
-            'email': user.get_username(),
+            'username': profile.user.username,
             'csrf_token': get_token(request)
         }, status=status.HTTP_200_OK)
     else: return Response({'error': 'Invalid credentials.'}, status=status.HTTP_401_UNAUTHORIZED)
