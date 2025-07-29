@@ -106,3 +106,11 @@ class EstateDataSerializer(serializers.ModelSerializer):
     class Meta:
         model = estate_models.Estate
         fields = ('id', 'estate_name', 'estate_price', 'slug', 'images')
+
+
+class WishlistItemSerializer(serializers.ModelSerializer):
+    estate = EstateDataSerializer()
+
+    class Meta:
+        model = models.WishlistItem
+        fields = ['estate', 'added_on']
