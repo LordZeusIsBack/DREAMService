@@ -136,3 +136,14 @@ def add_bookmarks(r, buyer_username):
     wishlist_item, created = WishlistItem.objects.get_or_create(buyer=buyer, estate=estate)
     if created: return Response({'message': 'Estate added to wishlist successfully', 'estate_name': estate.estate_name, 'estate_type': estate.estate_type, 'added_on': wishlist_item.added_on}, status=HTTP_201_CREATED)
     return Response({'error': 'Estate already in wishlist', 'estate_name': estate.estate_name}, status=HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_bookmarks(r, buyer_username):
+    slug = r.data.get('slug')
+    if not slug: return Response({'error': 'Estate Data has not been provided.'}, status=HTTP_400_BAD_REQUEST)
+    estate = get_object_or_404(Estate, slug=slug)
+    buyer = get_object_or_404(Buyer, user__username=buyer_username)
+    wishlist_item = get_object_or_404(WishlistItem, buyer=buyer, estate=estate)
+    wishlist_item.delete()
+    return Response({'message': 'Bookmark removed successfully.', 'estate_name': estate.estate_name, 'buyer': buyer_username}, status=HTTP_200_OK)
