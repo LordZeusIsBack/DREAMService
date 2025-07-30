@@ -31,33 +31,31 @@ buyer_resend_otp = buyer_views['resend_otp']
 @permission_classes([IsAuthenticated])
 def buyer_data(r, buyer_username):
     """
-    Retrieve buyer information by username for an authenticated user.
-    
-    Parameters:
-        buyer_username (str): Username of the buyer to retrieve.
+    Retrieve buyer details for a given username.
     
     Returns:
-        Response: Serialized buyer data with HTTP 200 status, or 404 if the buyer does not exist.
+        Response: Serialized buyer data with HTTP 200 if found, or 404 if the buyer does not exist.
     """
     return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def bookmarked_estates(r, buyer_username):
+    """
+    Retrieve all wishlist items for a buyer, including related estate details.
+    
+    Returns:
+        Response: A serialized list of the buyer's wishlist items with HTTP 200 status.
+    """
     return Response(WishlistItemSerializer(WishlistItem.objects.filter(buyer=get_object_or_404(Buyer, user__username=buyer_username)).select_related('estate'), many=True).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def eligibility_calculator(r):
     """
-    Calculate the maximum eligible loan amount and property cost based on down payment, interest rate, tenure, income, and existing debt.
+    Calculates the maximum eligible loan amount and property cost based on down payment, annual interest rate, tenure, monthly income, and existing debt.
     
-    Accepts query parameters for down payment (`dp`), annual interest rate (`r`), tenure in years (`n`), monthly income (`inc`), and existing debt (`d`). Returns the maximum loan amount (`L`) and maximum property cost (`C`) as a JSON response. If the calculated EMI is non-positive, returns a 422 error indicating the debt-to-income (DTI) limit is exceeded. Returns a 400 error for invalid or missing parameters.
-    
-    Returns:
-        JSON response with keys:
-            - L: Maximum eligible loan amount (float, rounded to 2 decimals)
-            - C: Maximum property cost (float, rounded to 2 decimals)
+    Accepts query parameters: down payment (`dp`), annual interest rate (`r`), tenure in years (`n`), monthly income (`inc`), and existing debt (`d`). Returns a JSON response with the maximum loan amount (`L`) and property cost (`C`), both rounded to two decimals. Returns HTTP 422 if the calculated EMI is non-positive, indicating the debt-to-income limit is exceeded. Returns HTTP 400 for invalid or missing parameters.
     """
     try:
         dp = loan_math.get_query_params(r, 'dp') # Down-Payment
@@ -108,12 +106,12 @@ def emi_calculator(r):
 @permission_classes([AllowAny])
 def affordability_calculator(r):
     """
-    Calculate the maximum affordable loan amount based on income, expenses, debts, savings, tenure, and interest rate.
+    Calculates the maximum loan amount a user can afford based on income, expenses, debts, savings, tenure, and interest rate.
     
-    Accepts query parameters for tenure in years (`n`), annual interest rate (`r`), income (`inc`), expenses (`exp`), existing debt (`d`), and savings (`s`). Returns the maximum loan amount the user can afford, or an error if debt-to-income constraints are violated or input is invalid.
+    Accepts query parameters for tenure in years (`n`), annual interest rate (`r`), income (`inc`), expenses (`exp`), existing debt (`d`), and savings (`s`). Returns the maximum affordable loan amount rounded to two decimals, or an error if debt-to-income constraints are exceeded or input is invalid.
     
     Returns:
-        Response: JSON with the maximum affordable loan amount rounded to two decimals and HTTP 200 status, or an error message with appropriate HTTP status code.
+        Response: JSON with the maximum affordable loan amount and HTTP 200 status, or an error message with an appropriate HTTP status code.
     """
     try:
         tenure = loan_math.get_query_params(r, 'n', int) * 12
@@ -128,6 +126,11 @@ def affordability_calculator(r):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def add_bookmarks(r, buyer_username):
+    """
+    Add an estate to a buyer's wishlist.
+    
+    Adds the specified estate to the wishlist for the given buyer if the estate exists, is available, and is not already bookmarked. Returns a success message with estate details if added, or an error if the estate is unavailable, missing, or already in the wishlist.
+    """
     slug = r.data.get('slug')
     if not slug: return Response({'error': 'Estate Data has not been provided.'}, status=HTTP_400_BAD_REQUEST)
     estate = get_object_or_404(Estate, slug=slug)
@@ -140,6 +143,14 @@ def add_bookmarks(r, buyer_username):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def remove_bookmarks(r, buyer_username):
+    """
+    Remove an estate from a buyer's wishlist.
+    
+    Deletes the specified estate from the buyer's wishlist based on the provided estate slug and buyer username.
+    
+    Returns:
+        Response: JSON message confirming removal with estate name and buyer username, HTTP 200 on success, or HTTP 400/404 for errors.
+    """
     slug = r.data.get('slug')
     if not slug: return Response({'error': 'Estate Data has not been provided.'}, status=HTTP_400_BAD_REQUEST)
     estate = get_object_or_404(Estate, slug=slug)
