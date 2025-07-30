@@ -129,10 +129,9 @@ def affordability_calculator(r):
 @permission_classes([IsAuthenticated])
 def add_bookmarks(r, buyer_username):
     slug = r.data.get('slug')
-    username = r.data.get('username')
-    if not slug or not username: return Response({'error': 'Both slug and username are required'}, status=HTTP_400_BAD_REQUEST)
+    if not slug: return Response({'error': 'Estate Data has not been provided.'}, status=HTTP_400_BAD_REQUEST)
     estate = get_object_or_404(Estate, slug=slug)
-    buyer = get_object_or_404(Buyer, user__username=username)
+    buyer = get_object_or_404(Buyer, user__username=buyer_username)
     if estate.status != 'available': return Response({'error': 'Cannot add unavailable properties to wishlist'}, status=HTTP_400_BAD_REQUEST)
     wishlist_item, created = WishlistItem.objects.get_or_create(buyer=buyer, estate=estate)
     if created: return Response({'message': 'Estate added to wishlist successfully', 'estate_name': estate.estate_name, 'estate_type': estate.estate_type, 'added_on': wishlist_item.added_on}, status=HTTP_201_CREATED)
