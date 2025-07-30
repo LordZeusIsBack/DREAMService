@@ -1,4 +1,5 @@
 from rest_framework import serializers
+import estate_data.models as estate_models
 from common.serializer import BaseUserSerializer
 import buyer_data.models as models
 
@@ -90,3 +91,26 @@ class BuyerSerializer(BaseUserSerializer):
             validated_data,
             'buyerverification'
         )
+
+
+class EstateImagesSerializer(serializers.ModelSerializer):
+    image_url = serializers.ImageField(source='image', read_only=True)
+
+    class Meta:
+        model = estate_models.EstateImage
+        fields = ('image_url',)
+
+
+class EstateDataSerializer(serializers.ModelSerializer):
+    images = EstateImagesSerializer(many=True, read_only=True)
+    class Meta:
+        model = estate_models.Estate
+        fields = ('id', 'estate_name', 'estate_price', 'slug', 'images')
+
+
+class WishlistItemSerializer(serializers.ModelSerializer):
+    estate = EstateDataSerializer()
+
+    class Meta:
+        model = models.WishlistItem
+        fields = ['estate', 'added_on']

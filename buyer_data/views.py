@@ -1,10 +1,12 @@
 import logging
 from django.shortcuts import get_object_or_404
-from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST
+from rest_framework.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, \
+    HTTP_201_CREATED
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from buyer_data.models import Buyer
-from buyer_data.serializer import BuyerSerializer
+from buyer_data.models import Buyer, WishlistItem
+from estate_data.models import Estate
+from buyer_data.serializer import BuyerSerializer, WishlistItemSerializer
 from rest_framework.response import Response
 from common.views import create_user_views
 from common.models import CustomUser
@@ -38,6 +40,11 @@ def buyer_data(r, buyer_username):
         Response: Serialized buyer data with HTTP 200 status, or 404 if the buyer does not exist.
     """
     return Response(BuyerSerializer(get_object_or_404(Buyer, user__username=buyer_username)).data, status=HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def bookmarked_estates(r, buyer_username):
+    return Response(WishlistItemSerializer(WishlistItem.objects.filter(buyer=get_object_or_404(Buyer, user__username=buyer_username)).select_related('estate'), many=True).data, status=HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -117,3 +124,26 @@ def affordability_calculator(r):
         max_loan = loan_math.calculate_max_loan(affordable_emi, interest_rate, tenure)
         return Response({'max_loan': round(max_loan, 2)}, status=HTTP_200_OK)
     except (TypeError, AttributeError, ValueError): return Response({'error': 'Invalid input. Check query parameters.'}, status=HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_bookmarks(r, buyer_username):
+    slug = r.data.get('slug')
+    if not slug: return Response({'error': 'Estate Data has not been provided.'}, status=HTTP_400_BAD_REQUEST)
+    estate = get_object_or_404(Estate, slug=slug)
+    buyer = get_object_or_404(Buyer, user__username=buyer_username)
+    if estate.status != 'available': return Response({'error': 'Cannot add unavailable properties to wishlist'}, status=HTTP_400_BAD_REQUEST)
+    wishlist_item, created = WishlistItem.objects.get_or_create(buyer=buyer, estate=estate)
+    if created: return Response({'message': 'Estate added to wishlist successfully', 'estate_name': estate.estate_name, 'estate_type': estate.estate_type, 'added_on': wishlist_item.added_on}, status=HTTP_201_CREATED)
+    return Response({'error': 'Estate already in wishlist', 'estate_name': estate.estate_name}, status=HTTP_400_BAD_REQUEST)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_bookmarks(r, buyer_username):
+    slug = r.data.get('slug')
+    if not slug: return Response({'error': 'Estate Data has not been provided.'}, status=HTTP_400_BAD_REQUEST)
+    estate = get_object_or_404(Estate, slug=slug)
+    buyer = get_object_or_404(Buyer, user__username=buyer_username)
+    wishlist_item = get_object_or_404(WishlistItem, buyer=buyer, estate=estate)
+    wishlist_item.delete()
+    return Response({'message': 'Bookmark removed successfully.', 'estate_name': estate.estate_name, 'buyer': buyer_username}, status=HTTP_200_OK)
