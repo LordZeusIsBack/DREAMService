@@ -127,7 +127,7 @@ def affordability_calculator(r):
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
-def add_bookmarks(r):
+def add_bookmarks(r, buyer_username):
     slug = r.data.get('slug')
     username = r.data.get('username')
     if not slug or not username: return Response({'error': 'Both slug and username are required'}, status=HTTP_400_BAD_REQUEST)
