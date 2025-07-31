@@ -4,3 +4,4 @@
 static/
 logs/
 celerybeat*
+locustfile.py
