@@ -21,6 +21,15 @@ def upload_to_s3(self):
 
 @shared_task(bind=True, autoretry_for=(SMTPException, SMTPRecipientsRefused, TimeoutError), retry_kwargs={'max_retries': 3, 'countdown': 20})
 def send_mail_containing_otp(self, email):
+    """
+    Send a one-time password (OTP) email to the specified address.
+    
+    Attempts to send an OTP using send_otp(email, is_resend=False). On SMTP-related failures
+    (SMTPException, SMTPRecipientsRefused, TimeoutError) the exception is re-raised so the
+    Celery task's autoretry can retry the send; other exceptions are logged and re-raised.
+    Parameters:
+        email (str): Recipient email address for the OTP.
+    """
     logger.info(f'Sending OTP to email: {email}')
     try:
         send_otp(email, is_resend=False)
