@@ -24,19 +24,25 @@ class BaseUserSerializer(serializers.ModelSerializer):
     @staticmethod
     def create_user(validated_data, user_model, verification_model, verification_field):
         """
-        Creates a new user and an associated verification record within a database transaction, sending an OTP to the user's email.
+        Create a new CustomUser, a related user_model instance, and an associated verification record; schedule sending an OTP email after the transaction commits.
+        
+        validates that both a password and verification data are present in validated_data, then within an atomic transaction:
+        - creates a CustomUser using nested 'user' data,
+        - creates and validates the related user_model instance,
+        - creates a verification_model linked to the created user_model,
+        - schedules an asynchronous OTP email to the CustomUser's email via on_commit.
         
         Parameters:
-            validated_data (dict): Contains nested user data, password, and verification information.
-            user_model: The model class for the user profile to be created.
-            verification_model: The model class for the verification record to be created.
-            verification_field (str): The key in validated_data containing verification data.
+            validated_data (dict): Serializer-validated data. Must include a 'user' mapping, an entry matching verification_field, and 'password'.
+            user_model (Model): Django model class for the related user profile to create.
+            verification_model (Model): Django model class for the verification record to create.
+            verification_field (str): Key in validated_data that contains verification-specific data.
         
         Returns:
-            An instance of the created user model.
+            Model: The created instance of user_model.
         
         Raises:
-            ValidationError: If required password or verification data is missing, or if any error occurs during creation or validation.
+            ValidationError: If password or verification data is missing, if model validation fails, or if any creation error occurs.
         """
         user_data = validated_data.pop('user')
         verification_data = validated_data.pop(verification_field)
