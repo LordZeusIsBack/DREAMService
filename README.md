@@ -49,11 +49,16 @@
 
 ## Overview
 
----
+DREAMService is a Django-based backend for real estate platforms that centralizes buyer, seller, and property data in a clean, modular architecture. It serves engineering teams and product builders who need a scalable, production-ready foundation to ship property workflows faster and more reliably. Core functionality includes web APIs for domain entities, background task orchestration with Celery and Redis, and production-ready operations using Gunicorn with CI automation via GitHub Actions.
 
 ## Features
 
-<code>❯ REPLACE-ME</code>
+- API: Exposes RESTful endpoints for authentication, user profiles, and property workflows, wired via Django apps, URLs, and views.​
+- buyer_data: Ingests and validates buyer profiles, contact info, and preferences with serializers, signals, and loan calculation utilities.​
+- estate_data: Models and stores property listings with CRUD, geospatial helpers, and calculator utilities for search-ready data.​
+- seller_data: Manages seller accounts, subscriptions, and verification flows with serializers, admin integration, and utility decorators.​
+- common: Provides shared models, background tasks, OTP handling, storage backends, and structured logging for cross-module consistency.​
+- Operations: Runs background jobs with Celery + Redis, serves via Gunicorn, and automates CI with GitHub Actions.
 
 ---
 
@@ -148,15 +153,15 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/build.sh'>build.sh</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Deployment script for building and configuring the application server.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/manage.py'>manage.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Django CLI for running management commands and project tasks.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/requirements.txt'>requirements.txt</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Python package dependencies list for project installation and setup.</code></td>
 				</tr>
 			</table>
 		</blockquote>
@@ -182,7 +187,7 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/.github/workflows/django.yml'>django.yml</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>CI/CD workflow for automated testing and deployment automation.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -204,27 +209,27 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/api/admin.py'>admin.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Django admin panel configurations for API model management.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/api/apps.py'>apps.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Application configuration defining API app metadata and settings.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/api/models.py'>models.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Database models defining API data structures and relationships.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/api/tests.py'>tests.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Unit tests for validating API functionality and endpoints.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/api/urls.py'>urls.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>URL routing patterns mapping endpoints to API views.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/api/views.py'>views.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Request handlers implementing API business logic and responses.</code></td>
 				</tr>
 			</table>
 		</blockquote>
@@ -244,31 +249,31 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/admin.py'>admin.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Admin interface configurations for buyer profile and data management.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/apps.py'>apps.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>App configuration defining buyer_data module metadata and signals.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/models.py'>models.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Buyer profile, preferences, and contact information database models.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/serializer.py'>serializer.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>JSON serializers for buyer data validation and API responses.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/tests.py'>tests.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Test suite for buyer registration, validation, and profile workflows.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/urls.py'>urls.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>URL patterns routing buyer profile and preference endpoints.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/views.py'>views.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>View handlers for buyer registration, authentication, and CRUD operations.</code></td>
 				</tr>
 			</table>
 			<!-- migrations Submodule -->
@@ -286,15 +291,15 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/migrations/0001_initial.py'>0001_initial.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Initial database schema migration creating buyer data tables.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/migrations/0002_initial.py'>0002_initial.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Secondary migration adding buyer relationships and foreign key constraints.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/migrations/0003_alter_buyer_phone_number.py'>0003_alter_buyer_phone_number.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Schema update modifying buyer phone number field validation rules.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -314,11 +319,11 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/utils/loan_math.py'>loan_math.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Mathematical utilities for calculating EMI, interest, and loan eligibility.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/buyer_data/utils/signals.py'>signals.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Django signals for buyer profile creation and update events.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -340,35 +345,35 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/admin.py'>admin.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Admin configurations for shared models and cross-module utilities.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/apps.py'>apps.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Application configuration for common shared resources and middleware.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/models.py'>models.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Shared database models for OTP, logs, and base classes.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/serializer.py'>serializer.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Common serializers for standardized API responses and data validation.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/tasks.py'>tasks.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Celery background tasks for email, OTP, and async processing.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/tests.py'>tests.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Test cases for common utilities, tasks, and shared functionality.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/urls.py'>urls.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>URL routing for OTP verification and shared endpoint patterns.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/views.py'>views.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>View handlers for OTP generation, validation, and common operations.</code></td>
 				</tr>
 			</table>
 			<!-- migrations Submodule -->
@@ -386,7 +391,7 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/migrations/0001_initial.py'>0001_initial.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Initial migration creating OTP, logging, and shared utility tables.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -406,19 +411,19 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/utils/otp_handler.py'>otp_handler.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>OTP generation, validation, and expiration logic for authentication.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/utils/signals.py'>signals.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Django signals for logging, notifications, and cross-module event handling.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/utils/storage_backends.py'>storage_backends.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Custom storage backends for AWS S3 and media file management.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/common/utils/upload_logs.py'>upload_logs.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Logging utilities for tracking file uploads and storage operations.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -440,23 +445,23 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/dream_service/asgi.py'>asgi.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>ASGI application configuration for async server and websocket support.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/dream_service/celery.py'>celery.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Celery configuration defining broker, tasks, and background job settings.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/dream_service/settings.py'>settings.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Django settings for database, middleware, apps, and environment variables.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/dream_service/urls.py'>urls.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Root URL configuration routing all app endpoints and admin.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/dream_service/wsgi.py'>wsgi.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>WSGI application entry point for Gunicorn and production deployment.</code></td>
 				</tr>
 			</table>
 		</blockquote>
@@ -476,31 +481,31 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/admin.py'>admin.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Admin interface for property listings, images, and estate management.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/apps.py'>apps.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>App configuration defining estate_data module metadata and ready hooks.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/models.py'>models.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Property listing models with fields for location, price, and amenities.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/serializer.py'>serializer.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Serializers for property data validation, search, and API responses.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/tests.py'>tests.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Test suite for property CRUD operations and search functionality.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/urls.py'>urls.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>URL patterns for property listing, search, and detail endpoints.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/views.py'>views.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>View handlers for property creation, retrieval, filtering, and pagination.</code></td>
 				</tr>
 			</table>
 			<!-- migrations Submodule -->
@@ -518,7 +523,7 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/migrations/0001_initial.py'>0001_initial.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Initial migration creating property listing and related data tables.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -538,15 +543,15 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/utils/geo_utils.py'>geo_utils.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Geospatial utilities for distance calculation and location-based property search.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/utils/signals.py'>signals.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Django signals for property updates, indexing, and notification triggers.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/estate_data/utils/views_calculator.py'>views_calculator.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Calculator utilities for property views, popularity scoring, and analytics.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -568,31 +573,31 @@
 			</thead>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/admin.py'>admin.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Admin interface for seller accounts, verification, and subscription management.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/apps.py'>apps.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>App configuration defining seller_data module metadata and initialization logic.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/models.py'>models.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Seller profile, verification status, and subscription tier database models.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/serializer.py'>serializer.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Serializers for seller registration, verification, and profile data validation.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/tests.py'>tests.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>Test suite for seller onboarding, verification workflows, and subscriptions.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/urls.py'>urls.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>URL routing for seller registration, verification, and profile endpoints.</code></td>
 				</tr>
 				<tr style='border-bottom: 1px solid #eee;'>
 					<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/views.py'>views.py</a></b></td>
-					<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+					<td style='padding: 8px;'>View handlers for seller authentication, profile updates, and subscription management.</code></td>
 				</tr>
 			</table>
 			<!-- migrations Submodule -->
@@ -610,15 +615,15 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/migrations/0001_initial.py'>0001_initial.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Initial migration creating seller account and verification tables.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/migrations/0002_remove_sellerverification_aadhaar_card_and_more.py'>0002_remove_sellerverification_aadhaar_card_and_more.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Migration removing Aadhaar fields and updating verification document structure.</code></td>
 						</tr>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/migrations/0003_alter_seller_phone_number.py'>0003_alter_seller_phone_number.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Schema update modifying seller phone number field with validation.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -638,7 +643,7 @@
 					</thead>
 						<tr style='border-bottom: 1px solid #eee;'>
 							<td style='padding: 8px;'><b><a href='https://github.com/LordZeusIsBack/DREAMService/blob/main/seller_data/utils/subscription_decorator.py'>subscription_decorator.py</a></b></td>
-							<td style='padding: 8px;'>Code>❯ REPLACE-ME</code></td>
+							<td style='padding: 8px;'>Decorator utilities for enforcing subscription-based access control and feature gating.</code></td>
 						</tr>
 					</table>
 				</blockquote>
@@ -660,7 +665,7 @@ This project requires the following dependencies:
 
 ### Installation
 
-Build DREAMService from the source and intsall dependencies:
+Build DREAMService from the source and install dependencies:
 
 1. **Clone the repository:**
 
@@ -696,12 +701,12 @@ Run the project with:
 **Using [pip](https://pypi.org/project/pip/):**
 
 ```sh
-python {entrypoint}
+python manage.py runserver
 ```
 
 ### Testing
 
-Dreamservice uses the {**test_framework**} test framework. Run the test suite with:
+Dreamservice uses the pytest test framework. Run the test suite with:
 
 **Using [pip](https://pypi.org/project/pip/):**
 
@@ -720,7 +725,7 @@ pytest
 <details closed>
 <summary>Contributing Guidelines</summary>
 
-1. **Fork the Repository**: Start by forking the project repository to your github account.
+1. **Fork the Repository**: Start by forking the project repository to your GitHub account.
 2. **Clone Locally**: Clone the forked repository to your local machine using a git client.
    ```sh
    git clone https://github.com/LordZeusIsBack/DREAMService
@@ -734,7 +739,7 @@ pytest
    ```sh
    git commit -m 'Implemented new feature x.'
    ```
-6. **Push to github**: Push the changes to your forked repository.
+6. **Push to GitHub**: Push the changes to your forked repository.
    ```sh
    git push origin new-feature-x
    ```
